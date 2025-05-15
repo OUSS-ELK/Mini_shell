@@ -1,6 +1,5 @@
 NAME = minishell
 FLAGS =  -lreadline
-
 SRC = main.c
 
 all: $(NAME)
