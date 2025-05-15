@@ -33,7 +33,7 @@ int main(void)
     char *input;
 
     atexit(ll);
-    while (1)
+    while (1)                                       //filtring line to tokenize it (token split the read line by ' ' or '&' or '|' or '') 
     {
         input = readline("[minishell]$ ");
         if (input)
@@ -43,11 +43,16 @@ int main(void)
                 free(input);
                 return (1);
             }
+            if (f_strlen(input) > 0)
+            {
+                add_history(input);
+                // write_history("history");
+                // read_history("history2");
+                // printf("add_history\n");
+            }
             printf("%s\n", input);
             free(input);
         }
-        else if (f_strlen(input) > 0)
-            add_history(input);
         else
             exit(1);
     }

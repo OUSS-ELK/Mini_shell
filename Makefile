@@ -1,5 +1,5 @@
 NAME = minishell
-FLAGS =  -lreadline
+FLAGS =  -lreadline -lhistory -lncurses
 SRC = main.c
 
 all: $(NAME)
