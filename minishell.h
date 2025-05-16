@@ -8,4 +8,11 @@
 # include <readline/history.h>
 
 
+typedef struct s_token
+{
+	char			*token;
+	int				token_type;
+	struct s_token	*next;
+} t_token;
+
 #endif
