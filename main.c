@@ -14,24 +14,41 @@ int f_strlen(char *s)
 
 int f_isspace(char *s)
 {
-	while (*s)
-	{
-		if (*s == ' ' || (*s >= 9 && *s <= 13))
-			return (0);
-		s++;
-	}
+    if (s)
+    {
+	    while (*s)
+	    {
+		    if (*s == ' ' || (*s >= 9 && *s <= 13))
+			    return (0);
+		    s++;
+	    }
+    }
 	return (1);
 }
 
-char	*filtred_input(char *input)
+char	*filtring_input(char *input)                // not finished
 {
 	char	*new_input;
+    int     i;
+    int     len;
 
-	
+    len = f_strlen(input);
+    new_input = malloc(len + 1);
+    if (!new_input)
+        return (NULL);
+    strncpy(new_input, input, len + 1);
+    i = 0;
+    while (new_input[i])
+    {
+        if (new_input[i] && f_isspace(new_input[i]))
+            i++;
+        if (is_quots(new_input[i]))                // to be implement
+        
+    }
 	return (new_input);
 }
 
-int lexer_function(t_token  **token, char *input)
+int lexer_function(t_token  **token, char *input) // not finished
 {
 	char    *filtred;
 	int     count;
@@ -40,11 +57,11 @@ int lexer_function(t_token  **token, char *input)
 	if (!token || !input || !*input)
 		return (0);
 	// cat abc
-	filtred = filtring_input(input);   // to check in input for error
+	filtred = filtring_input(input);            // to check input for error and align it
 	if (!filtred)
 		return (0);
-	count = count_word(input);         // count word in input
-	add_token(*token, count);          // add Node to struct
+	count = count_word(filtred);                // count word in input
+	add_token(*token, count);                   // add Node to struct
 	return (1);
 }
 
@@ -60,6 +77,9 @@ int main(void)
 	t_token *token;
 
 	// atexit(ll);
+    // t_token_type    a = WORD, b = HEREDOC, c = APPEND;
+    // printf("%d %d %d\n", a, b, c);
+    // printf("size of enum [%lu]\n", sizeof(a));
 	while (1)
 	{
 		input = readline("[minishell]$> ");
@@ -70,7 +90,7 @@ int main(void)
 				free(input);
 				return (1);
 			}
-			if (f_strlen(input) > 0)
+			if (input[0])
 			{
 				add_history(input);
 				write_history("history");
