@@ -26,7 +26,7 @@ int f_isspace(char *s)
 	return (1);
 }
 
-char	*filtring_input(char *input)                // not finished
+char	*lexer_input(char *input)                // not finished
 {
 	char	*new_input;
     int     i;
@@ -43,12 +43,14 @@ char	*filtring_input(char *input)                // not finished
         if (new_input[i] && f_isspace(new_input[i]))
             i++;
         if (is_quots(new_input[i]))                // to be implement
-        
+			i += inside_quotes(new_input[i]);
+		if (new_input[i] == '\0')
+			break;
     }
 	return (new_input);
 }
 
-int lexer_function(t_token  **token, char *input) // not finished
+int parsing_function(t_token  **token, char *input) // not finished
 {
 	char    *filtred;
 	int     count;
@@ -57,7 +59,7 @@ int lexer_function(t_token  **token, char *input) // not finished
 	if (!token || !input || !*input)
 		return (0);
 	// cat abc
-	filtred = filtring_input(input);            // to check input for error and align it
+	filtred = lexer_input(input);            // to check input for error and align it
 	if (!filtred)
 		return (0);
 	count = count_word(filtred);                // count word in input
@@ -76,6 +78,7 @@ int main(void)
 	char    *input;
 	t_token *token;
 
+	token = NULL;
 	// atexit(ll);
     // t_token_type    a = WORD, b = HEREDOC, c = APPEND;
     // printf("%d %d %d\n", a, b, c);
@@ -97,7 +100,7 @@ int main(void)
 				// printf("add_history\n");
 			}
 			printf("input reading by readline [%s]\n", input);
-			if (lexer_function(&token, input) == 1)
+			if (parsing_function(&token, input) == 1)
 			{
 				write_error(1);         // function to return error depends on num
 				free_tokens(token);     // function to free the linked list from tokens
