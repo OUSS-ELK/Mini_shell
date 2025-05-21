@@ -1,4 +1,2 @@
-_HiStOrY_V2_
-echo\040"cat\040abc"
-echo\040"cat\040abc"
-echo\040"cat\040abc"\040"
+ls
+cat "abc"

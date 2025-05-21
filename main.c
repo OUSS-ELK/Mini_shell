@@ -80,33 +80,63 @@ int	inside_quote(char *input, int start)
 	return (-1);								// no match
 }
 
-
-int	lexer_input(char *input)                // not finished
+int	is_operator(char oper, char next, t_token_type type)
 {
+	if (oper == '|')
+		return (type = PIPE);
+	else if (oper == '>' && next != '>')
+		return (type = REDIR_OUT);
+	else if (oper == '<' && next == '<')
+		return (type = HEREDOC);
+	else if (oper == '>' && next == '>')
+		return (type = APPEND);
+	else if (oper == '<' && next != '<')
+		return (type = REDIR_IN);
+	else
+		return (0);
+}
+
+int	lexer_input(t_token *token, char *input)                // not finished
+{
+	t_token_type	type;
+	int	oper;
     int	i;
+    int	start;
+	// skip space
 	// checking closed quotes
-	// inside quots ("hello world") => one word
 	// "word  > ("") not closed error.
+	// inside quots ("hello world") => one word
     i = 0;
    
     while (input[i])
     {
-		// printf("(inside lexer) input = [%c]\n", input[i]);
+		printf("(inside lexer) input = [%c]\n", input[i]);
         if (input[i] && f_isspace(input[i]))		// skip white space if not quote
             i++;
-        else if (is_quote(input[i]))			// handle quotes errors
+        else if (is_quote(input[i]))				// handle quotes errors
 		{
-			// printf(" when found quote [i= %d]\n", i);
+			start = i;
+			printf(" when found quote [i = %d] | [start = %d]\n", i, start);
 			i = inside_quote(input, i);
-			// printf(" after quote [i = %d]\n", i);
+			printf(" after quote [i = %d]\n", i);
 			if (i == -1)
 				return (0);
+			add_token(token, f_substring(input, start, i - start), WORD);
+		}
+		else if ((oper = is_operator(input[i], input[i + 1], type)) > 0)
+		{
+			if (oper == 5)
+				add_token(token, f_substring(input, i, 2), APPEND);
+			else if (oper == 6)
+				add_token(token, f_substring(input, i, 2), HEREDOC);
+			else if (oper == 2)
+				add_token(token, f_substring(input, i, 2), PIPE);
+			
 		}
 		else
 			i++;
     }
-	// printf("Extracted token: [%.*s]\n", i , &input[i]);
-	// return all (words, quoted_string, symbols) separated.
+	// return all (words, quoted_string, operator) separated.
 	return (1);
 }
 
@@ -117,7 +147,7 @@ int parsing_function(t_token  **token, char *input)			// not finished
 	if (!token || !input || !*input)
 		return (0);
 
-	if (!lexer_input(input))            		// to check input for error and align it
+	if (!lexer_input(*token, input))            		// to check input for error and align it
 	{
 		printf("lexer_error\n");
 		return (0);
