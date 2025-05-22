@@ -1,2 +1,6 @@
-ls
-cat "abc"
+echo "abc
+echo 'abc'
+echo "'"
+echo "'"
+echo '"'
+echo '''

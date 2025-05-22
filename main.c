@@ -51,19 +51,19 @@ int f_isspace(char c)
 
 int	is_quote(char quote)
 {
-	if (quote == '\'' || quote == '\"')
+	if (quote == '\'' || quote == '"')
 		return (1);
 	return (0);
 }
 
 // find the closing quote & return index after it
-int	inside_quote(char *input, int start)
+int	inside_quote(char *input, int start, t_token *token)
 {
 	char	quote;
 	int		q;
 
 	q = 0;
-	quote = input[start];						// save the opening cote
+	quote = input[start];							// save the opening cote
 	start++;
 	// printf("(inside quote) input = [%c]\n", input[start]);
 	while (input[start])
@@ -77,68 +77,69 @@ int	inside_quote(char *input, int start)
 		}
 		start++;
 	}
-	return (-1);								// no match
+	return (-1);									// no match
 }
 
-int	is_operator(char oper, char next, t_token_type type)
+int	is_operator(char oper)
 {
-	if (oper == '|')
-		return (type = PIPE);
-	else if (oper == '>' && next != '>')
-		return (type = REDIR_OUT);
-	else if (oper == '<' && next == '<')
-		return (type = HEREDOC);
-	else if (oper == '>' && next == '>')
-		return (type = APPEND);
-	else if (oper == '<' && next != '<')
-		return (type = REDIR_IN);
-	else
-		return (0);
+	return (oper == '|' || oper == '>' || oper == '<');
 }
 
-int	lexer_input(t_token *token, char *input)                // not finished
+int	check_operator(char *input, int i, t_token **token)
 {
 	t_token_type	type;
-	int	oper;
+
+	if (input[i] == '>' && input[i + 1] == '>')
+		type = APPEND;
+	else if (input[i] == '<' && input[i + 1] == '<')
+		type = HEREDOC;
+	else if (input[i] == '>')
+		type = REDIR_OUT;
+	else if (input[i] == '<')
+		type = REDIR_IN;
+	else if (input[i] == '|')
+		type = PIPE;
+	else
+		return (i);
+	if (type == APPEND || type == HEREDOC)
+	{
+		add_token(token, f_substring(input, i, 2), type);
+		return (i + 2);
+	}
+	add_token(token, f_substring(input, i, 1), type);
+	return (i + 1);
+
+int	lexer_input(t_token *token, char *input)         // not finished
+{
+	t_token_type	type;
     int	i;
-    int	start;
+	
 	// skip space
 	// checking closed quotes
 	// "word  > ("") not closed error.
 	// inside quots ("hello world") => one word
     i = 0;
-   
     while (input[i])
     {
-		printf("(inside lexer) input = [%c]\n", input[i]);
+		// printf("(inside lexer) input = [%c]\n", input[i]);
         if (input[i] && f_isspace(input[i]))		// skip white space if not quote
             i++;
         else if (is_quote(input[i]))				// handle quotes errors
 		{
-			start = i;
-			printf(" when found quote [i = %d] | [start = %d]\n", i, start);
-			i = inside_quote(input, i);
-			printf(" after quote [i = %d]\n", i);
+			// printf(" when found quote [i = %d] | [start = %d]\n", i, start);
+			i = inside_quote(input, i, token);
+			// printf(" after quote [i = %d]\n", i);
 			if (i == -1)
 				return (0);
-			add_token(token, f_substring(input, start, i - start), WORD);
 		}
-		else if ((oper = is_operator(input[i], input[i + 1], type)) > 0)
-		{
-			if (oper == 5)
-				add_token(token, f_substring(input, i, 2), APPEND);
-			else if (oper == 6)
-				add_token(token, f_substring(input, i, 2), HEREDOC);
-			else if (oper == 2)
-				add_token(token, f_substring(input, i, 2), PIPE);
-			
-		}
-		else
-			i++;
+		else if (is_operator(input[i]))
+			i = check_operator(input, i, token);
+		else 
+			i = find_word(input, i, token);
     }
-	// return all (words, quoted_string, operator) separated.
 	return (1);
 }
+
 
 int parsing_function(t_token  **token, char *input)			// not finished
 {
@@ -147,13 +148,11 @@ int parsing_function(t_token  **token, char *input)			// not finished
 	if (!token || !input || !*input)
 		return (0);
 
-	if (!lexer_input(*token, input))            		// to check input for error and align it
+	if (!lexer_input(*token, input))            		// check input for error 
 	{
 		printf("lexer_error\n");
 		return (0);
 	}
-	// // count = count_word(filtred);                // count word in input
-	// add_token(*token, count);                   // add Node to struct
 	return (1);
 }
 
