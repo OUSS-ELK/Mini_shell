@@ -1,20 +1,34 @@
 #include "minishell.h"
 
+int find_word(char *input, int start, t_token **token)
+{
+    int last;
+
+    last = start;
+    while (input[last] && is_word_start(input[last]))
+        last++;
+    if (last > start)
+        add_token(token, f_substring(input, start, last - start), WORD);
+    return (last);
+}
+
 // find the closing quote & return index after it
-int	inside_quote(char *input, int start, t_token *token)
+int	inside_quote(char *input, int start, t_token **token)
 {
 	char	quote;
 	int		i;
+
+	// printf("(inside quote function) input = [%c]\n", input[start]);
 	quote = input[start];							// save the opening cote
-	i = start + 1; 
-	printf("(inside quote) input = [%c]\n", input[start]);
-	while (input[start])
+	i = start + 1;
+	// printf("(i = [%d]\n", i);
+	while (input[i])
 	{
-	printf("(while) input = [%c]\n", input[start]);
-		if (input[start] == quote)			// found match closing quote
+	    // printf("(while) input = [%c]\n", input[start]);
+		if (input[i] == quote)			// found match closing quote
 		{
-			// add_token(token, f_substring(input, start, i - start + 1), WORD);
-			printf("(found match [quote = %c] == [input[%c]]\n", quote, input[start]);
+			add_token(*token, f_substring(input, start, i - start + 1), WORD);
+			// printf("(found match [quote = %c] == [input[%c]]\n", quote, input[start]);
 			return (i + 1);
 		}
 		i++;
@@ -72,10 +86,10 @@ int	check_operator(char *input, int i, t_token *token)
 		return (i);
 	if (type == APPEND || type == HEREDOC)
 	{
-		printf("append or heredoc\n");
-		add_token(token, f_substring(input, i, 2), type);
+		// printf("append or heredoc\n");
+		add_token(&token, f_substring(input, i, 2), type);
 		return (i + 2);
 	}
-	add_token(token, f_substring(input, i, 1), type);
+	add_token(&token, f_substring(input, i, 1), type);
 	return (i + 1);
 }

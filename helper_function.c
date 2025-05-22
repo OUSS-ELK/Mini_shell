@@ -40,10 +40,13 @@ int f_isspace(char c)
 }
 
 int	is_quote(char quote)
-{
-	if (quote == '\'' || quote == '"')
+ {	
+	// printf("is quote [%c]\n", quote);
+	if (quote == '\"' || quote == '\'')
 		return (1);
-	return (0);
+	else
+		return 0;
+	// return (quote == '\'' || quote == '"');
 }
 
 int	is_operator(char oper)
@@ -51,6 +54,10 @@ int	is_operator(char oper)
 	return (oper == '|' || oper == '>' || oper == '<');
 }
 
+int	is_word_start(char c)
+{
+	return (!f_isspace(c) && !is_operator(c) && !is_quote(c));
+}
 
 char    *f_substring(char *s, int start, int len)
 {
@@ -59,12 +66,8 @@ char    *f_substring(char *s, int start, int len)
 	int     i;
 
 	s_len = f_strlen(s);
-	if (start >= s_len || len == 0)
+	if (start || start >= s_len || len <= 0)
 		return (NULL);
-	s = s + start;
-	s_len = f_strlen(s);
-	if (s_len > len)
-		s_len = len;
 	str = malloc(s_len + 1);
 	if (!str)
 		return (NULL);
