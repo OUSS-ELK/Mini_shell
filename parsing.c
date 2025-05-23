@@ -27,7 +27,7 @@ int	inside_quote(char *input, int start, t_token **token)
 	    // printf("(while) input = [%c]\n", input[start]);
 		if (input[i] == quote)			// found match closing quote
 		{
-			add_token(*token, f_substring(input, start, i - start + 1), WORD);
+			add_token(token, f_substring(input, start, i - start + 1), WORD);
 			// printf("(found match [quote = %c] == [input[%c]]\n", quote, input[start]);
 			return (i + 1);
 		}
@@ -68,7 +68,7 @@ void	add_token(t_token **token, char *input, t_token_type type)
 	tmp->next = new;
 }
 
-int	check_operator(char *input, int i, t_token *token)
+int	check_operator(char *input, int i, t_token **token)
 {
 	t_token_type	type;
 
@@ -83,13 +83,13 @@ int	check_operator(char *input, int i, t_token *token)
 	else if (input[i] == '|')
 		type = PIPE;
 	else
-		return (i);
+		type = 0;
 	if (type == APPEND || type == HEREDOC)
 	{
 		// printf("append or heredoc\n");
-		add_token(&token, f_substring(input, i, 2), type);
+		add_token(token, f_substring(input, i, 2), type);
 		return (i + 2);
 	}
-	add_token(&token, f_substring(input, i, 1), type);
+	add_token(token, f_substring(input, i, 1), type);
 	return (i + 1);
 }

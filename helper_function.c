@@ -66,14 +66,23 @@ char    *f_substring(char *s, int start, int len)
 	int     i;
 
 	s_len = f_strlen(s);
-	if (start || start >= s_len || len <= 0)
+	if (start >= s_len || len <= 0)
 		return (NULL);
 	str = malloc(s_len + 1);
 	if (!str)
 		return (NULL);
 	i = 0;
-	while (s[start] && i < len)
+	while (i < len && s[start + i])
 		str[i++] = s[start++];
 	str[i] = '\0';
 	return (str);
+}
+
+void	print_tokens(t_token *token)
+{
+	while (token)
+	{
+		printf("token [%s] | type [%d]\n", token->token, token->type);
+		token = token->next;
+	}
 }
