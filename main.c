@@ -17,7 +17,7 @@ int	lexer_input(t_token **token, char *input)
         else if (is_quote(input[i]))						// handle quotes errors
 		{
 			printf(" when found quote [i = %d]\n", i);
-			i = inside_quote(input, i, &token);
+			i = inside_quote(input, i, token);
 			printf(" after quote [i = %d]\n", i);
 			if (i == -1)
 				return (0);

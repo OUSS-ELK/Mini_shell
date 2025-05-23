@@ -8,12 +8,14 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
-
-
-
 typedef enum s_token_type
 {
-	WORD = 1, PIPE, REDIR_IN, REDIR_OUT, APPEND, HEREDOC
+	WORD = 1,
+	PIPE,
+	REDIR_IN,
+	REDIR_OUT,
+	APPEND,
+	HEREDOC
 } t_token_type;
 
 typedef struct s_token
