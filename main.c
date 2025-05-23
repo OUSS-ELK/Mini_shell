@@ -12,13 +12,13 @@ int	lexer_input(t_token **token, char *input)
 	// printf("(inside lexer) input = [%c]\n", input[i]);
     while (input[i])
     {
-        if (f_isspace(input[i]))				// skip white space
+        if (f_isspace(input[i]))												// skip white space
             i++;
         else if (is_quote(input[i]))											// handle quotes errors
 		{
-			// printf(" when found quote [i = %d]\n", i);
+			printf(" when found quote [i = %d]\n", i);
 			i = inside_quote(input, i, token);
-			// printf(" after quote [i = %d]\n", i);
+			printf(" after quote [i = %d]\n", i);
 			if (i == -1)
 				return (0);
 		}
@@ -49,7 +49,7 @@ int parsing_function(t_token  **token, char *input)							// not finished
 //     system("leaks -q minishell");
 // }
 
-int main(void)
+int main(void)   // implement in args for third param (env)
 {
 	char    *input;
 	t_token *token;
@@ -74,8 +74,8 @@ int main(void)
 			printf("input reading by readline [%s]\n", input);
 			if (parsing_function(&token, input) == 0)
 			{
-				write_error(1);         						// function to return error depends on num
 				free_tokens(token);     						// function to free the linked list from tokens
+				write_error(1);         						// function to return error depends on num
 			}
 			free_tokens(token);
 			free(input);

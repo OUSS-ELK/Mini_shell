@@ -18,19 +18,20 @@ int	inside_quote(char *input, int start, t_token **token)
 	char	quote;
 	int		i;
 
-	// printf("(inside quote function) input = [%c]\n", input[start]);
-	quote = input[start];							// save the opening cote
+	printf("(inside quote function) input = [%c]\n", input[start]);
+	quote = input[start];									// save the opening cote
 	i = start + 1;
-	// printf("(i = [%d]\n", i);
+	printf("(i = [%d]\n", i);
 	while (input[i])
 	{
-	    // printf("(while) input = [%c]\n", input[start]);
-		if (input[i] == quote)			// found match closing quote
+	    printf("(while) input = [%c]\n", input[i]);
+		if (input[i] == quote)								// found match closing quote
 		{
-			add_token(token, f_substring(input, start, i - start + 1), WORD);
-			// printf("(found match [quote = %c] == [input[%c]]\n", quote, input[start]);
+			printf("(found match [quote = %c] == [input[%c]]\n", quote, input[i]);
+			add_token(token, f_substring(input, start + 1, i - start - 1), WORD);
 			return (i + 1);
 		}
+		printf("(No match [quote = %c] == [input[%c]]\n", quote, input[i]);
 		i++;
 	}
 	return (-1);									// no match

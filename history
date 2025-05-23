@@ -1,6 +1,3 @@
 _HiStOrY_V2_
-ls
-cat
-ls\040"echo"
-ls\040"echo"\040print
-ls\040"echo"\040print\040'ols'
+cat\040echo\040ls\040"acdf"
+cat\040echo\040ls\040"acdf"\040>\040<\040>>\040<<\040|
