@@ -49,11 +49,14 @@ int parsing_function(t_token  **token, char *input)							// not finished
 //     system("leaks -q minishell");
 // }
 
-int main(void)   // implement in args for third param (env)
+int main(int argc, char **argv, char **env)   // implement in args for third param (env)
 {
 	char    *input;
 	t_token *token;
 
+	(void)argc;
+	(void)argv;
+	(void)env;
 	// atexit(ll);
 	token = NULL;
 	while (1)

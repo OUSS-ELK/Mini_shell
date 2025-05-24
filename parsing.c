@@ -22,6 +22,11 @@ int	inside_quote(char *input, int start, t_token **token)
 	quote = input[start];									// save the opening cote
 	i = start + 1;
 	printf("(i = [%d]\n", i);
+	if (input[i] == '"' || input[i] == '\'')
+	{
+		add_token(token, "\0", WORD);
+		return (i + 1);
+	}
 	while (input[i])
 	{
 	    printf("(while) input = [%c]\n", input[i]);
@@ -34,7 +39,7 @@ int	inside_quote(char *input, int start, t_token **token)
 		printf("(No match [quote = %c] == [input[%c]]\n", quote, input[i]);
 		i++;
 	}
-	return (-1);									// no match
+	return (-1);											// no match
 }
 
 t_token	*create_token(char *input, t_token_type type)

@@ -40,7 +40,7 @@ typedef struct s_redir
 {
 	char			*filename;
 	t_token_type	type;
-	int				fd;
+	int				fd[2];
 	struct s_redir	*next;
 } t_redir;
 

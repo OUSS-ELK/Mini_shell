@@ -66,10 +66,8 @@ char    *f_substring(char *s, int start, int len)
 	int     i;
 
 	s_len = f_strlen(s);
-	printf("(inside substring len = %d | start[%d]\n", s_len, start);
 	if (start >= s_len || len <= 0)
 	{
-		printf("(start[%d] >= s_len[%d]|| len <= 0\n", start, s_len);
 		return (NULL);
 	}
 	str = malloc(s_len + 1);
@@ -78,7 +76,6 @@ char    *f_substring(char *s, int start, int len)
 	i = 0;
 	while (i < len && s[start + i])
 	{
-		printf("inside while str[%c] | s[%c]\n", str[i], s[start+i]);
 		str[i] = s[start + i];
 		i++;
 	}

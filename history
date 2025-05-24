@@ -1,3 +1,3 @@
-_HiStOrY_V2_
-cat\040echo\040ls\040"acdf"
-cat\040echo\040ls\040"acdf"\040>\040<\040>>\040<<\040|
+cat ""
+cat "" ''
+cat "" '' <7
