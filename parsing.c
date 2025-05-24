@@ -4,7 +4,7 @@ int find_word(char *input, int start, t_token **token)
 {
     int last;
 
-    last = start;
+    last = start;        
     while (input[last] && is_word_start(input[last]))
         last++;
     if (last > start)
@@ -12,34 +12,31 @@ int find_word(char *input, int start, t_token **token)
     return (last);
 }
 
+
 // find the closing quote & return index after it
-int	inside_quote(char *input, int start, t_token **token)
+int	inside_quote(char *input, int start, char **output)
 {
 	char	quote;
 	int		i;
 
-	printf("(inside quote function) input = [%c]\n", input[start]);
+	// printf("(inside quote function) input = [%c]\n", input[start]);
 	quote = input[start];									// save the opening cote
 	i = start + 1;
-	printf("(i = [%d]\n", i);
-	if (input[i] == '"' || input[i] == '\'')
-	{
-		add_token(token, "\0", WORD);
-		return (i + 1);
-	}
-	while (input[i])
-	{
-	    printf("(while) input = [%c]\n", input[i]);
-		if (input[i] == quote)								// found match closing quote
-		{
-			printf("(found match [quote = %c] == [input[%c]]\n", quote, input[i]);
-			add_token(token, f_substring(input, start + 1, i - start - 1), WORD);
-			return (i + 1);
-		}
-		printf("(No match [quote = %c] == [input[%c]]\n", quote, input[i]);
+	// printf("(i = [%d]\n", i);
+	// if ((input[i] == '"' || input[i] == '\'') && (input[i + 1] != '"' || input[i + 1] == '\''))
+	// {
+	// 	printf("( [input[i] = %c] && [input{i + 1}[%c]]\n", input[i], input[i + 1]);
+	// 	add_token(token, "\0", WORD);
+	// 	return (i + 1);
+	// }
+	while (input[i] && input[i] != quote)
 		i++;
-	}
-	return (-1);											// no match
+	if (!input[i])
+		return (-1);
+	*output = f_substring(input, start + 1, i - start - 1);
+	if (!*output)
+		return (-1);
+	return (i + 1);
 }
 
 t_token	*create_token(char *input, t_token_type type)
@@ -72,6 +69,7 @@ void	add_token(t_token **token, char *input, t_token_type type)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
+	printf("add_token\n");
 }
 
 int	check_operator(char *input, int i, t_token **token)

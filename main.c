@@ -2,30 +2,51 @@
 
 int	lexer_input(t_token **token, char *input)
 {
-    int	i;
+    int		i;
+    int		start;
+	char	*join;
+	char	*part;
 	
-	// skip space
-	// checking closed quotes
-	// "word  > ("") not closed error.
-	// inside quots ("hello world") => one word
     i = 0;
-	// printf("(inside lexer) input = [%c]\n", input[i]);
+	// test cases :
+	// echo "'Hello'" => [Hello]  
+	printf(GREEN "(inside lexer) "RESET "input = [%c]\n", input[i]);
     while (input[i])
     {
-        if (f_isspace(input[i]))												// skip white space
+		printf(" (while) \n");
+		join = NULL;
+        if (f_isspace(input[i]))
             i++;
-        else if (is_quote(input[i]))											// handle quotes errors
+        // should handle mixed quote
+		while (is_quote(input[i]))											// handle quotes errors
 		{
 			printf(" when found quote [i = %d]\n", i);
-			i = inside_quote(input, i, token);
-			printf(" after quote [i = %d]\n", i);
+			i = inside_quote(input, i, &part);
+			// printf(" after quote [i = %d]\n", i);
 			if (i == -1)
 				return (0);
+			join = f_strjoin(join, part);
 		}
-		else if (is_operator(input[i]))
+		if (is_word_start(input[i]))
+		{
+
+			start = i;
+			while (is_word_start(input[i]))
+				i++;
+			part = f_substring(input, start, i - start);
+			join = f_strjoin(join, part);
+			// i += f_strlen(join);
+		}
+		if (join)
+		{
+			printf("join\n");
+			add_token(token, join, WORD);
+			i += f_strlen(join);
+		}
+		if (is_operator(input[i]))
 			i = check_operator(input, i, token);
-		else
-			i = find_word(input, i, token);
+		// else
+		// 	i = find_word(input, i, token);
     }
 	print_tokens(*token);
 	return (1);
@@ -49,7 +70,7 @@ int parsing_function(t_token  **token, char *input)							// not finished
 //     system("leaks -q minishell");
 // }
 
-int main(int argc, char **argv, char **env)   // implement in args for third param (env)
+int main(int argc, char **argv, char **env)   								// implement in args for third param (env)
 {
 	char    *input;
 	t_token *token;
@@ -77,8 +98,8 @@ int main(int argc, char **argv, char **env)   // implement in args for third par
 			printf("input reading by readline [%s]\n", input);
 			if (parsing_function(&token, input) == 0)
 			{
-				free_tokens(token);     						// function to free the linked list from tokens
-				write_error(1);         						// function to return error depends on num
+				free_tokens(token);     									// function to free the linked list from tokens
+				write_error(1);         									// function to return error depends on num
 			}
 			free_tokens(token);
 			free(input);

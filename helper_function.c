@@ -91,3 +91,52 @@ void	print_tokens(t_token *token)
 		token = token->next;
 	}
 }
+
+char	*f_strdup(char *s)
+{
+	int	i = 0;
+
+	while (s[i])
+		i++;
+	char	*str = malloc(i + 1);
+	if (!str)
+		return NULL;
+	i = 0;
+	while (s[i])
+	{
+		str[i] = s[i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
+}
+
+char	*f_strjoin(char *s1, char *s2)
+{
+	char	*joined;
+	int		len;
+	int		i = 0;
+	int		x = 0;
+
+	if (!s1 && !s2)
+		return (NULL);
+	if (!s1)
+		return (f_strdup(s2));
+	if (!s2)
+		return (f_strdup(s1));
+	len = f_strlen(s1) + f_strlen(s2);
+	joined = malloc(len + 1);
+	if (!joined)
+		return (NULL);
+	joined[len] = '\0';
+	while (s1[i])
+	{
+		joined[i] = s1[i];
+		i++;
+	}
+	while (s1[i])
+		joined[i++] = s2[x++];
+	free(s1);
+	free(s2);
+	return (joined);
+}
