@@ -19,7 +19,7 @@ void	free_tokens(t_token *token)
 		tmp = token->next;
 		if (token->token)
 			free(token->token);
-		// free(token);
+		free(token);
 		token = tmp;
 	}
 }
@@ -43,12 +43,7 @@ int f_isspace(char c)
 
 int	is_quote(char quote)
  {	
-	// printf("is quote [%c]\n", quote);
-	if (quote == '\"' || quote == '\'')
-		return (1);
-	else
-		return 0;
-	// return (quote == '\'' || quote == '"');
+	return (quote == '\'' || quote == '"');
 }
 
 int	is_operator(char oper)
@@ -68,7 +63,7 @@ char    *f_substring(char *s, int start, int len)
 	int     i;
 
 	s_len = f_strlen(s);
-	if (start >= s_len || len <= 0)
+	if (start >= s_len || len < 0)
 	{
 		return (NULL);
 	}
@@ -89,7 +84,7 @@ void	print_tokens(t_token *token)
 {
 	while (token)
 	{
-		printf(WHITE"token [%s] | type [%d]\n" RESET, token->token, token->type);
+		printf(BLUE"token [%s] | type [%d]\n" RESET, token->token, token->type);
 		token = token->next;
 	}
 }
@@ -139,6 +134,6 @@ char	*f_strjoin(char *s1, char *s2)
 	while (s2[i])
 		joined[i++] = s2[x++];
 	free(s1);
-	free(s2);
+	// free(s2);
 	return (joined);
 }

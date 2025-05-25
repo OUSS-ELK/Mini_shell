@@ -19,35 +19,29 @@ int	inside_quote(char *input, int start, char **output)
 	char	quote;
 	int		i;
 
-	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
+	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
 	quote = input[start];									// save the opening cote
 	i = start + 1;
-	printf(YELLOW "(i = [%d]\n"RESET, i);
-	// if ((input[i] == '"' || input[i] == '\'') && (input[i + 1] != '"' || input[i + 1] == '\''))
-	// {
-	// 	printf("( [input[i] = %c] && [input{i + 1}[%c]]\n", input[i], input[i + 1]);
-	// 	add_token(token, "\0", WORD);
-	// 	return (i + 1);
-	// }
+	// printf(YELLOW "(i = [%d]\n"RESET, i);
 	while (input[i] && input[i] != quote)
 		i++;
 	if (!input[i])
 		return (-1);
 	*output = f_substring(input, start + 1, i - start - 1);
-	printf("output[%s]\n", *output);
+	// printf("output[%s]\n", *output);
 	if (!*output)
 		return (-1);
 	return (i + 1);
 }
 
-t_token	*create_token(char *input, t_token_type type)
+t_token	*creat_token(char *input, t_token_type type)
 {
 	t_token	*new;
 
 	new = malloc(sizeof(t_token));
 	if (!new)
 		return (NULL);
-	new->token = input;
+	new->token = f_strdup(input);
 	new->type = type;
 	new->next = NULL;
 	return (new);
@@ -58,7 +52,7 @@ void	add_token(t_token **token, char *input, t_token_type type)
 	t_token	*new;
 	t_token	*tmp;
 
-	new = create_token(input, type);
+	new = creat_token(input, type);
 	if (!new)
 		return ;
 	if (*token == NULL)

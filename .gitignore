@@ -2,3 +2,4 @@ minishell
 *.o
 .vscode
 .DS_Store
+history
