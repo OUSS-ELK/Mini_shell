@@ -17,7 +17,9 @@ void	free_tokens(t_token *token)
 	while (token)
 	{
 		tmp = token->next;
-		free(token);
+		if (token->token)
+			free(token->token);
+		// free(token);
 		token = tmp;
 	}
 }
@@ -70,7 +72,7 @@ char    *f_substring(char *s, int start, int len)
 	{
 		return (NULL);
 	}
-	str = malloc(s_len + 1);
+	str = malloc(len + 1);
 	if (!str)
 		return (NULL);
 	i = 0;
@@ -87,7 +89,7 @@ void	print_tokens(t_token *token)
 {
 	while (token)
 	{
-		printf("token [%s] | type [%d]\n", token->token, token->type);
+		printf(WHITE"token [%s] | type [%d]\n" RESET, token->token, token->type);
 		token = token->next;
 	}
 }
@@ -134,7 +136,7 @@ char	*f_strjoin(char *s1, char *s2)
 		joined[i] = s1[i];
 		i++;
 	}
-	while (s1[i])
+	while (s2[i])
 		joined[i++] = s2[x++];
 	free(s1);
 	free(s2);

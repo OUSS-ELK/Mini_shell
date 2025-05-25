@@ -19,10 +19,10 @@ int	inside_quote(char *input, int start, char **output)
 	char	quote;
 	int		i;
 
-	// printf("(inside quote function) input = [%c]\n", input[start]);
+	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
 	quote = input[start];									// save the opening cote
 	i = start + 1;
-	// printf("(i = [%d]\n", i);
+	printf(YELLOW "(i = [%d]\n"RESET, i);
 	// if ((input[i] == '"' || input[i] == '\'') && (input[i + 1] != '"' || input[i + 1] == '\''))
 	// {
 	// 	printf("( [input[i] = %c] && [input{i + 1}[%c]]\n", input[i], input[i + 1]);
@@ -34,6 +34,7 @@ int	inside_quote(char *input, int start, char **output)
 	if (!input[i])
 		return (-1);
 	*output = f_substring(input, start + 1, i - start - 1);
+	printf("output[%s]\n", *output);
 	if (!*output)
 		return (-1);
 	return (i + 1);
