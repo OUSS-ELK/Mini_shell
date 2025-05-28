@@ -5,76 +5,59 @@ int	lexer_input(t_token **token, char *input)
     int		i;
 	int 	len;
     int		start;
-	char	*join;
+	// char	*join;
 	char	*part;
 	
-    i = 0;
-	// test cases :
-	// echo "'Hello'" => [Hello]  
+    i = 0;  
 	printf(BOLDGREEN "(inside lexer) "RESET GREEN"input = [%c]\n"RESET, input[i]);
     while (input[i])
     {
-		join = NULL;
-        while (f_isspace(input[i]))
+		// join = NULL;
+        while (input[i] && f_isspace(input[i]))
             i++;
         // should handle mixed quote
 		while (input[i] && (is_quote(input[i]) || is_word_start(input[i])))						// handle quotes errors
 		{
-			if (is_quote(input[i]))
+			if (input[i] && is_quote(input[i]))
 			{
-				// check for one single quote error
-				// printf(" when found quote [i = %d]\n", i);
 				len = inside_quote(input, i, &part);
-				// printf(" after quote len = %d | [i = %d]\n", len, i);
 				if (len == -1 || !part)
-				{
-					free(join);
 					return (0);
-				}
-				// add_token(token, part, WORD);
-				join = f_strjoin(join, part);
+				add_token(token, part, WORD);
 				i = len;
 			}
-			else if (is_word_start(input[i]))
+			else if (input[i] && is_word_start(input[i]))
 			{
-				// printf(" word start = input[%c]\n", input[i]);
 				start = i;
-				while (is_word_start(input[i]))
+				while (input[i] && is_word_start(input[i]))
 					i++;
-				// printf("i = %d | start = %d\n", i, start);
 				part = f_substring(input, start, i - start);
 				if (!part)
 					return (0);
-				// add_token(token, part, WORD);
-				join = f_strjoin(join, part);
-				// i += f_strlen(join);
+				add_token(token, part, WORD);
 			}
 		}
-		if (join)
-		{
-			// printf("join\n");
-			add_token(token, join, WORD);
-			// i += f_strlen(join);
-		}
-		if (is_operator(input[i]))
+		// should check for space if 0 need to join string
+		if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
-		else if (f_isspace(input[i]))
+		else if (input[i] && f_isspace(input[i]))
 			i++;
     }
 	print_tokens(*token);
 	return (1);
 }
 
-int parsing_function(t_token  **token, char *input)							// not finished
+int parsing_function(t_token  **token, char *input)						// not finished
 {
 	if (!token || !input || !*input)
 		return (0);
 
-	if (!lexer_input(token, input))            								// check input for error 
+	if (!lexer_input(token, input))            							// check input for error 
 	{
 		printf("lexer_error\n");
 		return (0);
 	}
+	
 	return (1);
 }
 
@@ -83,7 +66,7 @@ int parsing_function(t_token  **token, char *input)							// not finished
 //     system("leaks -q minishell");
 // }
 
-int main(int argc, char **argv, char **env)   								// implement in args for third param (env)
+int main(int argc, char **argv, char **env)   							// implement in args for third param (env)
 {
 	char    *input;
 	t_token *token;

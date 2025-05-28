@@ -24,6 +24,7 @@ typedef struct s_token
 {
 	char			*token;
 	t_token_type	type;
+	int				space;
 	struct s_token	*next;
 } t_token;
 
