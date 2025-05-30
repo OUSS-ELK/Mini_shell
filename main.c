@@ -24,13 +24,13 @@ int	lexer_input(t_token **token, char *input)
 				if (len == -1 || !part)
 					return (0);
 				add_token(token, part, WORD);
-				printf("SPACE  INPUT[%c] | TOKEN->value\n", input[len]);
-				print_tokens(*token);
+				// printf("SPACE  INPUT[%c] | TOKEN->value\n", input[len]);
+				// print_tokens(*token);
 				if (input[len] && f_isspace(input[len]))
 				{
 					(*token)->space = 1;
-					while (input[len] && f_isspace(input[len]))
-						len++;
+					// while (input[len] && f_isspace(input[len]))
+					// 	len++;
 				}
 				else
 					(*token)->space = 0;
@@ -50,6 +50,7 @@ int	lexer_input(t_token **token, char *input)
 				printf("2 SPACE  INPUT[%c]\n", input[len]);
 				if (input[len] && f_isspace(input[len]))
 				{
+					printf("space in token %d\n", (*token)->space);
 					(*token)->space = 1;
 					while (input[len] && f_isspace(input[len]))
 						len++;
@@ -61,11 +62,11 @@ int	lexer_input(t_token **token, char *input)
 		}
 		if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
-		// else if (input[i] && f_isspace(input[i]))
-		// {
-		// 	// printf("SPACE  INPUT[%c]\n", input[i]);
-		// 	i++;
-		// }
+		else if (input[i] && f_isspace(input[i]))
+		{
+			// printf("SPACE  INPUT[%c]\n", input[i]);
+			i++;
+		}
 		// else if (input[i] && is_word_start(input[i]))
 		// {
 		// 	printf("WORD  INPUT[%c]\n", input[i]);
