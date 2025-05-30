@@ -84,7 +84,7 @@ void	print_tokens(t_token *token)
 {
 	while (token)
 	{
-		printf(BLUE"token [%s] | type [%d]\n" RESET, token->token, token->type);
+		printf(BLUE"token [%s] | type [%d] | space[%d]\n" RESET, token->token, token->type, token->space);
 		token = token->next;
 	}
 }
