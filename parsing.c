@@ -1,16 +1,16 @@
 #include "minishell.h"
 
-int find_word(char *input, int start, t_token **token)
-{
-    int last;
+// int find_word(char *input, int start, t_token **token)
+// {
+//     int last;
 
-    last = start;        
-    while (input[last] && is_word_start(input[last]))
-        last++;
-    if (last > start)
-        add_token(token, f_substring(input, start, last - start), WORD);
-    return (last);
-}
+//     last = start;        
+//     while (input[last] && is_word_start(input[last]))
+//         last++;
+//     if (last > start)
+//         add_token(token, f_substring(input, start, last - start), WORD);
+//     return (last);
+// }
 
 
 // find the closing quote & return index after it
@@ -20,7 +20,7 @@ int	inside_quote(char *input, int start, char **output)
 	int		i;
 
 	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
-	quote = input[start];									// save the opening cote
+	quote = input[start];										// save the opening quote
 	i = start + 1;
 	// printf(YELLOW "(i = [%d]\n"RESET, i);
 	while (input[i] && input[i] != quote)
