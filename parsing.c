@@ -12,7 +12,6 @@
 //     return (last);
 // }
 
-
 // find the closing quote & return index after it
 int	inside_quote(char *input, int start, char **output)
 {
@@ -21,18 +20,27 @@ int	inside_quote(char *input, int start, char **output)
 	int		dq = 0;
 	int		i;
 
-	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
-	quote = input[start];										// save the opening quote
+	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
+	quote = input[start];											// Save the opening quote
+	if (quote == '"')
+		dq = 1;
+	else if (quote == '\'')
+		sq = 1;
 	i = start + 1;
-	// printf(YELLOW "(i = [%d]\n"RESET, i);
-	while (input[i] && input[i] != quote)
-		i++;
+	printf(YELLOW "(i = [%d]\n"RESET, i);
+	while (input[i] && input[i] != quote) 							// Skip charachters inside quotes and keep check for $ to expand its value 
+	{
+		if (check_env(input + i))									// Check for Name validation
+			i = expand_value();
+		else
+			i++;
+	}
 	if (!input[i])
 		return (-1);
-	*output = f_substring(input, start + 1, i - start - 1);
+	// *output = f_substring(input, start + 1, i - start - 1);
 	// printf("output[%s]\n", *output);
-	if (!*output)
-		return (-1);
+	// if (!*output)
+		// return (-1);
 	return (i + 1);
 }
 
@@ -112,10 +120,10 @@ t_token	*new_token(t_token **token)
 			printf(GREEN"new_token = %s\n"RESET, n_content);
 			if (!n_content)
 				return (0);
-			free(current->token);						// free old content
-			current->token = n_content;					// remove next token from the list
-			free(next->token);							// free next token's content
-			free(next);									// free next token
+			free(current->token);							// free old content
+			current->token = n_content;						// remove next token from the list
+			free(next->token);								// free next token's content
+			free(next);										// free next token
 		}
 		else
 			current = current->next;

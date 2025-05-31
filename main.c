@@ -48,7 +48,7 @@ int	lexer_input(t_token **token, char *input)
 				part = f_substring(input, start, i - start);
 				if (!part)
 					return (0);
-				add_token(token, part, WORD);
+				// add_token(token, part, WORD);
 				// len = i;
 				// printf(" I - i[%d]\n", i);
 				// if (input[len] && f_isspace(input[len]))
