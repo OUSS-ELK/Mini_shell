@@ -137,3 +137,25 @@ char	*f_strjoin(char *s1, char *s2)
 	// free(s2);
 	return (joined);
 }
+
+int	check_quote(char *input)
+{
+	int	i;
+	int	sq;
+	int	dq;
+
+	i = 0;
+	sq = 0;
+	dq = 0;
+	while (input[i])
+	{
+		if (input[i] == '\'' && !dq)
+			sq = !sq;
+		else if (input[i] == '"' && !sq)
+			dq = !dq;
+		i++;
+	}
+	if (sq || dq)
+		return (0);
+	return (1);
+}

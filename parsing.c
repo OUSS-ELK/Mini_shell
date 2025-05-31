@@ -17,6 +17,8 @@
 int	inside_quote(char *input, int start, char **output)
 {
 	char	quote;
+	int		sq = 0;
+	int		dq = 0;
 	int		i;
 
 	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
@@ -57,6 +59,7 @@ void	add_token(t_token **token, char *input, t_token_type type)
 		return ;
 	if (*token == NULL)
 	{
+		printf("first_token\n");
 		*token = new;
 		return ;
 	}
@@ -91,4 +94,32 @@ int	check_operator(char *input, int i, t_token **token)
 	}
 	add_token(token, f_substring(input, i, 1), type);
 	return (i + 1);
+}
+
+t_token	*new_token(t_token **token)
+{
+	char	*n_content;
+	t_token	*current;
+	t_token	*next;
+
+	current = *token;
+	while (current && current->next)
+	{
+		if (current->space == 1)
+		{
+			next = current->next;
+			n_content = f_strjoin(current->token, next->token);
+			printf(GREEN"new_token = %s\n"RESET, n_content);
+			if (!n_content)
+				return (0);
+			free(current->token);						// free old content
+			current->token = n_content;					// remove next token from the list
+			free(next->token);							// free next token's content
+			free(next);									// free next token
+		}
+		else
+			current = current->next;
+	}
+	print_tokens(*token);
+	return (*token);
 }

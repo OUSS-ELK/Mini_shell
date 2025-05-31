@@ -47,11 +47,13 @@ typedef struct s_redir
 
 
 // parsing
+int	check_quote(char *input);
 int		inside_quote(char *input, int start, char **token);
 t_token	*creat_token(char *input, t_token_type type);
 void	add_token(t_token **token, char *input, t_token_type type);
 int		check_operator(char *input, int i, t_token **token);
-int 	find_word(char *input, int start, t_token **token);
+// int 	find_word(char *input, int start, t_token **token);
+t_token	*new_token(t_token **token);
 
 // helper function
 void	write_error(int	n);
