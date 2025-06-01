@@ -84,18 +84,19 @@ void	print_tokens(t_token *token)
 {
 	while (token)
 	{
-		printf(BLUE"token [%s] | type [%d] | space[%d]\n" RESET, token->token, token->type, token->space);
+		printf(BLUE"TOKEN [%s] | TYPE [%d] | \n" RESET, token->token, token->type);
 		token = token->next;
 	}
 }
 
 char	*f_strdup(char *s)
 {
-	int	i = 0;
+	int		i = 0;
+	char	*str;
 
-	while (s[i])
+	while (s && s[i])
 		i++;
-	char	*str = malloc(i + 1);
+	str = malloc(i + 1);
 	if (!str)
 		return NULL;
 	i = 0;
