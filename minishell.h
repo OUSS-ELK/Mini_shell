@@ -4,12 +4,14 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
+# include <stdbool.h>
+# include <fcntl.h>
 # include <string.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 
 // token type
-typedef enum s_token_type
+ enum s_token_type
 {
 	WORD = 1,
 	PIPE,
@@ -18,7 +20,7 @@ typedef enum s_token_type
 	APPEND,
 	HEREDOC
 } t_token_type;
-
+typedef
 // token struct
 typedef struct s_token
 {
@@ -45,6 +47,17 @@ typedef struct s_redir
 	struct s_redir	*next;
 } t_redir;
 
+typedef struct s_exec
+{
+	t_env	*env_lst;
+	char	**env_arr; // t_env to char ** for execve()
+	int		exit_status;
+	int		pipe_fd[2];
+	int		stdin_backup;
+	int		stdout_backup;
+	pid_t	last_pid;
+	bool	is_pipe;
+}	t_exec;
 
 // parsing
 int	check_quote(char *input);
@@ -87,6 +100,5 @@ void	print_tokens(t_token *token);
 #define BOLDYELLOW  "\033[1;33m"
 #define BOLDBLUE    "\033[1;34m"
 #define BOLDCYAN    "\033[1;36m"
-
 
 #endif
