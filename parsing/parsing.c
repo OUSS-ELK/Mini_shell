@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 // int find_word(char *input, int start, t_token **token)
 // {
