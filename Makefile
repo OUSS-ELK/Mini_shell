@@ -1,6 +1,6 @@
 NAME = minishell
 FLAGS =  -Wall -Wextra  -lreadline
-SRC = main.c parsing.c helper_function.c
+SRC = main.c parsing/parsing.c parsing/helper_function.c
 
 all: $(NAME)
 

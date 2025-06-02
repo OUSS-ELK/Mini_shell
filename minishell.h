@@ -11,7 +11,7 @@
 # include <readline/history.h>
 
 // token type
- enum s_token_type
+typedef enum s_token_type
 {
 	WORD = 1,
 	PIPE,
@@ -20,7 +20,7 @@
 	APPEND,
 	HEREDOC
 } t_token_type;
-typedef
+
 // token struct
 typedef struct s_token
 {

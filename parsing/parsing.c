@@ -13,7 +13,7 @@
 // }
 
 // find the closing quote & return index after it
-int	inside_quote(char *input, int start, char **output, t_env env, int last_exit)
+int	inside_quote(char *input, int start, char **output)  				//, t_env env, int last_exit)
 {
 	char	quote;
 	// char	*expand;

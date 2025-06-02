@@ -11,11 +11,11 @@ int	lexer_input(t_token **token, char *input)
 	printf(BOLDGREEN "(LEXER_FUNCTION) "RESET GREEN"   input[%c]\n"RESET, input[i]);
     while (input[i])
     {
-        while (input[i] && f_isspace(input[i]))
+        if (input[i] && f_isspace(input[i]))
             i++;
-		while (input[i] && (is_quote(input[i]) || is_word_start(input[i])))
-		{
-			if (input[i] && is_quote(input[i]))
+		// if (input[i] && (is_quote(input[i]) || is_word_start(input[i])))
+		// {
+			else if (input[i] && is_quote(input[i]))
 			{
 				len = inside_quote(input, i, &part);
 				if (len == -1 || !part)
@@ -33,8 +33,8 @@ int	lexer_input(t_token **token, char *input)
 					return (0);
 				add_token(token, part, WORD);
 			}
-		}
-		if (input[i] && is_operator(input[i]))
+		// }
+		else if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
     }
 	print_tokens(*token);
