@@ -1,5 +1,26 @@
 #include "minishell.h"
 
+int	is_alpha(char input)
+{
+	if ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'))
+		return (1);
+	return (0);
+}
+
+int	is_num(char input)
+{
+	if (input >= '0' && input <= '9')
+		return (1);
+	return (0);
+}
+
+int	valid_expand(char input, char next)
+{
+	if (input == '$' && (is_num(next) || is_alpha(next) || next == '_' || next == '?'))
+		return (1);
+	return (0);
+}
+
 int lexer_input(t_token **token, char *input)
 {
 	int i;
@@ -33,6 +54,8 @@ int lexer_input(t_token **token, char *input)
 		}
 		else if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
+		else if (valid_expand(input[i], input[i + 1]) == 1)
+			i = expanding_var(token, i, input);
 	}
 	print_tokens(*token);
 	return (1);
