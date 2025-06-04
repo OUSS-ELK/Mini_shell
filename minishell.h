@@ -60,11 +60,13 @@ typedef struct s_exec
 }	t_exec;
 
 // parsing
-int	check_quote(char *input);
-int		inside_quote(char *input, int start, char **token);
+int		check_quote(char *input);
+int		inside_quote(char *input, int start, char **output, t_token **token);
 t_token	*creat_token(char *input, t_token_type type);
 void	add_token(t_token **token, char *input, t_token_type type);
 int		check_operator(char *input, int i, t_token **token);
+int 	expanding_var(t_token **token, int i, char *input);
+
 // int 	find_word(char *input, int start, t_token **token);
 // t_token	*new_token(t_token **token);
 
@@ -79,6 +81,9 @@ char    *f_substring(char *s, int start, int len);
 int		is_word_start(char c);
 char	*f_strjoin(char *s1, char *s2);
 char	*f_strdup(char *s);
+int		valid_expand(char input, char next);
+int		is_num(char input);
+int		is_alpha(char input);
 
 // debug
 void	print_tokens(t_token *token);

@@ -56,6 +56,27 @@ int	is_word_start(char c)
 	return (!f_isspace(c) && !is_operator(c) && !is_quote(c));
 }
 
+int	is_alpha(char input)
+{
+	if ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'))
+		return (1);
+	return (0);
+}
+
+int	is_num(char input)
+{
+	if (input >= '0' && input <= '9')
+		return (1);
+	return (0);
+}
+
+int	valid_expand(char input, char next)
+{
+	if (input == '$' && (is_num(next) || is_alpha(next) || next == '_' || next == '?'))
+		return (1);
+	return (0);
+}
+
 char    *f_substring(char *s, int start, int len)
 {
 	char    *str;

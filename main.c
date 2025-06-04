@@ -1,26 +1,5 @@
 #include "minishell.h"
 
-int	is_alpha(char input)
-{
-	if ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'))
-		return (1);
-	return (0);
-}
-
-int	is_num(char input)
-{
-	if (input >= '0' && input <= '9')
-		return (1);
-	return (0);
-}
-
-int	valid_expand(char input, char next)
-{
-	if (input == '$' && (is_num(next) || is_alpha(next) || next == '_' || next == '?'))
-		return (1);
-	return (0);
-}
-
 int lexer_input(t_token **token, char *input)
 {
 	int i;
@@ -36,13 +15,13 @@ int lexer_input(t_token **token, char *input)
 			i++;
 		else if (input[i] && is_quote(input[i]))
 		{
-			len = inside_quote(input, i, &part);
+			len = inside_quote(input, i, &part, token);
 			if (len == -1 || !part)
 				return (0);
 			add_token(token, part, WORD);
 			i = len;
 		}
-		else if (input[i] && is_word_start(input[i]))
+		else if (input[i] && is_word_start(input[i]) && input[i] != '$')
 		{
 			start = i;
 			while (input[i] && is_word_start(input[i]))
@@ -55,7 +34,12 @@ int lexer_input(t_token **token, char *input)
 		else if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
 		else if (valid_expand(input[i], input[i + 1]) == 1)
+		{
+			printf(BLACK"find $ sign\n"RESET);
 			i = expanding_var(token, i, input);
+			if (i == -1)
+				return (0);
+		}
 	}
 	print_tokens(*token);
 	return (1);
@@ -76,10 +60,10 @@ int parsing_function(t_token **token, char *input) // not finished
 	return (1);
 }
 
-// void    ll(void)
-// {
-//     system("leaks -q minishell");
-// }
+void    ll(void)
+{
+    system("leaks -q minishell");
+}
 
 int main(int argc, char **argv, char **env) // implement in args for third param (env)
 {
@@ -89,7 +73,7 @@ int main(int argc, char **argv, char **env) // implement in args for third param
 	(void)argc;
 	(void)argv;
 	(void)env;
-	// atexit(ll);
+	atexit(ll);
 	while (1)
 	{
 		input = readline(BOLDRED "[minishell]$> " RESET);
@@ -100,8 +84,8 @@ int main(int argc, char **argv, char **env) // implement in args for third param
 			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
 			if (parsing_function(&token, input) == 0)
 			{
-				free_tokens(token); // function to free the linked list from tokens
-				write_error(1);		// function to return error depends on num
+				free_tokens(token); 		// function to free the linked list from tokens
+				write_error(1);				// function to return error depends on num
 			}
 			free_tokens(token);
 			free(input);
@@ -110,3 +94,4 @@ int main(int argc, char **argv, char **env) // implement in args for third param
 			exit(1);
 	}
 }
+

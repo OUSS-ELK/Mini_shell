@@ -12,36 +12,61 @@
 //     return (last);
 // }
 
+int expanding_var(t_token **token, int i, char *input)
+{
+	int		start;
+	int		len;
+	char	*var_name;
+	char	*expanded;
+
+	start = i + 1;
+	len = 0;
+	if (input[i] == '?')
+	{
+		var_name = f_substring(input, start, 1);
+		len = 1;
+	}
+	else
+	{
+		while (input[start + len] && (is_num(input[start + len]) || is_alpha(input[start + len]) || input[start + len] == '_'))
+			len++;
+		var_name = f_substring(input, start, len);
+	}
+	if (!var_name)
+		return (0);
+	expanded = getenv(var_name);
+	if (!expanded)
+		expanded = "";
+	add_token(token, expanded, WORD);
+	free(var_name);
+	return (start + len);
+}
+
 // find the closing quote & return index after it
-int	inside_quote(char *input, int start, char **output)  				//, t_env env, int last_exit)
+int	inside_quote(char *input, int start, char **output, t_token **token)
 {
 	char	quote;
-	// char	*expand;
+	char	*expand;
 	int		i;
 
 	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
 	quote = input[start];												// Save the opening quote
 	i = start + 1;
 	while (input[i] && input[i] != quote) 								// Skip charachters inside quotes and keep check for $ to expand its value 
-	{
-		// if (check_env(input + i))									// Check for Name validation
-		// 	i = expand_value();
-		// else
 		i++;
-	}
 	if (!input[i])
 		return (-1);
 	*output = f_substring(input, start + 1, i - start - 1);
 	if (!*output)
 		return (-1);
-	// if (quote == '"')
-	// {
-	// 	expand = expand_env(*output, env, last_exit);
-	// 	if (!expand)
-	// 		return (-1);
-	// 	free(*output);
-	// 	*output = expand;
-	// }
+	if (quote == '"')
+	{
+		expand = expand_var(token, i, *output);
+		if (!expand)
+			return (-1);
+		free(*output);
+		*output = expand;
+	}
 	return (i + 1);
 }
 
