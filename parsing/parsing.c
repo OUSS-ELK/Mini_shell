@@ -12,7 +12,7 @@
 //     return (last);
 // }
 
-int expanding_var(t_token **token, int i, char *input)
+int expanding_var(t_token **token, int i, char *input, t_env *env)
 {
 	int		start;
 	int		len;
@@ -21,20 +21,22 @@ int expanding_var(t_token **token, int i, char *input)
 
 	start = i + 1;
 	len = 0;
-	if (input[i] == '?')
-	{
-		var_name = f_substring(input, start, 1);
-		len = 1;
-	}
-	else
-	{
-		while (input[start + len] && (is_num(input[start + len]) || is_alpha(input[start + len]) || input[start + len] == '_'))
+	// if (input[i] == '?')
+	// {
+	// 	var_name = "?";
+	// 	printf("var_name = %s\n", var_name);
+	// 	// expanded = f_itoa(global_status);
+	// 	len = 1;
+	// }
+	// else
+	// {
+		while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
 			len++;
 		var_name = f_substring(input, start, len);
-	}
+	// }
 	if (!var_name)
 		return (0);
-	expanded = getenv(var_name);
+	expanded = ft_getenv(var_name, env); 						//  should implement this function 
 	if (!expanded)
 		expanded = "";
 	add_token(token, expanded, WORD);
@@ -46,27 +48,29 @@ int expanding_var(t_token **token, int i, char *input)
 int	inside_quote(char *input, int start, char **output, t_token **token)
 {
 	char	quote;
-	char	*expand;
+	// char	*expand;
 	int		i;
 
+	if (token)
+		print_tokens(*token);
 	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
 	quote = input[start];												// Save the opening quote
 	i = start + 1;
-	while (input[i] && input[i] != quote) 								// Skip charachters inside quotes and keep check for $ to expand its value 
+	while (input[i] && input[i] != quote)
 		i++;
 	if (!input[i])
 		return (-1);
 	*output = f_substring(input, start + 1, i - start - 1);
 	if (!*output)
 		return (-1);
-	if (quote == '"')
-	{
-		expand = expand_var(token, i, *output);
-		if (!expand)
-			return (-1);
-		free(*output);
-		*output = expand;
-	}
+	// if (quote == '"')
+	// {
+	// 	expand = expanding_var(token, i, *output);
+	// 	if (!expand)
+	// 		return (-1);
+	// 	free(*output);
+	// 	*output = expand;
+	// }
 	return (i + 1);
 }
 

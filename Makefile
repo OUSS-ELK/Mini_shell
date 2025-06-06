@@ -1,19 +1,25 @@
 NAME = minishell
-FLAGS =  -Wall -Wextra  -lreadline
+LIBFT = libft/libft.a
+FLAGS =  -Wall -Wextra -Werror -lreadline -Llibft -lft
 SRC = main.c parsing/parsing.c parsing/helper_function.c
 
 all: $(NAME)
+
+$(LIBFT):
+	make -C libft
 
 $(NAME): $(SRC)
 	cc $(SRC) $(FLAGS) -o $(NAME)
 
 %.o: %.c
-	$(CC) $(FLAGS) -c $< -o $@
+	cc $(FLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJ)
+	make clean -C libft
 
 fclean: clean
 	rm -f $(NAME)
+	make fclean -C libft
 
 re: clean all

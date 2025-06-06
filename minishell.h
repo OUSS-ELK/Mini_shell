@@ -1,6 +1,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include "libft/libft.h"
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
@@ -9,6 +10,9 @@
 # include <string.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+
+// globale exit status
+// int	global_status = 0;
 
 // token type
 typedef enum s_token_type
@@ -59,13 +63,19 @@ typedef struct s_exec
 	bool	is_pipe;
 }	t_exec;
 
+
+//env_func
+t_env	*collect_env(char **env);
+void	free_array(char **str);
+char	*ft_getenv(char *key, t_env *env);
+
 // parsing
 int		check_quote(char *input);
 int		inside_quote(char *input, int start, char **output, t_token **token);
 t_token	*creat_token(char *input, t_token_type type);
 void	add_token(t_token **token, char *input, t_token_type type);
 int		check_operator(char *input, int i, t_token **token);
-int 	expanding_var(t_token **token, int i, char *input);
+int 	expanding_var(t_token **token, int i, char *input, t_env *env);
 
 // int 	find_word(char *input, int start, t_token **token);
 // t_token	*new_token(t_token **token);
@@ -73,6 +83,7 @@ int 	expanding_var(t_token **token, int i, char *input);
 // helper function
 void	write_error(int	n);
 void	free_tokens(t_token *token);
+void	free_env(t_env *env);
 int 	f_strlen(char *s);
 int 	f_isspace(char c);
 int		is_quote(char quote);
@@ -82,11 +93,13 @@ int		is_word_start(char c);
 char	*f_strjoin(char *s1, char *s2);
 char	*f_strdup(char *s);
 int		valid_expand(char input, char next);
-int		is_num(char input);
 int		is_alpha(char input);
+char	*ft_itoa(int nbr);
 
 // debug
 void	print_tokens(t_token *token);
+void	print_env(t_env *env);
+void	print_array(char **arr);
 
 // === TEXT COLORS ===
 #define RESET		"\033[0m"

@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int lexer_input(t_token **token, char *input)
+int lexer_input(t_token **token, char *input, t_env *env)
 {
 	int i;
 	int len;
@@ -36,7 +36,7 @@ int lexer_input(t_token **token, char *input)
 		else if (valid_expand(input[i], input[i + 1]) == 1)
 		{
 			printf(BLACK"find $ sign\n"RESET);
-			i = expanding_var(token, i, input);
+			i = expanding_var(token, i, input, env);
 			if (i == -1)
 				return (0);
 		}
@@ -45,47 +45,54 @@ int lexer_input(t_token **token, char *input)
 	return (1);
 }
 
-int parsing_function(t_token **token, char *input) // not finished
+int parsing_function(t_token **token, char *input, char **env)
 {
+	t_env	*envr;
+
+	envr = collect_env(env); 						// collecte environement variables
+	if (!envr)
+		return (0);
 	if (!check_quote(input))
 	{
-		printf("quote_error\n");
+		write_error(2);
 		return (0);
 	}
-	if (!lexer_input(token, input))
+	if (!lexer_input(token, input, envr))
 	{
-		printf("lexer_error\n");
+		write_error(3);
+		free_env(envr);
 		return (0);
 	}
+	free_env(envr);
 	return (1);
 }
 
-void    ll(void)
-{
-    system("leaks -q minishell");
-}
+// void    ll(void)
+// {
+//     system("leaks -q minishell");
+// }
 
-int main(int argc, char **argv, char **env) // implement in args for third param (env)
+int main(int argc, char **argv, char **env)
 {
-	char *input;
 	t_token *token;
+	char	*input;
 
 	(void)argc;
 	(void)argv;
-	(void)env;
-	atexit(ll);
+
+	// atexit(ll);
 	while (1)
 	{
-		input = readline(BOLDRED "[minishell]$> " RESET);
+		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
 		if (input)
 		{
 			token = NULL;
 			add_history(input);
 			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
-			if (parsing_function(&token, input) == 0)
+			if (parsing_function(&token, input, env) == 0)
 			{
-				free_tokens(token); 		// function to free the linked list from tokens
-				write_error(1);				// function to return error depends on num
+				free_tokens(token); 							// function to free the linked list from tokens
+				write_error(1);									// function to return error depends on num
 			}
 			free_tokens(token);
 			free(input);
@@ -93,5 +100,6 @@ int main(int argc, char **argv, char **env) // implement in args for third param
 		else
 			exit(1);
 	}
+	return (0);
 }
 

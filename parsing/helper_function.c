@@ -3,9 +3,28 @@
 void	write_error(int	n)
 {
 	if (n == 1)
-		write(2, "Error in Parsing\n", 17);
+		write(2, "Parsing Error\n", 14);
+	else if (n == 2)
+		write(2, "Lexer Error\n", 12);
+	else if (n == 3)
+		write(2, "Quote Error\n", 12);
 	else
 		write(2, "Error\n", 6);
+}
+
+void	free_array(char **str)
+{
+	char	**tmp;
+
+	if (!str)
+		return ;
+	tmp = str;
+	while (*tmp)
+	{
+		free(*tmp);
+		tmp++;
+	}
+	free(str);
 }
 
 void	free_tokens(t_token *token)
@@ -21,6 +40,25 @@ void	free_tokens(t_token *token)
 			free(token->token);
 		free(token);
 		token = tmp;
+	}
+}
+
+void	free_env(t_env *env)
+{
+	t_env	*tmp;
+
+	if (!env)
+		return ;
+	while (env)
+	{
+		tmp = env->next;
+		if (env->key && env->value)
+		{
+			free(env->key);
+			free(env->value);
+		}
+		free(env);
+		env = tmp;
 	}
 }
 
@@ -58,23 +96,12 @@ int	is_word_start(char c)
 
 int	is_alpha(char input)
 {
-	if ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'))
-		return (1);
-	return (0);
-}
-
-int	is_num(char input)
-{
-	if (input >= '0' && input <= '9')
-		return (1);
-	return (0);
+	return ((input >= 'a' && input <= 'z') || (input >= 'A' && input <= 'Z'));
 }
 
 int	valid_expand(char input, char next)
 {
-	if (input == '$' && (is_num(next) || is_alpha(next) || next == '_' || next == '?'))
-		return (1);
-	return (0);
+	return (input == '$' && (is_alpha(next) || next == '_' || next == '?'));
 }
 
 char    *f_substring(char *s, int start, int len)
@@ -99,6 +126,15 @@ char    *f_substring(char *s, int start, int len)
 	}
 	str[i] = '\0';
 	return (str);
+}
+
+void	print_env(t_env *env)
+{
+	while (env)
+	{
+		printf(BLUE"KEY [%s] | VALUE [%s] | \n" RESET, env->key, env->value);
+		env = env->next;
+	}
 }
 
 void	print_tokens(t_token *token)
@@ -180,4 +216,61 @@ int	check_quote(char *input)
 	if (sq || dq)
 		return (0);
 	return (1);
+}
+
+void	print_array(char **arr)
+{
+	int i = 0;
+	while (arr[i])
+	{
+		printf("arr[%s]\n", arr[i]);
+		i++;
+	}
+}
+
+t_env	*collect_env(char **env)
+{
+	t_env	*top;
+	t_env	*curr;
+	char	**str;				// str[0] = key & str[1] = value
+	int		i;
+
+	if (!env)
+		return (NULL);
+	
+	top = malloc(sizeof(t_env));
+	if (!top)
+		return (NULL);
+	curr = top;
+	i = 0;
+	while (env[i])
+	{
+		str = ft_split(env[i], '=');
+		curr->key = ft_strdup(str[0]);
+		curr->value = ft_strdup(str[1]);
+		if (!env[i + 1])
+			curr->next = NULL;
+		else
+		{
+			curr->next = malloc(sizeof(t_env));
+			if (!curr->next)
+				return (NULL);
+		}
+		curr = curr->next;
+		i++;
+
+	}
+	free_array(str);
+	return (top);
+}
+
+char	*ft_getenv(char *key, t_env *env)
+{
+	while (env != NULL)
+	{
+		if (ft_strncmp(key, env->key, f_strlen(key)) == 0)
+			return (env->value);
+		env = env->next;
+	}
+	return (NULL);
 }
