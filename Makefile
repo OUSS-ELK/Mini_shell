@@ -8,7 +8,7 @@ all: $(NAME)
 $(LIBFT):
 	make -C libft
 
-$(NAME): $(SRC)
+$(NAME): $(SRC) $(LIBFT)
 	cc $(SRC) $(FLAGS) -o $(NAME)
 
 %.o: %.c

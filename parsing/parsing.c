@@ -35,7 +35,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 		var_name = f_substring(input, start, len);
 	// }
 	if (!var_name)
-		return (0);
+		return (-1);
 	expanded = ft_getenv(var_name, env); 						//  should implement this function 
 	if (!expanded)
 		expanded = "";
@@ -45,16 +45,22 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 }
 
 // find the closing quote & return index after it
-int	inside_quote(char *input, int start, char **output, t_token **token)
+int	inside_quote(char *input, int start, char **output, t_token **token, t_env *env)
 {
 	char	quote;
-	// char	*expand;
+	char	*expand;
 	int		i;
+	t_mode	mode;
 
-	if (token)
-		print_tokens(*token);
 	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
 	quote = input[start];												// Save the opening quote
+	if (quote == '\'')
+		mode = SQ;
+	else if (quote == '"')
+		mode = DQ;
+	else
+		mode = NONE;
+	printf("mode = %d\n", mode);
 	i = start + 1;
 	while (input[i] && input[i] != quote)
 		i++;
@@ -63,14 +69,14 @@ int	inside_quote(char *input, int start, char **output, t_token **token)
 	*output = f_substring(input, start + 1, i - start - 1);
 	if (!*output)
 		return (-1);
-	// if (quote == '"')
-	// {
-	// 	expand = expanding_var(token, i, *output);
-	// 	if (!expand)
-	// 		return (-1);
-	// 	free(*output);
-	// 	*output = expand;
-	// }
+	if (quote == '"')
+	{
+		expand = expanding_var(token, i, *output, env);
+		if (!expand)
+			return (-1);
+		free(*output);
+		*output = expand;
+	}
 	return (i + 1);
 }
 
@@ -97,7 +103,7 @@ void	add_token(t_token **token, char *input, t_token_type type)
 		return ;
 	if (*token == NULL)
 	{
-		printf("first_token\n");
+		printf("first_token \n");
 		*token = new;
 		return ;
 	}

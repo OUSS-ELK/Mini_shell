@@ -25,12 +25,28 @@ typedef enum s_token_type
 	HEREDOC
 } t_token_type;
 
+typedef enum s_mode
+{
+	DQ = 1,
+	SQ,
+	NONE
+} t_mode;
+
+// redirections
+typedef struct s_redir
+{
+	char			*filename;
+	t_token_type	type;
+	int				fd[2];
+	struct s_redir	*next;
+} t_redir;
+
 // token struct
 typedef struct s_token
 {
 	char			*token;
 	t_token_type	type;
-	// int				space;
+	t_redir			*redirection;
 	struct s_token	*next;
 } t_token;
 
@@ -42,14 +58,6 @@ typedef struct s_env
 	struct s_env	*next;
 } t_env;
 
-// redirections
-typedef struct s_redir
-{
-	char			*filename;
-	t_token_type	type;
-	int				fd[2];
-	struct s_redir	*next;
-} t_redir;
 
 typedef struct s_exec
 {
@@ -71,7 +79,7 @@ char	*ft_getenv(char *key, t_env *env);
 
 // parsing
 int		check_quote(char *input);
-int		inside_quote(char *input, int start, char **output, t_token **token);
+int		inside_quote(char *input, int start, char **output, t_token **token, t_env *env);
 t_token	*creat_token(char *input, t_token_type type);
 void	add_token(t_token **token, char *input, t_token_type type);
 int		check_operator(char *input, int i, t_token **token);

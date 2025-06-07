@@ -2,10 +2,10 @@
 
 int lexer_input(t_token **token, char *input, t_env *env)
 {
-	int i;
-	int len;
-	int start;
-	char *part;
+	int 	i;
+	int 	len;
+	int 	start;
+	char	*part;
 
 	i = 0;
 	printf(BOLDGREEN "(LEXER_FUNCTION) " RESET GREEN "   input[%c]\n" RESET, input[i]);
@@ -15,7 +15,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i++;
 		else if (input[i] && is_quote(input[i]))
 		{
-			len = inside_quote(input, i, &part, token);
+			len = inside_quote(input, i, &part, token, env);
 			if (len == -1 || !part)
 				return (0);
 			add_token(token, part, WORD);
@@ -40,6 +40,11 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			if (i == -1)
 				return (0);
 		}
+		else if (input[i] && input[i] == '$' && input[i + 1] == '$')
+			i += 2;
+		else
+			i++;
+		printf("final check\n");
 	}
 	print_tokens(*token);
 	return (1);
