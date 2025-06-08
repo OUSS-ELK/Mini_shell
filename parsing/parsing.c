@@ -21,13 +21,8 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 
 	start = i + 1;
 	len = 0;
-	// if (input[i] == '?')
-	// {
-	// 	var_name = "?";
-	// 	printf("var_name = %s\n", var_name);
-	// 	// expanded = f_itoa(global_status);
-	// 	len = 1;
-	// }
+	// if (input[start] == '?')
+	// 	return ();
 	// else
 	// {
 		while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
@@ -36,47 +31,38 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 	// }
 	if (!var_name)
 		return (-1);
-	expanded = ft_getenv(var_name, env); 						//  should implement this function 
+	expanded = ft_getenv(var_name, env); 
 	if (!expanded)
 		expanded = "";
 	add_token(token, expanded, WORD);
-	free(var_name);
+	// free(var_name);
 	return (start + len);
 }
 
-// find the closing quote & return index after it
+// find the closing quote & return index after it ( i should rebuild this function to match expanding variables)
 int	inside_quote(char *input, int start, char **output, t_token **token, t_env *env)
 {
 	char	quote;
 	char	*expand;
+	char	*raw;
 	int		i;
-	t_mode	mode;
 
-	printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
+	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
 	quote = input[start];												// Save the opening quote
-	if (quote == '\'')
-		mode = SQ;
-	else if (quote == '"')
-		mode = DQ;
-	else
-		mode = NONE;
-	printf("mode = %d\n", mode);
 	i = start + 1;
 	while (input[i] && input[i] != quote)
 		i++;
 	if (!input[i])
 		return (-1);
-	*output = f_substring(input, start + 1, i - start - 1);
-	if (!*output)
+	raw = f_substring(input, start + 1, i - start - 1);
+	if (!raw)
 		return (-1);
 	if (quote == '"')
-	{
-		expand = expanding_var(token, i, *output, env);
-		if (!expand)
-			return (-1);
-		free(*output);
-		*output = expand;
-	}
+		expand = expand_var_str(raw, env);
+	else
+		expand = ft_strdup(raw);
+	free(raw);
+	*output = expand;
 	return (i + 1);
 }
 
@@ -123,9 +109,9 @@ int	check_operator(char *input, int i, t_token **token)
 	else if (input[i] == '<' && input[i + 1] == '<')
 		type = HEREDOC;
 	else if (input[i] == '>')
-		type = REDIR_OUT;
-	else if (input[i] == '<')
 		type = REDIR_IN;
+	else if (input[i] == '<')
+		type = REDIR_OUT;
 	else if (input[i] == '|')
 		type = PIPE;
 	else

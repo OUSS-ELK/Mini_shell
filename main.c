@@ -8,7 +8,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 	char	*part;
 
 	i = 0;
-	printf(BOLDGREEN "(LEXER_FUNCTION) " RESET GREEN "   input[%c]\n" RESET, input[i]);
+	// printf(BOLDGREEN "(LEXER_FUNCTION) " RESET GREEN "   input[%c]\n" RESET, input[i]);
 	while (input[i])
 	{
 		if (input[i] && f_isspace(input[i]))
@@ -35,16 +35,16 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i = check_operator(input, i, token);
 		else if (valid_expand(input[i], input[i + 1]) == 1)
 		{
-			printf(BLACK"find $ sign\n"RESET);
+			// printf(BLACK"find $ sign\n"RESET);
 			i = expanding_var(token, i, input, env);
 			if (i == -1)
 				return (0);
 		}
-		else if (input[i] && input[i] == '$' && input[i + 1] == '$')
-			i += 2;
+		else if (input[i] && input[i] == '$' && input[i + 1] == '$')  // should ask for this case
+			i += 1;
 		else
 			i++;
-		printf("final check\n");
+		// printf("final check\n");
 	}
 	print_tokens(*token);
 	return (1);
@@ -60,6 +60,7 @@ int parsing_function(t_token **token, char *input, char **env)
 	if (!check_quote(input))
 	{
 		write_error(2);
+		free_env(envr);
 		return (0);
 	}
 	if (!lexer_input(token, input, envr))
@@ -68,6 +69,7 @@ int parsing_function(t_token **token, char *input, char **env)
 		free_env(envr);
 		return (0);
 	}
+	// parse_cmd(token);
 	free_env(envr);
 	return (1);
 }
@@ -103,7 +105,7 @@ int main(int argc, char **argv, char **env)
 			free(input);
 		}
 		else
-			exit(1);
+			return (1);
 	}
 	return (0);
 }

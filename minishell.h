@@ -27,10 +27,20 @@ typedef enum s_token_type
 
 typedef enum s_mode
 {
-	DQ = 1,
-	SQ,
-	NONE
+	NONE,
+	DQ,
+	SQ
 } t_mode;
+
+// token struct
+typedef struct s_token
+{
+	char			*token;
+	t_token_type	type;
+	struct s_token	*next;
+} t_token;
+
+
 
 // redirections
 typedef struct s_redir
@@ -41,14 +51,13 @@ typedef struct s_redir
 	struct s_redir	*next;
 } t_redir;
 
-// token struct
-typedef struct s_token
+// commands  struct that i should pass to exec
+typedef struct s_cmd
 {
-	char			*token;
-	t_token_type	type;
-	t_redir			*redirection;
-	struct s_token	*next;
-} t_token;
+	char			**args;
+	t_redir			*redir;
+	struct s_cmd	*next;
+} t_cmd;
 
 // environment variables
 typedef struct s_env

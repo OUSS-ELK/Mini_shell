@@ -207,6 +207,7 @@ int	check_quote(char *input)
 	dq = 0;
 	while (input[i])
 	{
+		printf("input[%c] | dq = %d | sq = %d\n", input[i], sq, dq);
 		if (input[i] == '\'' && !dq)
 			sq = !sq;
 		else if (input[i] == '"' && !sq)
