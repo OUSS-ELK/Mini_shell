@@ -25,9 +25,13 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 	// 	return ();
 	// else
 	// {
-		while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
-			len++;
-		var_name = f_substring(input, start, len);
+	while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
+	{
+		// if (input[i] == '{')
+		// 	len++;
+		len++;
+	}
+	var_name = f_substring(input, start, len);
 	// }
 	if (!var_name)
 		return (-1);
@@ -109,9 +113,9 @@ int	check_operator(char *input, int i, t_token **token)
 	else if (input[i] == '<' && input[i + 1] == '<')
 		type = HEREDOC;
 	else if (input[i] == '>')
-		type = REDIR_IN;
-	else if (input[i] == '<')
 		type = REDIR_OUT;
+	else if (input[i] == '<')
+		type = REDIR_IN;
 	else if (input[i] == '|')
 		type = PIPE;
 	else
@@ -126,30 +130,27 @@ int	check_operator(char *input, int i, t_token **token)
 	return (i + 1);
 }
 
-// t_token	*new_token(t_token **token)
+// void	merge_words(t_token **token)
 // {
-// 	char	*n_content;
-// 	t_token	*current;
-// 	t_token	*next;
+// 	t_token *curr;
+// 	t_token *tmp;
+// 	char	*merged;
 
-// 	current = *token;
-// 	while (current && current->next)
+// 	curr = *token;
+// 	while (curr && curr->next)
 // 	{
-// 		if (current->space == 1)
+// 		if (curr->type == WORD && curr->next->type == WORD)
 // 		{
-// 			next = current->next;
-// 			n_content = f_strjoin(current->token, next->token);
-// 			printf(GREEN"new_token = %s\n"RESET, n_content);
-// 			if (!n_content)
-// 				return (0);
-// 			free(current->token);							// free old content
-// 			current->token = n_content;						// remove next token from the list
-// 			free(next->token);								// free next token's content
-// 			free(next);										// free next token
+// 			merged = f_strjoin(curr->token, curr->next->token);
+// 			free(curr->token);
+// 			curr->token = merged;
+
+// 			tmp = curr->next;
+// 			curr->next = tmp->next;
+// 			free(tmp->token);
+// 			// free(tmp);
 // 		}
 // 		else
-// 			current = current->next;
+// 			curr = curr->next;
 // 	}
-// 	print_tokens(*token);
-// 	return (*token);
 // }

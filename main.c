@@ -33,7 +33,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		}
 		else if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
-		else if (valid_expand(input[i], input[i + 1]) == 1)
+		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 		// should add more test cases 
 		{
 			// printf(BLACK"find $ sign\n"RESET);
 			i = expanding_var(token, i, input, env);
@@ -46,6 +46,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i++;
 		// printf("final check\n");
 	}
+	merge_words(token);
 	print_tokens(*token);
 	return (1);
 }

@@ -83,7 +83,6 @@ typedef struct s_exec
 
 //env_func
 t_env	*collect_env(char **env);
-void	free_array(char **str);
 char	*ft_getenv(char *key, t_env *env);
 
 // parsing
@@ -93,14 +92,17 @@ t_token	*creat_token(char *input, t_token_type type);
 void	add_token(t_token **token, char *input, t_token_type type);
 int		check_operator(char *input, int i, t_token **token);
 int 	expanding_var(t_token **token, int i, char *input, t_env *env);
+char	*expand_var_str(char *str, t_env *env);
+void	merge_words(t_token **token);
+
 
 // int 	find_word(char *input, int start, t_token **token);
-// t_token	*new_token(t_token **token);
 
 // helper function
 void	write_error(int	n);
 void	free_tokens(t_token *token);
 void	free_env(t_env *env);
+void	free_array(char **str);
 int 	f_strlen(char *s);
 int 	f_isspace(char c);
 int		is_quote(char quote);

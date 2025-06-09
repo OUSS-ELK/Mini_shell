@@ -207,7 +207,6 @@ int	check_quote(char *input)
 	dq = 0;
 	while (input[i])
 	{
-		printf("input[%c] | dq = %d | sq = %d\n", input[i], sq, dq);
 		if (input[i] == '\'' && !dq)
 			sq = !sq;
 		else if (input[i] == '"' && !sq)
@@ -274,4 +273,66 @@ char	*ft_getenv(char *key, t_env *env)
 		env = env->next;
 	}
 	return (NULL);
+}
+
+char	*f_strjoin_free(char *s1, char *s2)
+{
+	char 	*joined;
+	joined = ft_strjoin(s1, s2);
+	free(s1);
+	return (joined);
+}
+
+char	*f_strjoin_char(char *s, char c)
+{
+	char str[2] = {c, 0};
+
+	return f_strjoin_free(s, str);
+}
+
+char	*expand_var_str(char *str, t_env *env)   // just to test (copied) should rebuild it   | add check for '${USER'} => sould expand
+{
+	char	*result;
+	int		i;
+	char	*tmp;
+	int		start;
+	char	*value;
+
+	i = 0;
+	result = ft_strdup("");
+	while (str[i])
+	{
+		if (str[i] == '$')
+		{
+			i++;
+			if (str[i] == '?')
+			{
+				tmp = ft_itoa(0);
+				result = f_strjoin_free(result, tmp);
+				free(tmp);
+				i++;
+			}
+			else if (ft_isalpha(str[i]) || str[i] == '_')
+			{
+				start = i;
+				while (ft_isalnum(str[i]) || str[i] == '_')
+					i++;
+				tmp = f_substring(str, start, i - start);
+				value = ft_getenv(tmp, env);
+				if (value)
+					result = f_strjoin_free(result, value);
+				else
+					result = f_strjoin_free(result, "");
+				free(tmp);
+			}
+			else
+				result = f_strjoin_char(result, '$');
+		}
+		else
+		{
+			result = f_strjoin_char(result, str[i]);
+			i++;
+		}
+	}
+	return (result);
 }
