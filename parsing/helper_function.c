@@ -134,7 +134,7 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (is_alpha(next) || next == '_' || next == '?'));
+	return (input == '$' && (is_alpha(next) || next == '{' || next == '_' || next == '?'));
 }
 
 char    *f_substring(char *s, int start, int len)
@@ -212,6 +212,7 @@ char	*f_strjoin(char *s1, char *s2)
 		return (f_strdup(s2));
 	if (!s2)
 		return (f_strdup(s1));
+	printf("s1 = %s | s2 = %s\n", s1, s2);
 	len = f_strlen(s1) + f_strlen(s2);
 	joined = malloc(len + 1);
 	if (!joined)
@@ -225,7 +226,7 @@ char	*f_strjoin(char *s1, char *s2)
 	while (s2[i])
 		joined[i++] = s2[x++];
 	free(s1);
-	// free(s2);
+	free(s2);
 	return (joined);
 }
 

@@ -30,9 +30,13 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 		free(expanded);
 		return (start + 1);
 	}
-	while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
+	while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_' || input[start + len] == '{'))
+	{
+		if (input[start] == '{')
+			start++;
 		len++;
-	var_name = f_substring(input, start, len);
+	}
+	var_name = ft_substr(input, start, len);
 	if (!var_name)
 		return (-1);
 	expanded = ft_getenv(var_name, env);
@@ -135,34 +139,41 @@ int	check_operator(char *input, int i, t_token **token)
 	if (type == APPEND || type == HEREDOC)
 	{
 		// printf("append or heredoc\n");
-		add_token(token, f_substring(input, i, 2), type);
+		add_token(token, ft_substr(input, i, 2), type);
 		return (i + 2);
 	}
-	add_token(token, f_substring(input, i, 1), type);
+	add_token(token, ft_substr(input, i, 1), type);
 	return (i + 1);
 }
 
-// void	merge_words(t_token **token)
-// {
-// 	t_token *curr;
-// 	t_token *tmp;
-// 	char	*merged;
+void	merge_words(t_token **token)                                 // function to handle mixed word (but should fix it some cases)
+{
+	t_token	*curr;
+	t_token *tmp;
+	char	*merged;
 
-// 	curr = *token;
-// 	while (curr && curr->next)
-// 	{
-// 		if (curr->type == WORD && curr->next->type == WORD)
-// 		{
-// 			merged = f_strjoin(curr->token, curr->next->token);
-// 			free(curr->token);
-// 			curr->token = merged;
+	curr = *token;
+	if (!curr && !curr->next)
+		return ;
+	print_tokens(*token);
+	while (curr && curr->next)
+	{
+		printf("%d | %d\n", curr->type == WORD, curr->next->type == WORD);
+		if (curr->type == WORD && curr->next->type == WORD)
+		{
+			merged = ft_strjoin(curr->token, curr->next->token);
+			printf("merged = %s\n", merged);
+			if (!merged)
+				return ;
+			free(curr->token);
+			curr->token = merged;
 
-// 			tmp = curr->next;
-// 			curr->next = tmp->next;
-// 			free(tmp->token);
-// 			// free(tmp);
-// 		}
-// 		else
-// 			curr = curr->next;
-// 	}
-// }
+			tmp = curr->next;
+			curr->next = tmp->next;
+			free(tmp->token);
+			free(tmp);
+		}
+		else
+			curr = curr->next;
+	}
+}

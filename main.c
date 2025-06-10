@@ -15,6 +15,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i++;
 		else if (input[i] && is_quote(input[i]))
 		{
+			printf("inside quote\n");
 			len = inside_quote(input, i, &part, token, env);
 			if (len == -1 || !part)
 				return (0);
@@ -23,10 +24,11 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		}
 		else if (input[i] && is_word_start(input[i]) && input[i] != '$')
 		{
+			printf("inside word\n");
 			start = i;
 			while (input[i] && is_word_start(input[i]))
 				i++;
-			part = f_substring(input, start, i - start);
+			part = ft_substr(input, start, i - start);
 			if (!part)
 				return (0);
 			add_token(token, part, WORD);
@@ -35,18 +37,22 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i = check_operator(input, i, token);
 		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 		// should add more test cases 
 		{
-			// printf(BLACK"find $ sign\n"RESET);
+			printf(BLACK"find $ sign\n"RESET);
 			i = expanding_var(token, i, input, env);
 			if (i == -1)
 				return (0);
 		}
-		else if (input[i] && input[i] == '$' && input[i + 1] == '$')  // should ask for this case
+		else if (input[i] && input[i] == '$' && input[i + 1] == '$') 			 				// should ask for this case
 			i += 1;
-		else
+		else if (!is_word_start(input[i]) && !is_operator(input[i]) && !valid_expand(input[i], input[i + 1]) && !is_word_start(input[i]))
+		{
+			printf("else input[%c]\n", input[i]);
 			i++;
-		// printf("final check\n");
+		}
+		printf("final check\n");
 	}
-	// merge_words(token);
+	merge_words(token);
+	printf("last tokens =>\n");
 	print_tokens(*token);
 	return (1);
 }
@@ -55,7 +61,7 @@ int parsing_function(t_token **token, char *input, char **env)
 {
 	t_env	*envr;
 
-	envr = collect_env(env); 						// collecte environement variables
+	envr = collect_env(env); 																	// collecte environement variables
 	if (!envr)
 		return (0);
 	if (!check_quote(input))
@@ -99,8 +105,8 @@ int main(int argc, char **argv, char **env)
 			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
 			if (parsing_function(&token, input, env) == 0)
 			{
-				free_tokens(token); 							// function to free the linked list from tokens
-				write_error(1);									// function to return error depends on num
+				free_tokens(token); 											// function to free the linked list from tokens
+				write_error(1);													// function to return error depends on num
 			}
 			free_tokens(token);
 			free(input);
