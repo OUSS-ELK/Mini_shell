@@ -21,25 +21,25 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 
 	start = i + 1;
 	len = 0;
-	// if (input[start] == '?')
-	// 	return ();
-	// else
-	// {
-	while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
+	if (input[start] == '?')
 	{
-		// if (input[i] == '{')
-		// 	len++;
-		len++;
+		expanded = ft_itoa(0);
+		if (!expanded)
+			return (-1);
+		add_token(token, expanded, WORD);
+		free(expanded);
+		return (start + 1);
 	}
+	while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_'))
+		len++;
 	var_name = f_substring(input, start, len);
-	// }
 	if (!var_name)
 		return (-1);
-	expanded = ft_getenv(var_name, env); 
+	expanded = ft_getenv(var_name, env);
+	free(var_name);
 	if (!expanded)
 		expanded = "";
 	add_token(token, expanded, WORD);
-	// free(var_name);
 	return (start + len);
 }
 
@@ -56,15 +56,27 @@ int	inside_quote(char *input, int start, char **output, t_token **token, t_env *
 	i = start + 1;
 	while (input[i] && input[i] != quote)
 		i++;
-	if (!input[i])
-		return (-1);
 	raw = f_substring(input, start + 1, i - start - 1);
 	if (!raw)
 		return (-1);
 	if (quote == '"')
+	{
 		expand = expand_var_str(raw, env);
+		if (!expand)
+		{
+			free(raw);
+			return (-1);
+		}
+	}
 	else
+	{
 		expand = ft_strdup(raw);
+		if (!expand)
+		{
+			free(raw);
+			return (-1);
+		}
+	}
 	free(raw);
 	*output = expand;
 	return (i + 1);

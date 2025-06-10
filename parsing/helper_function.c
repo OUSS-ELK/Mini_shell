@@ -12,6 +12,40 @@ void	write_error(int	n)
 		write(2, "Error\n", 6);
 }
 
+void	free_cmd(t_cmd *cmd)
+{
+	t_cmd	*tmp;
+
+	if (!cmd)
+		return ;
+	while (cmd)
+	{
+		tmp = cmd->next;
+		if (cmd->args)
+			free_array(cmd->args);
+		if (cmd->redir)
+			free_redir(cmd->redir);
+		free(cmd);
+		cmd = tmp;
+	}
+}
+
+void	free_redir(t_redir *redir)
+{
+	t_redir	*tmp;
+
+	if (!redir)
+		return ;
+	while (redir)
+	{
+		tmp = redir->next;
+		if (redir->filename)
+			free(redir->filename);
+		free(redir);
+		redir = tmp;
+	}
+}
+
 void	free_array(char **str)
 {
 	char	**tmp;
@@ -52,11 +86,10 @@ void	free_env(t_env *env)
 	while (env)
 	{
 		tmp = env->next;
-		if (env->key && env->value)
-		{
+		if (env->key)
 			free(env->key);
+		if (env->value)
 			free(env->value);
-		}
 		free(env);
 		env = tmp;
 	}
@@ -246,21 +279,28 @@ t_env	*collect_env(char **env)
 	while (env[i])
 	{
 		str = ft_split(env[i], '=');
+		if (!str)
+		{
+			free_env(top);
+			return (NULL);
+		}
 		curr->key = ft_strdup(str[0]);
-		curr->value = ft_strdup(str[1]);
+		curr->value = ft_strdup(str[1] ? str[1] : "");
+		free_array(str);
 		if (!env[i + 1])
 			curr->next = NULL;
 		else
 		{
 			curr->next = malloc(sizeof(t_env));
 			if (!curr->next)
+			{
+				free_env(top);
 				return (NULL);
+			}
+			curr = curr->next;
 		}
-		curr = curr->next;
 		i++;
-
 	}
-	free_array(str);
 	return (top);
 }
 
@@ -268,7 +308,7 @@ char	*ft_getenv(char *key, t_env *env)
 {
 	while (env != NULL)
 	{
-		if (ft_strncmp(key, env->key, f_strlen(key)) == 0)
+		if (ft_strncmp(key, env->key, f_strlen(key)) == 0 && ft_strlen(key) == ft_strlen(env->key))
 			return (env->value);
 		env = env->next;
 	}

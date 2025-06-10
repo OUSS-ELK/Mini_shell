@@ -40,8 +40,6 @@ typedef struct s_token
 	struct s_token	*next;
 } t_token;
 
-
-
 // redirections
 typedef struct s_redir
 {
@@ -100,6 +98,8 @@ void	merge_words(t_token **token);
 
 // helper function
 void	write_error(int	n);
+void	free_cmd(t_cmd *cmd);
+void	free_redir(t_redir *redir);
 void	free_tokens(t_token *token);
 void	free_env(t_env *env);
 void	free_array(char **str);

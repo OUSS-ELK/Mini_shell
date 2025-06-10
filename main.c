@@ -8,7 +8,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 	char	*part;
 
 	i = 0;
-	// printf(BOLDGREEN "(LEXER_FUNCTION) " RESET GREEN "   input[%c]\n" RESET, input[i]);
+	printf(BOLDGREEN "(LEXER_FUNCTION) " RESET GREEN "   input[%c]\n" RESET, input[i]);
 	while (input[i])
 	{
 		if (input[i] && f_isspace(input[i]))
@@ -46,7 +46,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i++;
 		// printf("final check\n");
 	}
-	merge_words(token);
+	// merge_words(token);
 	print_tokens(*token);
 	return (1);
 }
