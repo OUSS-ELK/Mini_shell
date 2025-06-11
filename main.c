@@ -35,15 +35,16 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		}
 		else if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token);
-		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 		// should add more test cases 
+		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 		// should add more test cases
 		{
 			printf(BLACK"find $ sign\n"RESET);
+			if (input[i + 1] == '$')
+				i += 1;
 			i = expanding_var(token, i, input, env);
 			if (i == -1)
 				return (0);
+			// handling '}' in last of ${USER} => [ouelkhar]
 		}
-		else if (input[i] && input[i] == '$' && input[i + 1] == '$') 			 				// should ask for this case
-			i += 1;
 		else if (!is_word_start(input[i]) && !is_operator(input[i]) && !valid_expand(input[i], input[i + 1]) && !is_word_start(input[i]))
 		{
 			printf("else input[%c]\n", input[i]);

@@ -134,7 +134,7 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (is_alpha(next) || next == '{' || next == '_' || next == '?'));
+	return (input == '$' && (is_alpha(next) || next == '{' || next == '_' || next == '?' || next == '$'));
 }
 
 char    *f_substring(char *s, int start, int len)

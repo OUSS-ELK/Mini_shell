@@ -36,7 +36,10 @@ int expanding_var(t_token **token, int i, char *input, t_env *env)
 			start++;
 		len++;
 	}
+	// if (input[start] == '}')
+	// 	start--;
 	var_name = ft_substr(input, start, len);
+	printf("var_name = %s\n", var_name);
 	if (!var_name)
 		return (-1);
 	expanded = ft_getenv(var_name, env);
@@ -146,7 +149,7 @@ int	check_operator(char *input, int i, t_token **token)
 	return (i + 1);
 }
 
-void	merge_words(t_token **token)                                 // function to handle mixed word (but should fix it some cases)
+void	merge_words(t_token **token)                            		     // function to handle mixed word (should fix some cases)
 {
 	t_token	*curr;
 	t_token *tmp;
@@ -161,6 +164,7 @@ void	merge_words(t_token **token)                                 // function to
 		printf("%d | %d\n", curr->type == WORD, curr->next->type == WORD);
 		if (curr->type == WORD && curr->next->type == WORD)
 		{
+			// should merge if not space after word.
 			merged = ft_strjoin(curr->token, curr->next->token);
 			printf("merged = %s\n", merged);
 			if (!merged)
