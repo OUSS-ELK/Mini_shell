@@ -64,7 +64,7 @@ int	inside_quote(char *input, int start, char **output, t_token **token, t_env *
 	i = start + 1;
 	while (input[i] && input[i] != quote)
 		i++;
-	str = f_substring(input, start + 1, i - start - 1);
+	str = ft_substr(input, start + 1, i - start - 1);
 	if (!str)
 		return (-1);
 	if (quote == '"')
@@ -97,7 +97,7 @@ t_token	*creat_token(char *input, t_token_type type, bool space)
 	new = malloc(sizeof(t_token));
 	if (!new)
 		return (NULL);
-	new->token = f_strdup(input);
+	new->token = ft_strdup(input);
 	new->type = type;
 	new->space = space;
 	new->next = NULL;
@@ -114,7 +114,6 @@ void	add_token(t_token **token, char *input, t_token_type type, bool space)
 		return ;
 	if (*token == NULL)
 	{
-		printf("first_token \n");
 		*token = new;
 		return ;
 	}
@@ -122,7 +121,6 @@ void	add_token(t_token **token, char *input, t_token_type type, bool space)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
-	printf("add_token\n");
 }
 
 int	check_operator(char *input, int i, t_token **token, bool space)
@@ -160,15 +158,12 @@ void	merge_words(t_token **token)                            		     // function 
 	curr = *token;
 	if (!curr && !curr->next)
 		return ;
-	print_tokens(*token);
 	while (curr && curr->next)
 	{
-		printf("%d | %d\n", curr->type == WORD, curr->next->type == WORD);
 		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
 		{
 			// should merge if not space after word.
 			merged = ft_strjoin(curr->token, curr->next->token);
-			printf("merged = %s\n", merged);
 			if (!merged)
 				return ;
 			free(curr->token);
@@ -184,7 +179,7 @@ void	merge_words(t_token **token)                            		     // function 
 	}
 }
 
-t_cmd	*parse_cmd(t_token **token)
-{
+// t_cmd	*parse_cmd(t_token **token)
+// {
 	
-}
+// }

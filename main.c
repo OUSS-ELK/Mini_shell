@@ -10,7 +10,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 
 	i = 0;
 	space = false;
-	printf(BOLDGREEN "(LEXER_FUNCTION) " RESET GREEN "   input[%c]\n" RESET, input[i]);
+	printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
 	while (input[i])
 	{
 		if (input[i] && f_isspace(input[i]))
@@ -20,7 +20,6 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		}
 		else if (input[i] && is_quote(input[i]))
 		{
-			printf("inside quote\n");
 			len = inside_quote(input, i, &part, token, env);
 			if (len == -1 || !part)
 				return (0);
@@ -30,7 +29,6 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		}
 		else if (input[i] && is_word_start(input[i]) && input[i] != '$')
 		{
-			printf("inside word\n");
 			start = i;
 			while (input[i] && is_word_start(input[i]))
 				i++;
@@ -42,9 +40,8 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		}
 		else if (input[i] && is_operator(input[i]))
 			i = check_operator(input, i, token, space);
-		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 		// should add more test cases
+		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 			// should add more test cases
 		{
-			printf(BLACK"find $ sign\n"RESET);
 			if (input[i + 1] == '$')
 				i += 1;
 			i = expanding_var(token, i, input, env, space);
@@ -53,14 +50,10 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			// handling '}' in last of ${USER} => [ouelkhar]
 		}
 		else if (!is_word_start(input[i]) && !is_operator(input[i]) && !valid_expand(input[i], input[i + 1]) && !is_word_start(input[i]))
-		{
-			printf("else input[%c]\n", input[i]);
 			i++;
-		}
-		printf("final check\n");
 	}
 	merge_words(token);
-	printf("last tokens =>\n");
+	printf("Last Tokens ===>>\n");
 	print_tokens(*token);
 	return (1);
 }
@@ -85,9 +78,9 @@ int parsing_function(t_token **token, char *input, char **env)
 		free_env(envr);
 		return (0);
 	}
-	cmd = parse_cmd(token);
-	if (!cmd)
-		return (0);
+	// cmd = parse_cmd(token);
+	// if (!cmd)
+	// 	return (0);
 	free_env(envr);
 	return (1);
 }

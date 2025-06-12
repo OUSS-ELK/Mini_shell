@@ -117,7 +117,6 @@ char	*f_strjoin(char *s1, char *s2);
 char	*f_strdup(char *s);
 int		valid_expand(char input, char next);
 int		is_alpha(char input);
-char	*ft_itoa(int nbr);
 
 // debug
 void	print_tokens(t_token *token);

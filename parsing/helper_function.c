@@ -95,18 +95,6 @@ void	free_env(t_env *env)
 	}
 }
 
-int f_strlen(char *s)
-{
-	int i;
-
-	if (!s)
-		return (0);
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
-
 int f_isspace(char c)
 {
 	return (c == ' ' || (c >= 9 && c <= 13));
@@ -137,30 +125,6 @@ int	valid_expand(char input, char next)
 	return (input == '$' && (is_alpha(next) || next == '{' || next == '_' || next == '?' || next == '$'));
 }
 
-char    *f_substring(char *s, int start, int len)
-{
-	char    *str;
-	int     s_len;
-	int     i;
-
-	s_len = f_strlen(s);
-	if (start >= s_len || len < 0)
-	{
-		return (NULL);
-	}
-	str = malloc(len + 1);
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (i < len && s[start + i])
-	{
-		str[i] = s[start + i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
 void	print_env(t_env *env)
 {
 	while (env)
@@ -177,57 +141,6 @@ void	print_tokens(t_token *token)
 		printf(BLUE"TOKEN [%s] | TYPE [%d] | \n" RESET, token->token, token->type);
 		token = token->next;
 	}
-}
-
-char	*f_strdup(char *s)
-{
-	int		i = 0;
-	char	*str;
-
-	while (s && s[i])
-		i++;
-	str = malloc(i + 1);
-	if (!str)
-		return NULL;
-	i = 0;
-	while (s[i])
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-char	*f_strjoin(char *s1, char *s2)
-{
-	char	*joined;
-	int		len;
-	int		i = 0;
-	int		x = 0;
-
-	if (!s1 && !s2)
-		return (NULL);
-	if (!s1)
-		return (f_strdup(s2));
-	if (!s2)
-		return (f_strdup(s1));
-	printf("s1 = %s | s2 = %s\n", s1, s2);
-	len = f_strlen(s1) + f_strlen(s2);
-	joined = malloc(len + 1);
-	if (!joined)
-		return (NULL);
-	joined[len] = '\0';
-	while (s1[i])
-	{
-		joined[i] = s1[i];
-		i++;
-	}
-	while (s2[i])
-		joined[i++] = s2[x++];
-	free(s1);
-	free(s2);
-	return (joined);
 }
 
 int	check_quote(char *input)
@@ -309,7 +222,7 @@ char	*ft_getenv(char *key, t_env *env)
 {
 	while (env != NULL)
 	{
-		if (ft_strncmp(key, env->key, f_strlen(key)) == 0 && ft_strlen(key) == ft_strlen(env->key))
+		if (ft_strncmp(key, env->key, ft_strlen(key)) == 0 && ft_strlen(key) == ft_strlen(env->key))
 			return (env->value);
 		env = env->next;
 	}
@@ -358,7 +271,7 @@ char	*expand_var_str(char *str, t_env *env)   // just to test (copied) should re
 				start = i;
 				while (ft_isalnum(str[i]) || str[i] == '_')
 					i++;
-				tmp = f_substring(str, start, i - start);
+				tmp = ft_substr(str, start, i - start);
 				value = ft_getenv(tmp, env);
 				if (value)
 					result = f_strjoin_free(result, value);
