@@ -31,12 +31,10 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 		free(expanded);
 		return (start + 1);
 	}
-	while (input[start + len] && (is_alpha(input[start + len]) || input[start + len] == '_' || input[start + len] == '{'))
+	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_' || input[start + len] == '{') )//&& (input[start + len + 1] != ' ' ))//|| input[start + len + 1] != '\0'))
 	{
 		if (input[start] == '{')
 			start++;
-		if (!is_alpha(input[start + len]))
-			printf("input[%c]\n", input[start + len]);
 		len++;
 	}
 	printf("input + len[%c]  | len = %d\n", input[start + len], len);
@@ -45,6 +43,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 	if (!var_name)
 		return (-1);
 	expanded = ft_getenv(var_name, env);
+	printf("expanded = %s\n", expanded);
 	free(var_name);
 	if (!expanded)
 		expanded = "";
