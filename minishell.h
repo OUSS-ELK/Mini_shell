@@ -87,7 +87,7 @@ char	*ft_getenv(char *key, t_env *env);
 
 // parsing
 int		check_quote(char *input);
-int		inside_quote(char *input, int start, char **output, t_token **token, t_env *env);
+int		inside_quote(char *input, int start, char **output, t_env *env);
 t_token	*creat_token(char *input, t_token_type type, bool space);
 void	add_token(t_token **token, char *input, t_token_type type, bool space);
 int		check_operator(char *input, int i, t_token **token, bool space);
@@ -107,14 +107,10 @@ void	free_redir(t_redir *redir);
 void	free_tokens(t_token *token);
 void	free_env(t_env *env);
 void	free_array(char **str);
-int 	f_strlen(char *s);
 int 	f_isspace(char c);
 int		is_quote(char quote);
 int		is_operator(char oper);
-char    *f_substring(char *s, int start, int len);
 int		is_word_start(char c);
-char	*f_strjoin(char *s1, char *s2);
-char	*f_strdup(char *s);
 int		valid_expand(char input, char next);
 int		is_alpha(char input);
 

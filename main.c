@@ -13,21 +13,21 @@ int lexer_input(t_token **token, char *input, t_env *env)
 	printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
 	while (input[i])
 	{
-		if (input[i] && f_isspace(input[i]))
+		if (input[i] && f_isspace(input[i]))															// Skip spaces
 		{
-			space = true;
+			space = true;																				// Flag for no space words
 			i++;
 		}
-		else if (input[i] && is_quote(input[i]))
+		else if (input[i] && is_quote(input[i]))														//	Inside quotes
 		{
-			len = inside_quote(input, i, &part, token, env);
+			len = inside_quote(input, i, &part, env);
 			if (len == -1 || !part)
 				return (0);
-			add_token(token, part, WORD, space);
+			add_token(token, part, WORD, space);														// Create Node with its type
 			space = false;
 			i = len;
 		}
-		else if (input[i] && is_word_start(input[i]) && input[i] != '$')
+		else if (input[i] && is_word_start(input[i]) && input[i] != '$')								// If find word create a token for it 
 		{
 			start = i;
 			while (input[i] && is_word_start(input[i]))
@@ -38,9 +38,11 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			add_token(token, part, WORD, space);
 			space = false;
 		}
-		else if (input[i] && is_operator(input[i]))
+		else if (input[i] && is_operator(input[i]))													// Check for operator
 			i = check_operator(input, i, token, space);
-		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 			// should add more test cases
+		else if (input[i] && input[i + 1] && input[i] == '$' && input[i + 1] == '\'')
+			i++;
+		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 			// Expanding in normale
 		{
 			if (input[i + 1] == '$')
 				i += 1;
@@ -49,10 +51,10 @@ int lexer_input(t_token **token, char *input, t_env *env)
 				return (0);
 			// handling '}' in last of ${USER} => [ouelkhar]
 		}
-		else if (!is_word_start(input[i]) && !is_operator(input[i]) && !valid_expand(input[i], input[i + 1]) && !is_word_start(input[i]))
+		else if (!is_word_start(input[i]) && !is_operator(input[i]) && !valid_expand(input[i], input[i + 1]) && !is_word_start(input[i])) // Skip if non of elder 
 			i++;
 	}
-	merge_words(token);
+	merge_words(token);																				// Merge words thath are no space bitween them 
 	printf("Last Tokens ===>>\n");
 	print_tokens(*token);
 	return (1);

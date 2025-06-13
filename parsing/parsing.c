@@ -23,7 +23,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 	len = 0;
 	if (input[start] == '?')
 	{
-		expanded = ft_itoa(0);
+		expanded = ft_itoa(0);									// Should change 0 with exit_status comming from exec
 		if (!expanded)
 			return (-1);
 		add_token(token, expanded, WORD, space);
@@ -35,10 +35,11 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 	{
 		if (input[start] == '{')
 			start++;
+		if (!is_alpha(input[start + len]))
+			printf("input[%c]\n", input[start + len]);
 		len++;
 	}
-	// if (input[start] == '}')
-	// 	start--;
+	printf("input + len[%c]  | len = %d\n", input[start + len], len);
 	var_name = ft_substr(input, start, len);
 	printf("var_name = %s\n", var_name);
 	if (!var_name)
@@ -48,11 +49,12 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 	if (!expanded)
 		expanded = "";
 	add_token(token, expanded, WORD, space);
+	space = false;
 	return (start + len);
 }
 
-// find the closing quote & return index after it ( i should rebuild this function to match expanding variables)
-int	inside_quote(char *input, int start, char **output, t_token **token, t_env *env)
+// find the closing quote & return index & expand inside Double_quote
+int	inside_quote(char *input, int start, char **output, t_env *env)
 {
 	char	quote;
 	char	*expand;
@@ -64,26 +66,20 @@ int	inside_quote(char *input, int start, char **output, t_token **token, t_env *
 	i = start + 1;
 	while (input[i] && input[i] != quote)
 		i++;
-	str = ft_substr(input, start + 1, i - start - 1);
+	str = ft_substr(input, start + 1, i - start - 1);					// Take what inside quotes
 	if (!str)
 		return (-1);
-	if (quote == '"')
+	if (quote == '"')													// Expanding inside DQ
 	{
 		expand = expand_var_str(str, env);
 		if (!expand)
-		{
-			free(str);
-			return (-1);
-		}
+			return (free(str), -1);
 	}
 	else
 	{
 		expand = ft_strdup(str);
 		if (!expand)
-		{
-			free(str);
-			return (-1);
-		}
+			return (free(str), -1);
 	}
 	free(str);
 	*output = expand;
@@ -141,7 +137,6 @@ int	check_operator(char *input, int i, t_token **token, bool space)
 		type = 0;
 	if (type == APPEND || type == HEREDOC)
 	{
-		// printf("append or heredoc\n");
 		add_token(token, ft_substr(input, i, 2), type, space);
 		return (i + 2);
 	}
