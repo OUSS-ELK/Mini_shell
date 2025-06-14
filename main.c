@@ -39,7 +39,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			part = ft_substr(input, start, i - start);
 			if (!part)
 				return (0);
-			printf(BLUE"word = %s\n", part);
+			printf(BLUE"word = %s\n"RESET, part);
 			add_token(token, part, WORD, space);
 			space = false;
 		}
@@ -60,7 +60,8 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		else
 			i++;
 	}
-	merge_words(token);																				// Merge words thath are no space bitween them 
+	if (i > 0)
+		merge_words(token);																				// Merge words thath are no space bitween them 
 	printf("Last Tokens ===>>\n");
 	print_tokens(*token);
 	return (1);
@@ -86,9 +87,9 @@ int parsing_function(t_token **token, char *input, char **env)
 		free_env(envr);
 		return (0);
 	}
-	// cmd = parse_cmd(token);
-	// if (!cmd)
-	// 	return (0);
+	cmd = parse_cmd(token);
+	if (!cmd)
+		return (0);
 	free_env(envr);
 	return (1);
 }

@@ -173,7 +173,30 @@ void	merge_words(t_token **token)                            		     // function 
 	}
 }
 
-// t_cmd	*parse_cmd(t_token **token)
-// {
-	
-// }
+t_cmd *parse_cmd(t_token **token)
+{
+	t_cmd *head = NULL;
+	t_cmd *curr = NULL;
+	t_token *curr_token = *token;
+
+	while (curr_token)
+	{
+		if (!curr)
+			curr = init_new_cmd();
+
+		if (curr_token->type == WORD)
+			handle_word(curr, curr_token);
+		else if (curr_token->type == REDIR_IN  || curr_token->type == REDIR_OUT || curr_token->type == APPEND || curr_token->type == HEREDOC)
+		{
+			if (is_redirection(curr_token->token))
+				handle_redirection(curr, &curr_token);
+			else if (curr_token->type == PIPE)
+			{
+				curr->next = init_new_cmd();
+				curr = curr->next;
+			}
+		}
+		curr_token = curr_token->next;
+	}
+	return head;
+}
