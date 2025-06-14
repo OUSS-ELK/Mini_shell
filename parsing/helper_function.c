@@ -112,7 +112,7 @@ int	is_operator(char oper)
 
 int	is_word_start(char c)
 {
-	return (!f_isspace(c) && !is_operator(c) && !is_quote(c));
+	return (!f_isspace(c) && !is_operator(c) && !is_quote(c) && c != '$');
 }
 
 int	is_alpha(char input)
@@ -122,7 +122,7 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (is_alpha(next) || next == '{' || next == '_' || next == '?' || next == '$'));
+	return (input == '$' && (ft_isalnum(next) || next == '{' || next == '_' || next == '?' || next == '$'));
 }
 
 void	print_env(t_env *env)
@@ -179,7 +179,7 @@ t_env	*collect_env(char **env)
 {
 	t_env	*top;
 	t_env	*curr;
-	char	**str;				// str[0] = key & str[1] = value
+	char	**str;							// str[0] = key & str[1] = value
 	int		i;
 
 	if (!env)

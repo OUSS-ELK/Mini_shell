@@ -23,7 +23,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 	len = 0;
 	if (input[start] == '?')
 	{
-		expanded = ft_itoa(0);									// Should change 0 with exit_status comming from exec
+		expanded = ft_itoa(0);												// Should change 0 with exit_status comming from exec
 		if (!expanded)
 			return (-1);
 		add_token(token, expanded, WORD, space);
@@ -31,7 +31,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 		free(expanded);
 		return (start + 1);
 	}
-	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_' || input[start + len] == '{') )//&& (input[start + len + 1] != ' ' ))//|| input[start + len + 1] != '\0'))
+	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_' || input[start + len] == '{'))
 	{
 		if (input[start] == '{')
 			start++;
@@ -74,7 +74,7 @@ int	inside_quote(char *input, int start, char **output, t_env *env)
 		if (!expand)
 			return (free(str), -1);
 	}
-	else
+	else																// Normal word inside quotes
 	{
 		expand = ft_strdup(str);
 		if (!expand)

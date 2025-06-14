@@ -15,35 +15,41 @@ int lexer_input(t_token **token, char *input, t_env *env)
 	{
 		if (input[i] && f_isspace(input[i]))															// Skip spaces
 		{
+			printf(CYAN"find_space\n"RESET);
 			space = true;																				// Flag for no space words
 			i++;
 		}
 		else if (input[i] && is_quote(input[i]))														//	Inside quotes
 		{
+			printf(YELLOW"find_quote\n"RESET);
 			len = inside_quote(input, i, &part, env);
 			if (len == -1 || !part)
 				return (0);
+			printf(BLUE"word_inside_quote = %s\n", part);
 			add_token(token, part, WORD, space);														// Create Node with its type
 			space = false;
 			i = len;
 		}
-		else if (input[i] && is_word_start(input[i]) && input[i] != '$')								// If find word create a token for it 
+		else if (input[i] && is_word_start(input[i]))								// If find word create a token for it 
 		{
+			printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
 			start = i;
 			while (input[i] && is_word_start(input[i]))
 				i++;
 			part = ft_substr(input, start, i - start);
 			if (!part)
 				return (0);
+			printf(BLUE"word = %s\n", part);
 			add_token(token, part, WORD, space);
 			space = false;
 		}
 		else if (input[i] && is_operator(input[i]))													// Check for operator
 			i = check_operator(input, i, token, space);
-		else if (input[i] && input[i + 1] && input[i] == '$' && input[i + 1] == '\'')
-			i++;
+		// else if (input[i] && input[i + 1] && input[i] == '$' && input[i + 1] == '\'')
+		// 	i++;
 		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 			// Expanding in normale
 		{
+			printf(GREEN"expand_outside_quotes\n"RESET);
 			if (input[i + 1] == '$')
 				i += 1;
 			i = expanding_var(token, i, input, env, space);
@@ -51,7 +57,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 				return (0);
 			// handling '}' in last of ${USER} => [ouelkhar]
 		}
-		else if (!is_word_start(input[i]) && !is_operator(input[i]) && !valid_expand(input[i], input[i + 1]) && !is_word_start(input[i])) // Skip if non of elder 
+		else
 			i++;
 	}
 	merge_words(token);																				// Merge words thath are no space bitween them 

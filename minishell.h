@@ -25,13 +25,6 @@ typedef enum s_token_type
 	HEREDOC
 } t_token_type;
 
-typedef enum s_mode
-{
-	NONE,
-	DQ,
-	SQ
-} t_mode;
-
 // token struct
 typedef struct s_token
 {
@@ -50,6 +43,14 @@ typedef struct s_redir
 	struct s_redir	*next;
 } t_redir;
 
+// environment variables
+typedef struct s_env
+{
+	char			*key;
+	char			*value;
+	struct s_env	*next;
+} t_env;
+
 // commands  struct that i should pass to exec
 typedef struct s_cmd
 {
@@ -58,14 +59,6 @@ typedef struct s_cmd
 	t_redir			*redir;
 	struct s_cmd	*next;
 } t_cmd;
-
-// environment variables
-typedef struct s_env
-{
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-} t_env;
 
 
 typedef struct s_exec
