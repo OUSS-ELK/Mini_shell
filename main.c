@@ -30,7 +30,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			space = false;
 			i = len;
 		}
-		else if (input[i] && is_word_start(input[i]))								// If find word create a token for it 
+		else if (input[i] && is_word_start(input[i]))													// If find word create a token for it 
 		{
 			printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
 			start = i;
@@ -43,11 +43,9 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			add_token(token, part, WORD, space);
 			space = false;
 		}
-		else if (input[i] && is_operator(input[i]))													// Check for operator
+		else if (input[i] && is_operator(input[i]))														// Check for operator
 			i = check_operator(input, i, token, space);
-		// else if (input[i] && input[i + 1] && input[i] == '$' && input[i + 1] == '\'')
-		// 	i++;
-		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 			// Expanding in normale
+		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 				// Expanding in normale
 		{
 			printf(GREEN"expand_outside_quotes\n"RESET);
 			if (input[i + 1] == '$')
@@ -72,9 +70,9 @@ int parsing_function(t_token **token, char *input, char **env)
 	t_env	*envr;
 	t_cmd	*cmd;
 
-	envr = collect_env(env); 														// collecte environement variables
+	envr = collect_env(env); 																		// collecte environement variables
 	if (!envr)
-		return (0);																	//	return 0 for error & 1 for success 
+		return (0);																					//	return 0 for error & 1 for success 
 	if (!check_quote(input))
 	{
 		write_error(2);

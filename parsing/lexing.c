@@ -12,46 +12,6 @@
 //     return (last);
 // }
 
-int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
-{
-	int		start;
-	int		len;
-	char	*var_name;
-	char	*expanded;
-
-	start = i + 1;
-	len = 0;
-	if (input[start] == '?')
-	{
-		expanded = ft_itoa(0);												// Should change 0 with exit_status comming from exec
-		if (!expanded)
-			return (-1);
-		add_token(token, expanded, WORD, space);
-		space = false;
-		free(expanded);
-		return (start + 1);
-	}
-	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_' || input[start + len] == '{'))
-	{
-		if (input[start] == '{')
-			start++;
-		len++;
-	}
-	printf("input + len[%c]  | len = %d\n", input[start + len], len);
-	var_name = ft_substr(input, start, len);
-	printf("var_name = %s\n", var_name);
-	if (!var_name)
-		return (-1);
-	expanded = ft_getenv(var_name, env);
-	printf("expanded = %s\n", expanded);
-	free(var_name);
-	if (!expanded)
-		expanded = "";
-	add_token(token, expanded, WORD, space);
-	space = false;
-	return (start + len);
-}
-
 // find the closing quote & return index & expand inside Double_quote
 int	inside_quote(char *input, int start, char **output, t_env *env)
 {
@@ -173,30 +133,3 @@ void	merge_words(t_token **token)                            		     // function 
 	}
 }
 
-t_cmd *parse_cmd(t_token **token)
-{
-	t_cmd *head = NULL;
-	t_cmd *curr = NULL;
-	t_token *curr_token = *token;
-
-	while (curr_token)
-	{
-		if (!curr)
-			curr = init_new_cmd();
-
-		if (curr_token->type == WORD)
-			handle_word(curr, curr_token);
-		else if (curr_token->type == REDIR_IN  || curr_token->type == REDIR_OUT || curr_token->type == APPEND || curr_token->type == HEREDOC)
-		{
-			if (is_redirection(curr_token->token))
-				handle_redirection(curr, &curr_token);
-			else if (curr_token->type == PIPE)
-			{
-				curr->next = init_new_cmd();
-				curr = curr->next;
-			}
-		}
-		curr_token = curr_token->next;
-	}
-	return head;
-}

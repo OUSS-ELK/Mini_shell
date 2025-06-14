@@ -1,7 +1,7 @@
 NAME = minishell
 LIBFT = libft/libft.a
 FLAGS =  -Wall -Wextra -lreadline -Llibft -lft
-SRC = main.c parsing/parsing.c parsing/helper_function.c
+SRC = main.c parsing/lexing.c parsing/helper_function.c parsing/environement.c
 
 all: $(NAME)
 
