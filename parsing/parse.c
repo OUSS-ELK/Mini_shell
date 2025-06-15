@@ -5,39 +5,7 @@ int is_oper(int type)
 	return (type == REDIR_IN || type == REDIR_OUT || type == APPEND || type == HEREDOC);
 }
 
-void free_cmds(t_cmd *cmd)
-{
-	t_cmd	*tmp;
-	t_redir *r_tmp;
-
-	while (cmd)
-	{
-		tmp = cmd->next;
-
-		if (cmd->cmd)
-			free(cmd->cmd);
-
-		if (cmd->args)
-		{
-			for (int i = 0; cmd->args[i]; i++)
-				free(cmd->args[i]);
-			free(cmd->args);
-		}
-
-		while (cmd->redir)
-		{
-			r_tmp = cmd->redir->next;
-			free(cmd->redir->filename);
-			free(cmd->redir);
-			cmd->redir = r_tmp;
-		}
-
-		free(cmd);
-		cmd = tmp;
-	}
-}
-
-t_cmd *alloc_new_cmd(void)
+t_cmd	*alloc_new_cmd(void)
 {
 	t_cmd *new;
 
@@ -64,7 +32,7 @@ int	get_type(int type)
 	return (-1);
 }
 
-char **add_to_args(char **args, char *new_arg)
+char	**add_to_args(char **args, char *new_arg)
 {
 	int		len = 0;
 	char	**new_args;
@@ -129,33 +97,38 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
     return (1);
 }
 
-// int	handle_redirection(t_cmd *cmd, t_token **curr_token)
+// void free_cmds(t_cmd *cmd)
 // {
-// 	t_redir	*new_redir;
-// 	int		type;
+// 	t_cmd *tmp;
+// 	t_redir *r_tmp;
 
-// 	if (!(*curr_token) || !(*curr_token)->next)
+// 	while (cmd)
 // 	{
-// 		write_error(4);
-// 		return (0);
+// 		tmp = cmd->next;
+
+// 		if (cmd->cmd)
+// 			free(cmd->cmd);
+
+// 		if (cmd->args)
+// 		{
+// 			for (int i = 0; cmd->args[i]; i++)
+// 				free(cmd->args[i]);
+// 			free(cmd->args);
+// 		}
+
+// 		while (cmd->redir)
+// 		{
+// 			r_tmp = cmd->redir->next;
+// 			free(cmd->redir->filename);
+// 			free(cmd->redir);
+// 			cmd->redir = r_tmp;
+// 		}
+
+// 		free(cmd);
+// 		cmd = tmp;
 // 	}
-// 	type = get_type((*curr_token)->type);
-// 	(*curr_token) = (*curr_token)->next;
-// 	if ((*curr_token)->type != WORD)
-// 	{
-// 		write_error(5);
-// 		return (0);
-// 	}
-// 	new_redir = malloc(sizeof(t_redir));
-// 	if (!new_redir)
-// 		return (0);
-// 	new_redir->type = type;
-// 	new_redir->filename = ft_strdup((*curr_token)->token);
-// 	if (!new_redir)
-// 		return (free(new_redir), 0);
-// 	add_redirection(&(cmd->redir), new_redir);
-// 	return (1);
 // }
+
 
 void handle_word(t_cmd *cmd, t_token *token)
 {
@@ -177,6 +150,7 @@ t_cmd *parse_cmd(t_token **token)
 	{
 		if (curr_token->type == PIPE)
 		{
+		printf("Loking for PIPE  token->type = %d\n", curr_token->type);
 			if (!curr->cmd && !curr->args && !curr->redir)
 			{
 				write_error(5);
@@ -194,6 +168,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (is_oper(curr_token->type))
 		{
+		printf("loking for operators token->type = %d\n", curr_token->type);
 			if (!handle_redirection(curr, &curr_token))
 			{
 				free_cmds(head);
@@ -203,6 +178,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (curr_token->type == WORD)
 		{
+		printf(" Loking for _WORDS token->type = %d\n", curr_token->type);
 			if (!curr->redir || curr->redir->filename)
 				handle_word(curr, curr_token);
 			curr_token = curr_token->next;
@@ -210,11 +186,10 @@ t_cmd *parse_cmd(t_token **token)
 		else
 			curr_token = curr_token->next;
 	}
-	printf("debug\n");
-	 if (!head->cmd && !head->args)
-	 {
-        free_cmds(head);
-        return(NULL);
-	 }
+	if (!head->cmd && !head->args)
+	{
+       free_cmds(head);
+       return(NULL);
+	}
 	return (head);
 }

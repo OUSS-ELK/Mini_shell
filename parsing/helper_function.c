@@ -16,23 +16,25 @@ void	write_error(int	n)
 		write(2, "Error\n", 6);
 }
 
-// void	free_cmd(t_cmd *cmd)
-// {
-// 	t_cmd	*tmp;
+void	free_cmd(t_cmd *cmd)
+{
+	t_cmd	*tmp;
 
-// 	if (!cmd)
-// 		return ;
-// 	while (cmd)
-// 	{
-// 		tmp = cmd->next;
-// 		if (cmd->args)
-// 			free_array(cmd->args);
-// 		if (cmd->redir)
-// 			free_redir(cmd->redir);
-// 		free(cmd);
-// 		cmd = tmp;
-// 	}
-// }
+	if (!cmd)
+		return ;
+	while (cmd)
+	{
+		tmp = cmd->next;
+		if (cmd->cmd)
+			free(cmd->cmd);
+		if (cmd->args)
+			free_array(cmd->args);
+		if (cmd->redir)
+			free_redir(cmd->redir);
+		free(cmd);
+		cmd = tmp;
+	}
+}
 
 void	free_redir(t_redir *redir)
 {

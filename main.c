@@ -10,36 +10,36 @@ int lexer_input(t_token **token, char *input, t_env *env)
 
 	i = 0;
 	space = false;
-	printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
+	// printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
 	while (input[i])
 	{
 		if (input[i] && f_isspace(input[i]))															// Skip spaces
 		{
-			printf(CYAN"find_space\n"RESET);
+			// printf(CYAN"find_space\n"RESET);
 			space = true;																				// Flag for no space words
 			i++;
 		}
 		else if (input[i] && is_quote(input[i]))														//	Inside quotes
 		{
-			printf(YELLOW"find_quote\n"RESET);
+			// printf(YELLOW"find_quote\n"RESET);
 			len = inside_quote(input, i, &part, env);
 			if (len == -1 || !part)
 				return (0);
-			printf(BLUE"word_inside_quote = %s\n", part);
+			// printf(BLUE"word_inside_quote = %s\n", part);
 			add_token(token, part, WORD, space);														// Create Node with its type
 			space = false;
 			i = len;
 		}
 		else if (input[i] && is_word_start(input[i]))													// If find word create a token for it 
 		{
-			printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
+			// printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
 			start = i;
 			while (input[i] && is_word_start(input[i]))
 				i++;
 			part = ft_substr(input, start, i - start);
 			if (!part)
 				return (0);
-			printf(BLUE"word = %s\n"RESET, part);
+			// printf(BLUE"word = %s\n"RESET, part);
 			add_token(token, part, WORD, space);
 			space = false;
 		}
@@ -47,7 +47,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i = check_operator(input, i, token, space);
 		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 				// Expanding in normale
 		{
-			printf(GREEN"expand_outside_quotes\n"RESET);
+			// printf(GREEN"expand_outside_quotes\n"RESET);
 			if (input[i + 1] == '$')
 				i += 1;
 			i = expanding_var(token, i, input, env, space);
@@ -60,8 +60,8 @@ int lexer_input(t_token **token, char *input, t_env *env)
 	}
 	if (i > 0)
 		merge_words(token);																				// Merge words thath are no space bitween them 
-	printf("Last Tokens ===>>\n");
-	print_tokens(*token);
+	// printf("Last Tokens ===>>\n");
+	// print_tokens(*token);
 	return (1);
 }
 
