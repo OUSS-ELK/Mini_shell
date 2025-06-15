@@ -31,12 +31,12 @@ void	handle_redirection(t_cmd *cmd, t_token **curr_token)
 	}
 	type = get_type((*curr_token)->type);
 	(*curr_token) = (*curr_token)->next;
-	if ((*curr_token) != WORD)
+	if ((*curr_token)->type != WORD)
 	{
 		write_error(5);
 		return ;
 	}
-	new_redir = malloc(sizeof(curr_token));
+	new_redir = malloc(sizeof(t_redir));
 	if (!new_redir)
 		return ;
 	new_redir->type = type;
@@ -69,9 +69,9 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (curr_token->type == WORD)
 			handle_word(curr, curr_token);
-		else if (is_redirection(curr_token->token))
+		else if (is_operator(curr_token->token))
 			handle_redirection(curr, &curr_token);
-		curr_token = curr_token->token;
+	curr_token = curr_token->next;
 	}
 	return (head);
 }
