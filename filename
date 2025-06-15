@@ -1,0 +1,14 @@
+total 88
+drwxr-xr-x  13 ouelkhar  candidates    442 Jun 15 10:49 .
+drwxr-xr-x   3 ouelkhar  candidates    102 Jun 10 16:46 ..
+drwxr-xr-x  15 ouelkhar  candidates    510 Jun 15 09:52 .git
+-rw-r--r--   1 ouelkhar  candidates     39 Jun 10 16:46 .gitignore
+-rw-r--r--   1 ouelkhar  candidates    422 Jun 15 10:01 Makefile
+drwxr-xr-x  10 ouelkhar  candidates    340 Jun 10 16:46 exec
+-rw-r--r--   1 ouelkhar  candidates      0 Jun 15 10:49 filename
+drwxr-xr-x  74 ouelkhar  candidates   2516 Jun 15 09:53 libft
+-rw-r--r--   1 ouelkhar  candidates   3073 Jun 15 10:15 main.c
+-rwxr-xr-x   1 ouelkhar  candidates  27652 Jun 15 10:47 minishell
+-rw-r--r--   1 ouelkhar  candidates   2827 Jun 15 10:12 minishell.h
+drwxr-xr-x   6 ouelkhar  candidates    204 Jun 15 09:52 parsing
+drwxr-xr-x   3 ouelkhar  candidates    102 Jun 10 16:46 utils

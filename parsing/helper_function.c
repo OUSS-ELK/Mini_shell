@@ -8,27 +8,31 @@ void	write_error(int	n)
 		write(2, "Lexer Error\n", 12);
 	else if (n == 3)
 		write(2, "Quote Error\n", 12);
+	else if (n == 4)
+		write(2, "syntax error: missing filename after redirection\n", 49);
+	else if (n == 5)
+		write(1, "Syntax error empty command before pipe\n", 39);
 	else
 		write(2, "Error\n", 6);
 }
 
-void	free_cmd(t_cmd *cmd)
-{
-	t_cmd	*tmp;
+// void	free_cmd(t_cmd *cmd)
+// {
+// 	t_cmd	*tmp;
 
-	if (!cmd)
-		return ;
-	while (cmd)
-	{
-		tmp = cmd->next;
-		if (cmd->args)
-			free_array(cmd->args);
-		if (cmd->redir)
-			free_redir(cmd->redir);
-		free(cmd);
-		cmd = tmp;
-	}
-}
+// 	if (!cmd)
+// 		return ;
+// 	while (cmd)
+// 	{
+// 		tmp = cmd->next;
+// 		if (cmd->args)
+// 			free_array(cmd->args);
+// 		if (cmd->redir)
+// 			free_redir(cmd->redir);
+// 		free(cmd);
+// 		cmd = tmp;
+// 	}
+// }
 
 void	free_redir(t_redir *redir)
 {
@@ -175,3 +179,28 @@ void	print_array(char **arr)
 	}
 }
 
+void	print_cmds(t_cmd *cmd)
+{
+	int i = 0;
+	while (cmd)
+	{
+		printf(WHITE"==== CMD ====\n"RESET);
+		printf("Command: %s\n", cmd->cmd ? cmd->cmd : "NULL");
+
+		if (cmd->args)
+		{
+			printf(YELLOW"Args:\n"RESET);
+			while (cmd->args[i])
+				printf(BLUE"  [%s]\n"RESET, cmd->args[i++]);
+			i = 0;
+		}
+
+		t_redir *r = cmd->redir;
+		while (r)
+		{
+			printf(GREEN"Redir: type[%d], file[%s]\n"RESET, r->type, r->filename);
+			r = r->next;
+		}
+		cmd = cmd->next;
+	}
+}

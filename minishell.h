@@ -113,6 +113,8 @@ int		is_oper_type(t_token *curr_token);
 void	print_tokens(t_token *token);
 void	print_env(t_env *env);
 void	print_array(char **arr);
+void	print_cmds(t_cmd *cmd);
+
 
 // === TEXT COLORS ===
 #define RESET		"\033[0m"

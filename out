@@ -1,0 +1,10 @@
+Makefile
+exec
+filename
+libft
+main.c
+minishell
+minishell.h
+out
+parsing
+utils

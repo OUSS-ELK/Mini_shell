@@ -88,6 +88,7 @@ int parsing_function(t_token **token, char *input, char **env)
 	cmd = parse_cmd(token);
 	if (!cmd)
 		return (0);
+	print_cmds(cmd);
 	free_env(envr);
 	return (1);
 }
