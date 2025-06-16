@@ -12,7 +12,6 @@ t_cmd	*alloc_new_cmd(void)
 	new = ft_calloc(1, sizeof(t_cmd));
 	if (!new)
 		return (NULL);
-	new->cmd = NULL;
 	new->args = NULL;
 	new->redir = NULL;
 	new->next = NULL;
@@ -57,6 +56,11 @@ char	**add_to_args(char **args, char *new_arg)
 	return (new_args);
 }
 
+void handle_word(t_cmd *cmd, t_token *token)
+{
+	cmd->args = add_to_args(cmd->args, token->token);
+}
+
 void	add_redirection(t_redir **redir_list, t_redir *new_redir)
 {
 	t_redir *temp;
@@ -87,6 +91,7 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
     new_redir->filename = ft_strdup((*curr_token)->next->token);
     if (!new_redir->filename)
     {
+		printf("error filename\n");
         free(new_redir);
         return 0;
     }
@@ -97,45 +102,6 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
     return (1);
 }
 
-// void free_cmds(t_cmd *cmd)
-// {
-// 	t_cmd *tmp;
-// 	t_redir *r_tmp;
-
-// 	while (cmd)
-// 	{
-// 		tmp = cmd->next;
-
-// 		if (cmd->cmd)
-// 			free(cmd->cmd);
-
-// 		if (cmd->args)
-// 		{
-// 			for (int i = 0; cmd->args[i]; i++)
-// 				free(cmd->args[i]);
-// 			free(cmd->args);
-// 		}
-
-// 		while (cmd->redir)
-// 		{
-// 			r_tmp = cmd->redir->next;
-// 			free(cmd->redir->filename);
-// 			free(cmd->redir);
-// 			cmd->redir = r_tmp;
-// 		}
-
-// 		free(cmd);
-// 		cmd = tmp;
-// 	}
-// }
-
-
-void handle_word(t_cmd *cmd, t_token *token)
-{
-	if (!cmd->cmd)
-		cmd->cmd = ft_strdup(token->token);
-	cmd->args = add_to_args(cmd->args, token->token);
-}
 
 t_cmd *parse_cmd(t_token **token)
 {
@@ -146,21 +112,22 @@ t_cmd *parse_cmd(t_token **token)
 	head = alloc_new_cmd();
 	curr = head;
 	curr_token = *token;
+
 	while (curr_token)
 	{
 		if (curr_token->type == PIPE)
 		{
 		printf("Loking for PIPE  token->type = %d\n", curr_token->type);
-			if (!curr->cmd && !curr->args && !curr->redir)
+			if (!curr->args && !curr->redir)
 			{
 				write_error(5);
-				free_cmds(head);
+				free_cmd(head);
 				return (NULL);
 			}
 			curr->next = alloc_new_cmd();
 			if (!curr->next)
 			{
-                free_cmds(head);
+                free_cmd(head);
                 return NULL;
             }
 			curr = curr->next;
@@ -171,7 +138,7 @@ t_cmd *parse_cmd(t_token **token)
 		printf("loking for operators token->type = %d\n", curr_token->type);
 			if (!handle_redirection(curr, &curr_token))
 			{
-				free_cmds(head);
+				free_cmd(head);
 				return (NULL);
 			}
 			curr_token = curr_token->next;
@@ -186,9 +153,9 @@ t_cmd *parse_cmd(t_token **token)
 		else
 			curr_token = curr_token->next;
 	}
-	if (!head->cmd && !head->args)
+	if (!head->args)
 	{
-       free_cmds(head);
+       free_cmd(head);
        return(NULL);
 	}
 	return (head);

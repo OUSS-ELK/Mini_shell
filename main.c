@@ -70,9 +70,9 @@ int parsing_function(t_token **token, char *input, char **env)
 	t_env	*envr;
 	t_cmd	*cmd;
 
-	envr = collect_env(env); 																		// collecte environement variables
+	envr = collect_env(env); 																			// collecte environement variables
 	if (!envr)
-		return (0);																					//	return 0 for error & 1 for success 
+		return (0);																						//	return 0 for error & 1 for success 
 	if (!check_quote(input))
 	{
 		write_error(2);
@@ -110,6 +110,13 @@ int main(int argc, char **argv, char **env)
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
+		if (!input)									// Ctrl + D (EOF) 
+			break ;
+		if (all_space(input))						// Empty or spaces
+		{
+			free(input);
+			continue ;
+		}
 		if (input)
 		{
 			token = NULL;
@@ -117,14 +124,13 @@ int main(int argc, char **argv, char **env)
 			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
 			if (parsing_function(&token, input, env) == 0)
 			{
-				free_tokens(token); 											// function to free the linked list from tokens
 				write_error(1);													// function to return error depends on num
+				free_tokens(token); 											// function to free the linked list from tokens
+				continue ;
 			}
 			free_tokens(token);
 			free(input);
 		}
-		else
-			return (1);
 	}
 	return (0);
 }

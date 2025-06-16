@@ -54,7 +54,6 @@ typedef struct s_env
 // commands  struct that i should pass to exec
 typedef struct s_cmd
 {
-	char			*cmd;
 	char			**args;
 	t_redir			*redir;
 	struct s_cmd	*next;
@@ -107,6 +106,8 @@ int		is_word_start(char c);
 int		valid_expand(char input, char next);
 int		is_alpha(char input);
 int		is_oper_type(t_token *curr_token);
+int		all_space(char *input);
+
 
 
 // debug

@@ -25,8 +25,6 @@ void	free_cmd(t_cmd *cmd)
 	while (cmd)
 	{
 		tmp = cmd->next;
-		if (cmd->cmd)
-			free(cmd->cmd);
 		if (cmd->args)
 			free_array(cmd->args);
 		if (cmd->redir)
@@ -99,6 +97,22 @@ void	free_env(t_env *env)
 		free(env);
 		env = tmp;
 	}
+}
+
+int	all_space(char *input)
+{
+	int	i;
+
+	i = 0;
+	if (!input)
+		return (1);
+	while (input[i])
+	{
+		if (!f_isspace(input[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 int f_isspace(char c)
@@ -186,9 +200,7 @@ void	print_cmds(t_cmd *cmd)
 	int i = 0;
 	while (cmd)
 	{
-		printf(WHITE"==== CMD ====\n"RESET);
-		printf("Command: %s\n", cmd->cmd ? cmd->cmd : "NULL");
-
+		printf(RED"==== CMD ====\n"RESET);
 		if (cmd->args)
 		{
 			printf(YELLOW"Args:\n"RESET);
@@ -200,7 +212,7 @@ void	print_cmds(t_cmd *cmd)
 		t_redir *r = cmd->redir;
 		while (r)
 		{
-			printf(GREEN"Redir: type[%d], file[%s]\n"RESET, r->type, r->filename);
+			printf(GREEN"Redir: type[%d], filename [%s]\n"RESET, r->type, r->filename);
 			r = r->next;
 		}
 		cmd = cmd->next;
