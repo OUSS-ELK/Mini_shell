@@ -25,13 +25,13 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 			start++;
 		len++;
 	}
-	printf("input + len[%c]  | len = %d\n", input[start + len], len);
+	// printf("input + len[%c]  | len = %d\n", input[start + len], len);
 	var_name = ft_substr(input, start, len);
-	printf("var_name = %s\n", var_name);
+	// printf("var_name = %s\n", var_name);
 	if (!var_name)
 		return (-1);
 	expanded = ft_getenv(var_name, env);
-	printf("expanded = %s\n", expanded);
+	// printf("expanded = %s\n", expanded);
 	free(var_name);
 	if (!expanded)
 		expanded = "";

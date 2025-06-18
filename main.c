@@ -93,11 +93,6 @@ int parsing_function(t_token **token, char *input, char **env)
 	return (1);
 }
 
-// void    ll(void)
-// {
-//     system("leaks -q minishell");
-// }
-
 int main(int argc, char **argv, char **env)
 {
 	t_token *token;
@@ -110,9 +105,9 @@ int main(int argc, char **argv, char **env)
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
-		if (!input)									// Ctrl + D (EOF) 
+		if (!input)																// Ctrl + D (EOF) 
 			break ;
-		if (all_space(input))						// Empty or spaces
+		if (all_space(input))													// Empty or spaces
 		{
 			free(input);
 			continue ;
@@ -128,9 +123,12 @@ int main(int argc, char **argv, char **env)
 				free_tokens(token); 											// function to free the linked list from tokens
 				continue ;
 			}
-			free_tokens(token);
-			free(input);
 		}
+		free_tokens(token);
+		free(input);
+	// printf("token adress [%p]\n", (void *)token);
+	// printf("token adress [%p]\n", (void *)token->token);
+	// printf("input adress [%p] | [%s]\n", input, input);
 	}
 	return (0);
 }

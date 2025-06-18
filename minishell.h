@@ -88,8 +88,6 @@ char	*expand_var_str(char *str, t_env *env);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);
 
-
-
 // int 	find_word(char *input, int start, t_token **token);
 
 // helper function
@@ -115,6 +113,7 @@ void	print_tokens(t_token *token);
 void	print_env(t_env *env);
 void	print_array(char **arr);
 void	print_cmds(t_cmd *cmd);
+void    ll(void);
 
 
 // === TEXT COLORS ===

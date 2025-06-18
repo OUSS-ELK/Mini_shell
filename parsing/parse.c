@@ -18,48 +18,40 @@ t_cmd	*alloc_new_cmd(void)
 	return (new);
 }
 
-int	get_type(int type)
-{
-	if (type == REDIR_IN)
-		return (REDIR_IN);
-	else if (type == REDIR_OUT)
-		return (REDIR_OUT);
-	else if (type == APPEND)
-		return (APPEND);
-	else if (type == HEREDOC)
-		return (HEREDOC);
-	return (-1);
-}
-
-char	**add_to_args(char **args, char *new_arg)
+char	**handle_word(char **args, char *new_arg)
 {
 	int		len = 0;
 	char	**new_args;
+	int 	i = 0;
 
+	// printf("inside add_to_arg\n");
 	if (args)
 		while (args[len])
 			len++;
+	// print_array(args);
+	// printf("len = %d\n", len);
 
 	new_args = malloc(sizeof(char *) * (len + 2));
 	if (!new_args)
 		return (NULL);
 
-	for (int i = 0; i < len; i++)
+	while ( i < len)
+	{
 		new_args[i] = args[i];
-
+		i++;
+	}
 	new_args[len] = ft_strdup(new_arg);
 	if (!new_args[len])
 		return (free(new_args), NULL);
 	new_args[len + 1] = NULL;
-
 	free(args);
 	return (new_args);
 }
 
-void handle_word(t_cmd *cmd, t_token *token)
-{
-	cmd->args = add_to_args(cmd->args, token->token);
-}
+// void handle_word(t_cmd *cmd, t_token *token)
+// {
+// 	cmd->args = add_to_args(cmd->args, token->token);
+// }
 
 void	add_redirection(t_redir **redir_list, t_redir *new_redir)
 {
@@ -117,7 +109,7 @@ t_cmd *parse_cmd(t_token **token)
 	{
 		if (curr_token->type == PIPE)
 		{
-		printf("Loking for PIPE  token->type = %d\n", curr_token->type);
+		// printf("_PIPE  token->type = %d\n", curr_token->type);
 			if (!curr->args && !curr->redir)
 			{
 				write_error(5);
@@ -135,7 +127,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (is_oper(curr_token->type))
 		{
-		printf("loking for operators token->type = %d\n", curr_token->type);
+		// printf("_Operators token->type = %d\n", curr_token->type);
 			if (!handle_redirection(curr, &curr_token))
 			{
 				free_cmd(head);
@@ -145,9 +137,9 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (curr_token->type == WORD)
 		{
-		printf(" Loking for _WORDS token->type = %d\n", curr_token->type);
+		// printf(" _WORDS token->type = %d\n", curr_token->type);
 			if (!curr->redir || curr->redir->filename)
-				handle_word(curr, curr_token);
+				curr->args = handle_word(curr->args, curr_token->token);
 			curr_token = curr_token->next;
 		}
 		else

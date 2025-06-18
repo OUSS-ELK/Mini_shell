@@ -8,7 +8,7 @@ all: $(NAME)
 $(LIBFT):
 	make -C libft
 
-$(NAME): $(SRC) $(LIBFT)
+$(NAME): $(SRC) $(LIBFT) minishell.h
 	cc $(SRC) $(FLAGS) -o $(NAME)
 
 %.o: %.c

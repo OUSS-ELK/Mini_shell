@@ -163,6 +163,11 @@ void	print_tokens(t_token *token)
 	}
 }
 
+void    ll(void)
+{
+    system("leaks -q minishell");
+}
+
 int	check_quote(char *input)
 {
 	int	i;
