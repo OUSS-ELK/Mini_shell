@@ -88,6 +88,7 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
         return 0;
     }
     new_redir->type = (*curr_token)->type;
+  
     new_redir->next = NULL;
     add_redirection(&cmd->redir, new_redir);
     *curr_token = (*curr_token)->next;
@@ -101,6 +102,8 @@ t_cmd *parse_cmd(t_token **token)
 	t_cmd	*curr;
 	t_token *curr_token;
 
+	if (token)
+		printf("NULL\n");
 	head = alloc_new_cmd();
 	curr = head;
 	curr_token = *token;
