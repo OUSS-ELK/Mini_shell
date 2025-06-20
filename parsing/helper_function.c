@@ -12,6 +12,8 @@ void	write_error(int	n)
 		write(2, "syntax error: missing filename after redirection\n", 49);
 	else if (n == 5)
 		write(1, "Syntax error empty command before pipe\n", 39);
+		else if (n == 6)
+		write(1, "Syntax error empty command after pipe\n", 39);
 	else
 		write(2, "Error\n", 6);
 }
@@ -108,7 +110,7 @@ int	all_space(char *input)
 		return (1);
 	while (input[i])
 	{
-		if (!f_isspace(input[i]))
+		if (!f_isspace(input[i]) && input[i] != '$')
 			return (0);
 		i++;
 	}

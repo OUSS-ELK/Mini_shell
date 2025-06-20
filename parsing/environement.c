@@ -85,9 +85,12 @@ t_env	*collect_env(char **env)
 
 char	*ft_getenv(char *key, t_env *env)
 {
+	int	key_len;
+
+	key_len = ft_strlen(key);
 	while (env != NULL)
 	{
-		if (ft_strncmp(key, env->key, ft_strlen(key)) == 0 && ft_strlen(key) == ft_strlen(env->key))
+		if (ft_strncmp(key, env->key, key_len) == 0 && key_len == (int)ft_strlen(env->key))
 			return (env->value);
 		env = env->next;
 	}

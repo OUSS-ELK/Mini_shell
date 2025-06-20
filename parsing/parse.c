@@ -9,6 +9,7 @@ t_cmd	*alloc_new_cmd(void)
 {
 	t_cmd *new;
 
+	printf("alloc new cmd\n");
 	new = ft_calloc(1, sizeof(t_cmd));
 	if (!new)
 		return (NULL);
@@ -60,7 +61,7 @@ void	add_redirection(t_redir **redir_list, t_redir *new_redir)
 	if (!*redir_list)
 	{
 		*redir_list = new_redir;
-		return;
+		return ;
 	}
 	temp = *redir_list;
 	while (temp->next)
@@ -91,7 +92,7 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
   
     new_redir->next = NULL;
     add_redirection(&cmd->redir, new_redir);
-    *curr_token = (*curr_token)->next;
+    *curr_token = (*curr_token)->next->next;
     return (1);
 }
 
@@ -102,8 +103,8 @@ t_cmd *parse_cmd(t_token **token)
 	t_cmd	*curr;
 	t_token *curr_token;
 
-	if (token)
-		printf("NULL\n");
+	if (!token)
+		return (NULL);
 	head = alloc_new_cmd();
 	curr = head;
 	curr_token = *token;
@@ -115,16 +116,26 @@ t_cmd *parse_cmd(t_token **token)
 		// printf("_PIPE  token->type = %d\n", curr_token->type);
 			if (!curr->args && !curr->redir)
 			{
+				printf("dee\n");
 				write_error(5);
 				free_cmd(head);
 				return (NULL);
 			}
-			curr->next = alloc_new_cmd();
-			if (!curr->next)
+			if (!curr_token->next)
 			{
-                free_cmd(head);
-                return NULL;
-            }
+				write_error(6);
+				free_cmd(head);
+				return (NULL);
+			}
+			if (curr_token->next)
+			{
+				curr->next = alloc_new_cmd();
+				if (!curr->next)
+				{
+					free_cmd(head);
+					return NULL;
+				}
+			}
 			curr = curr->next;
 			curr_token = curr_token->next;
 		}
@@ -136,19 +147,22 @@ t_cmd *parse_cmd(t_token **token)
 				free_cmd(head);
 				return (NULL);
 			}
-			curr_token = curr_token->next;
+			// curr_token = curr_token->next;
 		}
 		else if (curr_token->type == WORD)
 		{
 		// printf(" _WORDS token->type = %d\n", curr_token->type);
-			if (!curr->redir || curr->redir->filename)
+			if (!curr->redir || (curr->redir && curr->redir->filename))
+			{
+				// printf("deb\n");
 				curr->args = handle_word(curr->args, curr_token->token);
 			curr_token = curr_token->next;
+			}
 		}
 		else
 			curr_token = curr_token->next;
 	}
-	if (!head->args)
+	if (!head->args && !head->redir)
 	{
        free_cmd(head);
        return(NULL);

@@ -110,7 +110,8 @@ void	merge_words(t_token **token)                            		     // function 
 	char	*merged;
 
 	curr = *token;
-	if (!curr && !curr->next)
+	// printf("inside merge word\n");
+	if (!curr || !curr->next)
 		return ;
 	while (curr && curr->next)
 	{

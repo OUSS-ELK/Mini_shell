@@ -10,36 +10,36 @@ int lexer_input(t_token **token, char *input, t_env *env)
 
 	i = 0;
 	space = false;
-	printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
+	// printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
 	while (input[i])
 	{
 		if (input[i] && f_isspace(input[i]))															// Skip spaces
 		{
-			printf(CYAN"find_space\n"RESET);
+			// printf(CYAN"find_space\n"RESET);
 			space = true;																				// Flag for no space words
 			i++;
 		}
 		else if (input[i] && is_quote(input[i]))														//	Inside quotes
 		{
-			printf(YELLOW"find_quote\n"RESET);
+			// printf(YELLOW"find_quote\n"RESET);
 			len = inside_quote(input, i, &part, env);
 			if (len == -1 || !part)
 				return (0);
-			printf(BLUE"word_inside_quote = %s\n", part);
+			// printf(BLUE"word_inside_quote = %s\n", part);
 			add_token(token, part, WORD, space);														// Create Node with its type
 			space = false;
 			i = len;
 		}
 		else if (input[i] && is_word_start(input[i]))													// If find word create a token for it 
 		{
-			printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
+			// printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
 			start = i;
 			while (input[i] && is_word_start(input[i]))
 				i++;
 			part = ft_substr(input, start, i - start);
 			if (!part)
 				return (0);
-			printf(BLUE"word = %s\n"RESET, part);
+			// printf(BLUE"word = %s\n"RESET, part);
 			add_token(token, part, WORD, space);
 			space = false;
 		}
@@ -47,7 +47,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			i = check_operator(input, i, token, space);
 		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 				// Expanding in normale
 		{
-			printf(GREEN"expand_outside_quotes\n"RESET);
+			// printf(GREEN"expand_outside_quotes\n"RESET);
 			if (input[i + 1] == '$')
 				i += 1;
 			i = expanding_var(token, i, input, env, space);
@@ -57,18 +57,17 @@ int lexer_input(t_token **token, char *input, t_env *env)
 		else
 			i++;
 	}
-	printf("i = %d\n", i);
-	if (i > 1)
+	// printf("i = %d\n", i);
+	if (i != 0)
 		merge_words(token);																				// Merge words thath are no space bitween them 
-	printf("Last Tokens ===>>\n");
+	// printf("Last Tokens ===>>\n");
 	// print_tokens(*token);
 	return (1);
 }
 
-int parsing_function(t_token **token, char *input, char **env)
+int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
 {
 	t_env	*envr;
-	t_cmd	*cmd;
 
 	envr = collect_env(env); 																			// collecte environement variables
 	if (!envr)
@@ -81,17 +80,16 @@ int parsing_function(t_token **token, char *input, char **env)
 	}
 	if (!lexer_input(token, input, envr))
 	{
-		printf("debug\n");
+		// printf("lexer function error\n");
 		write_error(3);
 		free_env(envr);
 		return (0);
 	}
-	printf("debug1\n");
-	cmd = parse_cmd(token);
-	if (!cmd)
+	// printf("lexer function pass\n");
+	*cmd = parse_cmd(token);
+	if (!*cmd)
 		return (0);
-	printf("debug3\n");
-	print_cmds(cmd);
+	// printf("parse cmd function pass\n");
 	free_env(envr);
 	return (1);
 }
@@ -100,11 +98,12 @@ int main(int argc, char **argv, char **env)
 {
 	t_token *token;
 	char	*input;
+	t_cmd	*cmd;
 
 	(void)argc;
 	(void)argv;
 
-	// atexit(ll);
+	atexit(ll);
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
@@ -120,15 +119,19 @@ int main(int argc, char **argv, char **env)
 			token = NULL;
 			add_history(input);
 			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
-			if (parsing_function(&token, input, env) == 0)
+			if (parsing_function(&token, input, env, &cmd) == 0)
 			{
 				write_error(1);													// function to return error depends on num
 				free_tokens(token); 											// function to free the linked list from tokens
+				free_cmd(cmd);
 				continue ;
 			}
+			print_cmds(cmd);
 		}
 		free_tokens(token);
+		free_cmd(cmd);
 		free(input);
+		printf("")
 	}
 	return (0);
 }

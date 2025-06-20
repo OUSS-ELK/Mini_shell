@@ -39,6 +39,7 @@ typedef struct s_redir
 {
 	char			*filename;
 	t_token_type	type;
+	bool			quoted;				// if true not expand inside  
 	int				fd[2];
 	struct s_redir	*next;
 } t_redir;
