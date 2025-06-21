@@ -61,6 +61,13 @@ typedef struct s_cmd
 } t_cmd;
 
 
+typedef struct s_cmd
+{
+	char			**args;
+	t_redir			*redir;
+	struct s_cmd	*next;
+} t_cmd;
+
 typedef struct s_exec
 {
 	t_env	*env_lst;
