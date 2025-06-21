@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   heredoc.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/01 14:52:36 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/06/01 15:53:00 by bel-abde         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "execution.h"
 
@@ -28,24 +17,33 @@ The redir->fd[0] stores the read-end of that pipe, so it can be used later for i
 */
 
 // Go through all the tokens and apply handle_herdocs func on the right token
-bool	exec_heredoc(t_token *tokens, t_exec *exec)
+bool	exec_heredoc(t_cmd *cmds, t_exec *exec)
 {
-	t_token	*curr;
-	t_redir	redir;
+	t_cmd	*curr_cmd;
 
-	curr = tokens;
-	while (curr)
+	curr_cmd = cmds;
+	while (curr_cmd)
 	{
-		if (curr->type == HEREDOC && curr->next)
-		{
-			redir.type = HEREDOC;
-			redir.filename = curr->next->token;
-			redir.next = NULL;
-			if (handle_herdoc_redir(&redir, exec));
-				return (true);
-		}
-		curr = curr->next;
+		if (handle_heredoc_redir(curr_cmd->redir, exec))
+			return (true);
+		curr_cmd = curr_cmd->next;
 	}
+	// t_token	*curr;
+	// t_redir	redir;
+
+	// curr = tokens;
+	// while (curr)
+	// {
+	// 	if (curr->type == HEREDOC && curr->next)
+	// 	{
+	// 		redir.type = HEREDOC;
+	// 		redir.filename = curr->next->token;
+	// 		redir.next = NULL;
+	// 		if (handle_herdoc_redir(&redir, exec));
+	// 			return (true);
+	// 	}
+	// 	curr = curr->next;
+	// }
 	return (false);
 }
 
@@ -61,17 +59,37 @@ bool	handle_heredoc_redir(t_redir *redir, t_exec *exec)
 			tmp = ft_strdup(redir->filename);
 			if (!tmp)
 				return (true);
-			fd = create_herdoc_pipe(tmp, exec);
-			free(redir->filename);
+			fd = create_heredoc_pipe(tmp, exec);
 			free(tmp);
 			if (fd < 0)
 				return (true);
 			redir->fd[0] = fd;
-			if (expander(exec, redir))
-				{close(redir->fd); return (true);}
+			if (expander(exec, redir)) // Expand $VAR inside heredoc
+			{
+				close(redir->fd[0]);
+				return (true);
+			}
 		}
 		redir = redir->next;
 	}
+	// while (redir)
+	// {
+	// 	if (redir->type == HEREDOC)
+	// 	{
+	// 		tmp = ft_strdup(redir->filename);
+	// 		if (!tmp)
+	// 			return (true);
+	// 		fd = create_herdoc_pipe(tmp, exec);
+	// 		free(redir->filename);
+	// 		free(tmp);
+	// 		if (fd < 0)
+	// 			return (true);
+	// 		redir->fd[0] = fd;
+	// 		if (expander(exec, redir))
+	// 			{close(redir->fd); return (true);}
+	// 	}
+	// 	redir = redir->next;
+	// }
 	return (false);
 }
 
