@@ -30,7 +30,7 @@ typedef struct s_token
 {
 	char			*token;
 	t_token_type	type;
-	bool			space;
+	bool			space;				// for mergine words that are no space bitween them
 	struct s_token	*next;
 } t_token;
 
@@ -53,14 +53,6 @@ typedef struct s_env
 } t_env;
 
 // commands  struct that i should pass to exec
-typedef struct s_cmd
-{
-	char			**args;
-	t_redir			*redir;
-	struct s_cmd	*next;
-} t_cmd;
-
-
 typedef struct s_cmd
 {
 	char			**args;

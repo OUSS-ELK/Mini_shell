@@ -160,7 +160,7 @@ void	print_tokens(t_token *token)
 {
 	while (token)
 	{
-		printf(BLUE"TOKEN [%s] | TYPE [%d] | \n" RESET, token->token, token->type);
+		printf(BLUE"TOKEN [%s] | TYPE [%d] | space[%d]\n" RESET, token->token, token->type, token->space);
 		token = token->next;
 	}
 }

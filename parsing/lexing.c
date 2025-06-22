@@ -103,21 +103,22 @@ int	check_operator(char *input, int i, t_token **token, bool space)
 	return (i + 1);
 }
 
-void	merge_words(t_token **token)                            		     // function to handle mixed word (should fix some cases)
+void	merge_words(t_token **token)                            		     // function to handle mixed word (if space true d'ont merge)
 {
 	t_token	*curr;
 	t_token *tmp;
 	char	*merged;
 
 	curr = *token;
-	// printf("inside merge word\n");
 	if (!curr || !curr->next)
 		return ;
+	printf("inside merge word\n");
 	while (curr && curr->next)
 	{
+		// should merge if no space after word.
 		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
 		{
-			// should merge if not space after word.
+			printf("mix \n");
 			merged = ft_strjoin(curr->token, curr->next->token);
 			if (!merged)
 				return ;
@@ -133,4 +134,3 @@ void	merge_words(t_token **token)                            		     // function 
 			curr = curr->next;
 	}
 }
-

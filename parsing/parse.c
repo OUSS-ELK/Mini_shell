@@ -141,7 +141,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (is_oper(curr_token->type))
 		{
-		// printf("_Operators token->type = %d\n", curr_token->type);
+		printf("_Operators token->type = %d\n", curr_token->type);
 			if (!handle_redirection(curr, &curr_token))
 			{
 				free_cmd(head);
@@ -151,7 +151,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (curr_token->type == WORD)
 		{
-		// printf(" _WORDS token->type = %d\n", curr_token->type);
+		printf(" _WORDS token->type = %d\n", curr_token->type);
 			if (!curr->redir || (curr->redir && curr->redir->filename))
 			{
 				// printf("deb\n");
