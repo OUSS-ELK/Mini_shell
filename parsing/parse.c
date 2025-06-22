@@ -72,12 +72,21 @@ void	add_redirection(t_redir **redir_list, t_redir *new_redir)
 int handle_redirection(t_cmd *cmd, t_token **curr_token)
 {
     t_redir	*new_redir;
-
+	char	*filename;
     if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
     {
         write_error(4);
         return 0;
     }
+	filename = (*curr_token)->next->token;
+	if (!filename || filename[0] == '\0')
+	{
+		if ((*curr_token)->type != HEREDOC)
+		{
+			write_error(7);
+			return (0);
+		}
+	}
 	new_redir = malloc(sizeof(t_redir));
     if (!new_redir)
 		return 0;
@@ -95,7 +104,6 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
     *curr_token = (*curr_token)->next->next;
     return (1);
 }
-
 
 t_cmd *parse_cmd(t_token **token)
 {

@@ -83,7 +83,7 @@ int		inside_quote(char *input, int start, char **output, t_env *env);
 t_token	*creat_token(char *input, t_token_type type, bool space);
 void	add_token(t_token **token, char *input, t_token_type type, bool space);
 int		check_operator(char *input, int i, t_token **token, bool space);
-int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool space);
+int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space);
 char	*expand_var_str(char *str, t_env *env);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);

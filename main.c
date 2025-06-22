@@ -50,7 +50,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			// printf(GREEN"expand_outside_quotes\n" RESET);
 			if (input[i + 1] == '$')
 				i += 1;
-			i = expanding_var(token, i, input, env, space);
+			i = expanding_var(token, i, input, env, &space);
 			if (i == -1)
 				return (0);
 		}

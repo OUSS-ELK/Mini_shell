@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
+int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 {
 	int		start;
 	int		len;
@@ -35,9 +35,12 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool space)
 	free(var_name);
 	if (!expanded)
 		expanded = "";
-	printf("space [%d]in expand normal\n", space);
+	printf("space [%d]in expand normal\n", *space);
 	add_token(token, expanded, WORD, space);
-	space = f_isspace(input[i]);
+	if (input[i] && !f_isspace(input[i]))
+		*space = false;
+	else
+		*space = true;
 	return (start + len);
 }
 
