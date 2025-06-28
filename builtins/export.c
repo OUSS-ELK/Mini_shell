@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 10:18:33 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/06/28 12:37:16 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/06/28 15:30:40 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static int	is_valid_env_var(const char *s, t_exec *flag)
 // append == when we use += instead of = (apend new value to the existing one)
 // replace == variable exist and += is not used (replace the current value)
 
-void	builtin_export(char **av, t_env **env_lst, t_exec *exec)
+void	ft_export(char **av, t_env **env_lst, t_exec *exec)
 {
 	int		i;
 
@@ -55,7 +55,7 @@ void	builtin_export(char **av, t_env **env_lst, t_exec *exec)
 	while (av[++i])
 	{
 		if (!is_valid_env_var(av[i], exec))
-			break ;
+			continue ;
 		process_export_arg(av[i], env_lst);
 	}
 }

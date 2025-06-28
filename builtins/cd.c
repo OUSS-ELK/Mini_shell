@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:28:16 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/06/28 12:28:23 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/06/28 14:45:24 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static int	go_home(t_env *env_lst)
 }
 
 // main function
-void	builtin_cd(char **args, t_env **env_lst, t_exec *exec)
+void	ft_cd(char **args, t_env **env_lst, t_exec *exec)
 {
 	if (!args || !args[0] || !env_lst || !(*env_lst))
 		return ;

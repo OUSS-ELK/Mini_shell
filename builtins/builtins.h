@@ -5,10 +5,10 @@
 # include "../exec/execution.h"
 
 // cd.c
-void	builtin_cd(char **args, t_env **env_lst, t_exec *exec);
+void	ft_cd(char **args, t_env **env_lst, t_exec *exec);
 
 // export.c
-void	builtin_export(char **av, t_env **env_lst, t_exec *exec);
+void	ft_export(char **av, t_env **env_lst, t_exec *exec);
 void	print_export(t_env **env_lst);
 
 // export_utils.c
@@ -17,6 +17,9 @@ char	*get_value(char *str);
 void	add_to_env(t_env **env_lst, char *key, char *value);
 void	append_env_value(t_env *tmp, char *value);
 void	replace_env_value(t_env *tmp, char *value);
+
+// unset.c
+void	ft_unset(char **av, t_env **env_lst, t_exec *exec);
 
 
 #endif
