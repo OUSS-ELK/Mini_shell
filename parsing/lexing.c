@@ -66,7 +66,7 @@ void	add_token(t_token **token, char *input, t_token_type type, bool space)
 	tmp->next = new;
 }
 
-int	check_operator(char *input, int i, t_token **token, bool space)
+int	check_operator(char *input, int i, t_token **token, bool space, bool *heredoc)
 {
 	t_token_type	type;
 
@@ -84,6 +84,8 @@ int	check_operator(char *input, int i, t_token **token, bool space)
 		type = 0;
 	if (type == APPEND || type == HEREDOC)
 	{
+		if (type == HEREDOC)
+			*heredoc = true;
 		add_token(token, ft_substr(input, i, 2), type, space);
 		return (i + 2);
 	}

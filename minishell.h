@@ -81,7 +81,7 @@ int		check_quote(char *input);
 int		inside_quote(char *input, int start, char **output, t_env *env);
 t_token	*creat_token(char *input, t_token_type type, bool space);
 void	add_token(t_token **token, char *input, t_token_type type, bool space);
-int		check_operator(char *input, int i, t_token **token, bool space);
+int		check_operator(char *input, int i, t_token **token, bool space, bool *heredoc);
 int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space);
 char	*expand_var_str(char *str, t_env *env);
 void	merge_words(t_token **token);
@@ -100,9 +100,10 @@ int		is_operator(char oper);
 int		is_word_start(char c);
 int		valid_expand(char input, char next);
 int		is_alpha(char input);
-int		is_oper_type(t_token *curr_token);
 int		all_space(char *input);
+t_token	*get_last_token(t_token *token);
 
+int	handle_word(t_token **token, char *input, bool *space);
 
 
 // debug

@@ -19,7 +19,7 @@ t_cmd	*alloc_new_cmd(void)
 	return (new);
 }
 
-char	**handle_word(char **args, char *new_arg)
+char	**handl_word(char **args, char *new_arg)
 {
 	int		len = 0;
 	char	**new_args;
@@ -162,7 +162,7 @@ t_cmd *parse_cmd(t_token **token)
 			if (!curr->redir || (curr->redir && curr->redir->filename))
 			{
 				// printf("deb\n");
-				curr->args = handle_word(curr->args, curr_token->token);
+				curr->args = handl_word(curr->args, curr_token->token);
 			curr_token = curr_token->next;
 			}
 		}

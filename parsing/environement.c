@@ -14,16 +14,37 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 		expanded = ft_itoa(0);												// Should change 0 with exit_status comming from exec
 		if (!expanded)
 			return (-1);
-		add_token(token, expanded, WORD, space);
+		add_token(token, expanded, WORD, *space);
 		space = false;
 		free(expanded);
 		return (start + 1);
 	}
-	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_' || input[start + len] == '{'))
+	if (input[start] == '{')
 	{
-		if (input[start] == '{')
-			start++;
+		start++; // skip '{'
+		while (input[start + len] && input[start + len] != '}')
+			len++;
+		if (input[start + len] != '}')
+			return (-1); // invalid syntax: missing '}'
+		var_name = ft_substr(input, start, len);
+		if (!var_name)
+			return (-1);
+		expanded = ft_getenv(var_name, env);
+		free(var_name);
+		if (!expanded)
+			expanded = "";
+		add_token(token, expanded, WORD, *space);
+		*space = false;
+		return (start + len + 2); // +2 for ${ and }
+	}
+	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
 		len++;
+	if (len == 0)
+	{
+		// case: single $ followed by non-var char
+		add_token(token, "$", WORD, *space);
+		*space = false;
+		return (i + 1);
 	}
 	// printf("input + len[%c]  | len = %d\n", input[start + len], len);
 	var_name = ft_substr(input, start, len);
@@ -36,11 +57,11 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 	if (!expanded)
 		expanded = "";
 	// printf("space [%d]in expand normal\n", *space);
-	add_token(token, expanded, WORD, space);
-	if (input[i] && !f_isspace(input[i]))
+	add_token(token, expanded, WORD, *space);
+	// if (input[i] && !f_isspace(input[i]))
 		*space = false;
-	else
-		*space = true;
+	// else
+	// 	*space = true;
 	return (start + len);
 }
 
@@ -116,16 +137,12 @@ char	*f_strjoin_char(char *s, char c)
 	return f_strjoin_free(s, str);
 }
 
-char	*expand_var_str(char *str, t_env *env)   // just to test (copied) should rebuild it   | add check for '${USER'} => sould expand
+char	*expand_var_str(char *str, t_env *env)
 {
-	char	*result;
-	int		i;
-	char	*tmp;
-	int		start;
-	char	*value;
+	char	*result = ft_strdup("");
+	int		i = 0, start;
+	char	*tmp, *value;
 
-	i = 0;
-	result = ft_strdup("");
 	while (str[i])
 	{
 		if (str[i] == '$')
@@ -138,6 +155,19 @@ char	*expand_var_str(char *str, t_env *env)   // just to test (copied) should re
 				free(tmp);
 				i++;
 			}
+			else if (str[i] == '{') // handle ${VAR}
+			{
+				start = ++i;
+				while (str[i] && str[i] != '}')
+					i++;
+				if (str[i] != '}')
+					return (result);
+				tmp = ft_substr(str, start, i - start);
+				value = ft_getenv(tmp, env);
+				result = f_strjoin_free(result, value ? value : "");
+				free(tmp);
+				i++;
+			}
 			else if (ft_isalpha(str[i]) || str[i] == '_')
 			{
 				start = i;
@@ -145,20 +175,62 @@ char	*expand_var_str(char *str, t_env *env)   // just to test (copied) should re
 					i++;
 				tmp = ft_substr(str, start, i - start);
 				value = ft_getenv(tmp, env);
-				if (value)
-					result = f_strjoin_free(result, value);
-				else
-					result = f_strjoin_free(result, "");
+				result = f_strjoin_free(result, value ? value : "");
 				free(tmp);
 			}
 			else
 				result = f_strjoin_char(result, '$');
 		}
 		else
-		{
-			result = f_strjoin_char(result, str[i]);
-			i++;
-		}
+			result = f_strjoin_char(result, str[i++]);
 	}
 	return (result);
 }
+
+
+// char	*expand_var_str(char *str, t_env *env)   		//  add check for '${USER'} => sould expand
+// {
+// 	char	*result;
+// 	int		i;
+// 	char	*tmp;
+// 	int		start;
+// 	char	*value;
+
+// 	i = 0;
+// 	result = ft_strdup("");
+// 	while (str[i])
+// 	{
+// 		if (str[i] == '$')
+// 		{
+// 			i++;
+// 			if (str[i] == '?')
+// 			{
+// 				tmp = ft_itoa(0);
+// 				result = f_strjoin_free(result, tmp);
+// 				free(tmp);
+// 				i++;
+// 			}
+// 			else if (ft_isalpha(str[i]) || str[i] == '_')
+// 			{
+// 				start = i;
+// 				while (ft_isalnum(str[i]) || str[i] == '_')
+// 					i++;
+// 				tmp = ft_substr(str, start, i - start);
+// 				value = ft_getenv(tmp, env);
+// 				if (value)
+// 					result = f_strjoin_free(result, value);
+// 				else
+// 					result = f_strjoin_free(result, "");
+// 				free(tmp);
+// 			}
+// 			else
+// 				result = f_strjoin_char(result, '$');
+// 		}
+// 		else
+// 		{
+// 			result = f_strjoin_char(result, str[i]);
+// 			i++;
+// 		}
+// 	}
+// 	return (result);
+// }

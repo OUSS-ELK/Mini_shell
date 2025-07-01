@@ -66,20 +66,25 @@
 // 	return (1);
 // }
 
-int	handle_expand(t_token **token, char *input, t_env *env, bool *space)
+int	handle_expand(t_token **token, char *input, t_env *env, bool *space, bool *heredoc)
 {
 	if (is_operator(input[0]))
-		return (check_operator(input, 0, token, *space));
-	if (valid_expand(input[0], input[1]) == 1)
+		return (check_operator(input, 0, token, space, heredoc));
+	if (*heredoc)
 	{
-		if (input[1] == '$')
+		if (input[1] && valid_expand(input[0], input[1]) == 1)
+				return (handle_word(token, input, space));
+	}
+	else
+	{
+		if (input[0] && input[1] && input[1] == '$')
 			return (expanding_var(token, 1, input, env, space));
 		return (expanding_var(token, 0, input, env, space));
 	}
 	return (1);
 }
 
-int	handle_word1(t_token **token, char *input, bool *space)
+int	handle_word(t_token **token, char *input, bool *space)
 {
 	int		i;
 	char	*part;
@@ -112,9 +117,11 @@ int	lexer_input(t_token **token, char *input, t_env *env)
 {
 	int		i;
 	bool	space;
+	bool	heredoc;
 
 	i = 0;
 	space = false;
+	heredoc = false;
 	while (input[i])
 	{
 		if (f_isspace(input[i]))
@@ -125,12 +132,17 @@ int	lexer_input(t_token **token, char *input, t_env *env)
 		else if (is_quote(input[i]))
 			i += handle_quote(token, input + i, env, &space);
 		else if (is_word_start(input[i]))
-			i += handle_word1(token, input + i, &space);
+		{
+			i += handle_word(token, input + i, &space);
+			heredoc = false;
+		}
 		else
-			i += handle_expand(token, input + i, env, &space);
+			i += handle_expand(token, input + i, env, &space, &heredoc);
 	}
-	if (i > 0)
+	if (i > 0 && *token)
 		merge_words(token);
+	else if (i < 0)
+		return (0);
 	return (1);
 }
 
@@ -138,7 +150,7 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
 {
 	t_env	*envr;
 
-	envr = collect_env(env); 																			// collecte environement variables
+	envr = collect_env(env); 																			// 	collecte environement variables
 	if (!envr)
 		return (0);																						//	return 0 for error & 1 for success 
 	if (!check_quote(input))

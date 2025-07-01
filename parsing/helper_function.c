@@ -103,6 +103,16 @@ void	free_env(t_env *env)
 	}
 }
 
+t_token	*get_last_token(t_token *token)
+{
+	if (!token)
+		return (NULL);
+
+	while (token)
+		token = token->next;
+	return (token);
+}
+
 int	all_space(char *input)
 {
 	int	i;
