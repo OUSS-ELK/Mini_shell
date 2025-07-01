@@ -1,17 +1,5 @@
 #include "../minishell.h"
 
-// int find_word(char *input, int start, t_token **token)
-// {
-//     int last;
-
-//     last = start;        
-//     while (input[last] && is_word_start(input[last]))
-//         last++;
-//     if (last > start)
-//         add_token(token, f_substring(input, start, last - start), WORD);
-//     return (last);
-// }
-
 // find the closing quote & return index & expand inside Double_quote
 int	inside_quote(char *input, int start, char **output, t_env *env)
 {
@@ -112,13 +100,13 @@ void	merge_words(t_token **token)                            		     // function 
 	curr = *token;
 	if (!curr || !curr->next)
 		return ;
-	printf("inside merge word\n");
+	// printf("inside merge word\n");
 	while (curr && curr->next)
 	{
 		// should merge if no space after word.
 		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
 		{
-			printf("mix \n");
+			// printf("mix \n");
 			merged = ft_strjoin(curr->token, curr->next->token);
 			if (!merged)
 				return ;
