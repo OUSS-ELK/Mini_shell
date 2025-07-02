@@ -1,19 +1,7 @@
 #include "../minishell.h"
 
-// int find_word(char *input, int start, t_token **token)
-// {
-//     int last;
-
-//     last = start;        
-//     while (input[last] && is_word_start(input[last]))
-//         last++;
-//     if (last > start)
-//         add_token(token, f_substring(input, start, last - start), WORD);
-//     return (last);
-// }
-
 // find the closing quote & return index & expand inside Double_quote
-int	inside_quote(char *input, int start, char **output, t_env *env)
+int	inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc)
 {
 	char	quote;
 	char	*expand;
@@ -28,9 +16,15 @@ int	inside_quote(char *input, int start, char **output, t_env *env)
 	str = ft_substr(input, start + 1, i - start - 1);					// Take what inside quotes
 	if (!str)
 		return (-1);
-	if (quote == '"')													// Expanding inside DQ
+	if (*heredoc)
 	{
-		expand = expand_var_str(str, env);
+		expand = ft_strdup(str);
+		if (!expand)
+			return (free(str), -1);
+	}
+	else if (quote == '"')													// Expanding inside DQ
+	{
+		expand = expand_var_str(str, env, *heredoc);
 		if (!expand)
 			return (free(str), -1);
 	}
@@ -82,6 +76,7 @@ int	check_operator(char *input, int i, t_token **token, bool space, bool *heredo
 {
 	t_token_type	type;
 
+	// printf("inside check operator\n");
 	if (input[i] == '>' && input[i + 1] == '>')
 		type = APPEND;
 	else if (input[i] == '<' && input[i + 1] == '<')
@@ -98,7 +93,9 @@ int	check_operator(char *input, int i, t_token **token, bool space, bool *heredo
 	{
 		if (type == HEREDOC)
 			*heredoc = true;
+	// printf("heredoc flag = %d\n", *heredoc);
 		add_token(token, ft_substr(input, i, 2), type, space);
+		// *heredoc = false;
 		return (i + 2);
 	}
 	add_token(token, ft_substr(input, i, 1), type, space);
@@ -114,13 +111,13 @@ void	merge_words(t_token **token)                            		     // function 
 	curr = *token;
 	if (!curr || !curr->next)
 		return ;
-	printf("inside merge word\n");
+	// printf("inside merge word\n");
 	while (curr && curr->next)
 	{
 		// should merge if no space after word.
 		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
 		{
-			printf("mix \n");
+			// printf("mix \n");
 			merged = ft_strjoin(curr->token, curr->next->token);
 			if (!merged)
 				return ;

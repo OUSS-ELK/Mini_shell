@@ -9,7 +9,7 @@ t_cmd	*alloc_new_cmd(void)
 {
 	t_cmd *new;
 
-	printf("alloc new cmd\n");
+	// printf("alloc new cmd\n");
 	new = ft_calloc(1, sizeof(t_cmd));
 	if (!new)
 		return (NULL);
@@ -124,7 +124,6 @@ t_cmd *parse_cmd(t_token **token)
 		// printf("_PIPE  token->type = %d\n", curr_token->type);
 			if (!curr->args && !curr->redir)
 			{
-				printf("dee\n");
 				write_error(5);
 				free_cmd(head);
 				return (NULL);
@@ -149,7 +148,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (is_oper(curr_token->type))
 		{
-		printf("_Operators token->type = %d\n", curr_token->type);
+		// printf("_Operators token->type = %d\n", curr_token->type);
 			if (!handle_redirection(curr, &curr_token))
 			{
 				free_cmd(head);
@@ -159,7 +158,7 @@ t_cmd *parse_cmd(t_token **token)
 		}
 		else if (curr_token->type == WORD)
 		{
-		printf(" _WORDS token->type = %d\n", curr_token->type);
+		// printf(" _WORDS token->type = %d\n", curr_token->type);
 			if (!curr->redir || (curr->redir && curr->redir->filename))
 			{
 				// printf("deb\n");

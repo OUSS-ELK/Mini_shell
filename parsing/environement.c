@@ -1,13 +1,16 @@
 #include "../minishell.h"
 
-int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
+int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc)
 {
 	int		start;
 	int		len;
 	char	*var_name;
 	char	*expanded;
 
-	start = i + 1;
+	if (!heredoc)
+		start = i + 1;
+	else
+		start = i;
 	len = 0;
 	if (input[start] == '?')
 	{
@@ -21,11 +24,11 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 	}
 	if (input[start] == '{')
 	{
-		start++; // skip '{'
+		start++; 															// skip '{'
 		while (input[start + len] && input[start + len] != '}')
 			len++;
 		if (input[start + len] != '}')
-			return (-1); // invalid syntax: missing '}'
+			return (-1); 													// invalid syntax: missing '}'
 		var_name = ft_substr(input, start, len);
 		if (!var_name)
 			return (-1);
@@ -35,14 +38,13 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 			expanded = "";
 		add_token(token, expanded, WORD, *space);
 		*space = false;
-		return (start + len + 2); // +2 for ${ and }
+		return (start + len + 2); 											// +2 for ${ and }
 	}
 	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
 		len++;
 	if (len == 0)
-	{
-		// case: single $ followed by non-var char
-		add_token(token, "$", WORD, *space);
+	{	printf("solo '$' len == %d\n", len);				
+		add_token(token, "$", WORD, *space); 								// case: single $ followed by non-var char
 		*space = false;
 		return (i + 1);
 	}
@@ -57,7 +59,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 	if (!expanded)
 		expanded = "";
 	// printf("space [%d]in expand normal\n", *space);
-	add_token(token, expanded, WORD, space);
+	add_token(token, expanded, WORD, *space);
 	if (input[i] && !f_isspace(input[i]))
 		*space = false;
 	// else
@@ -69,7 +71,7 @@ t_env	*collect_env(char **env)
 {
 	t_env	*top;
 	t_env	*curr;
-	char	**str;							// str[0] = key & str[1] = value
+	char	**str;															// str[0] = key & str[1] = value
 	int		i;
 
 	if (!env)
@@ -137,7 +139,7 @@ char	*f_strjoin_char(char *s, char c)
 	return f_strjoin_free(s, str);
 }
 
-char	*expand_var_str(char *str, t_env *env)
+char	*expand_var_str(char *str, t_env *env, bool heredoc)
 {
 	char	*result = ft_strdup("");
 	int		i = 0, start;
@@ -148,6 +150,8 @@ char	*expand_var_str(char *str, t_env *env)
 		if (str[i] == '$')
 		{
 			i++;
+			if (heredoc)
+				i--;
 			if (str[i] == '?')
 			{
 				tmp = ft_itoa(0);
@@ -155,7 +159,7 @@ char	*expand_var_str(char *str, t_env *env)
 				free(tmp);
 				i++;
 			}
-			else if (str[i] == '{') // handle ${VAR}
+			else if (str[i] == '{') 										// handle ${VAR}
 			{
 				start = ++i;
 				while (str[i] && str[i] != '}')

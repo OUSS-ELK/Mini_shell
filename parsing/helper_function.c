@@ -108,7 +108,7 @@ t_token	*get_last_token(t_token *token)
 	if (!token)
 		return (NULL);
 
-	while (token)
+	while (token->next)
 		token = token->next;
 	return (token);
 }

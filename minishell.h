@@ -79,16 +79,16 @@ char	*ft_getenv(char *key, t_env *env);
 
 // parsing
 int		check_quote(char *input);
-int		inside_quote(char *input, int start, char **output, t_env *env);
+int		inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc);
 t_token	*creat_token(char *input, t_token_type type, bool space);
 void	add_token(t_token **token, char *input, t_token_type type, bool space);
 int		check_operator(char *input, int i, t_token **token, bool space, bool *heredoc);
-int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space);
-char	*expand_var_str(char *str, t_env *env);
+int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc);
+char	*expand_var_str(char *str, t_env *env, bool heredoc);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);
+int 	parsing_function(t_token **token, char *input, char **env, t_cmd **cmd);
 
-// int 	find_word(char *input, int start, t_token **token);
 
 // helper function
 void	write_error(int	n);
