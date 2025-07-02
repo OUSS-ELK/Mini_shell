@@ -11,6 +11,9 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+// globale exit status
+// int	global_status = 0;
+
 // token type
 typedef enum s_token_type
 {
@@ -27,7 +30,7 @@ typedef struct s_token
 {
 	char			*token;
 	t_token_type	type;
-	bool			space;				// for mergin words that are no space bitween them
+	bool			space;				// for mergine words that are no space bitween them
 	struct s_token	*next;
 } t_token;
 
@@ -75,8 +78,6 @@ t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
 
 // parsing
-int 	parsing_function(t_token **token, char *input, char **env, t_cmd **cmd);
-int 	lexer_input(t_token **token, char *input, t_env *env);
 int		check_quote(char *input);
 int		inside_quote(char *input, int start, char **output, t_env *env);
 t_token	*creat_token(char *input, t_token_type type, bool space);
@@ -86,6 +87,8 @@ int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 char	*expand_var_str(char *str, t_env *env);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);
+
+// int 	find_word(char *input, int start, t_token **token);
 
 // helper function
 void	write_error(int	n);

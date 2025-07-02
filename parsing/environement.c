@@ -57,8 +57,8 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space)
 	if (!expanded)
 		expanded = "";
 	// printf("space [%d]in expand normal\n", *space);
-	add_token(token, expanded, WORD, *space);
-	// if (input[i] && !f_isspace(input[i]))
+	add_token(token, expanded, WORD, space);
+	if (input[i] && !f_isspace(input[i]))
 		*space = false;
 	// else
 	// 	*space = true;
