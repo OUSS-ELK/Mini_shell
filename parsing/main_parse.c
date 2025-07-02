@@ -72,8 +72,8 @@ int	handle_expand(t_token **token, char *input, t_env *env, bool *space, bool *h
 		return (check_operator(input, 0, token, space, heredoc));
 	if (*heredoc)
 	{
-		if (input[1] && valid_expand(input[0], input[1]) == 1)
-				return (handle_word(token, input, space));
+		// if (input[1] && valid_expand(input[0], input[1]) == 1)
+		return (handle_word(token, input, space));
 	}
 	else
 	{
@@ -130,12 +130,28 @@ int	lexer_input(t_token **token, char *input, t_env *env)
 			i++;
 		}
 		else if (is_quote(input[i]))
+		{
+			t_token *last = get_last_token(*token);
+			if (last && last->type == HEREDOC)
+				heredoc = true;
+			else
+				heredoc = true;
 			i += handle_quote(token, input + i, env, &space);
+		}
 		else if (is_word_start(input[i]))
 		{
+			t_token *last = get_last_token(*token);
+			if (last && last->type == HEREDOC)
+				heredoc = false;
 			i += handle_word(token, input + i, &space);
-			heredoc = false;
 		}
+		// else if (is_quote(input[i]))
+		// 	i += handle_quote(token, input + i, env, &space);
+		// else if (is_word_start(input[i]))
+		// {
+		// 	i += handle_word(token, input + i, &space);
+		// 	heredoc = false;
+		// }
 		else
 			i += handle_expand(token, input + i, env, &space, &heredoc);
 	}
