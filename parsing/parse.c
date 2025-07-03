@@ -49,11 +49,6 @@ char	**handl_word(char **args, char *new_arg)
 	return (new_args);
 }
 
-// void handle_word(t_cmd *cmd, t_token *token)
-// {
-// 	cmd->args = add_to_args(cmd->args, token->token);
-// }
-
 void	add_redirection(t_redir **redir_list, t_redir *new_redir)
 {
 	t_redir *temp;
@@ -73,6 +68,7 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
 {
     t_redir	*new_redir;
 	char	*filename;
+
     if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
     {
         write_error(4);
@@ -98,7 +94,7 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
         return 0;
     }
     new_redir->type = (*curr_token)->type;
-  
+    new_redir->quoted = (*curr_token)->next->quote;
     new_redir->next = NULL;
     add_redirection(&cmd->redir, new_redir);
     *curr_token = (*curr_token)->next->next;
@@ -163,7 +159,7 @@ t_cmd *parse_cmd(t_token **token)
 			{
 				// printf("deb\n");
 				curr->args = handl_word(curr->args, curr_token->token);
-			curr_token = curr_token->next;
+				curr_token = curr_token->next;
 			}
 		}
 		else

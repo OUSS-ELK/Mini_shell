@@ -172,7 +172,7 @@ void	print_tokens(t_token *token)
 {
 	while (token)
 	{
-		printf(BLUE"TOKEN [%s] | TYPE [%d] | space[%d]\n" RESET, token->token, token->type, token->space);
+		printf(BLUE"TOKEN [%s] | TYPE [%d] | space[%d] | quote[%d]\n" RESET, token->token, token->type, token->space, token->quote);
 		token = token->next;
 	}
 }
@@ -231,7 +231,7 @@ void	print_cmds(t_cmd *cmd)
 		t_redir *r = cmd->redir;
 		while (r)
 		{
-			printf(GREEN"Redir: type[%d], filename [%s]\n"RESET, r->type, r->filename);
+			printf(GREEN"Redir: type[%d], filename [%s] | quote[%d]\n"RESET, r->type, r->filename, r->quoted);
 			r = r->next;
 		}
 		cmd = cmd->next;

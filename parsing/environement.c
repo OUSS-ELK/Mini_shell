@@ -17,7 +17,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, 
 		expanded = ft_itoa(0);												// Should change 0 with exit_status comming from exec
 		if (!expanded)
 			return (-1);
-		add_token(token, expanded, WORD, *space);
+		add_token(token, expanded, WORD, *space, false);
 		space = false;
 		free(expanded);
 		return (start + 1);
@@ -36,7 +36,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, 
 		free(var_name);
 		if (!expanded)
 			expanded = "";
-		add_token(token, expanded, WORD, *space);
+		add_token(token, expanded, WORD, *space, false);
 		*space = false;
 		return (start + len + 2); 											// +2 for ${ and }
 	}
@@ -44,7 +44,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, 
 		len++;
 	if (len == 0)
 	{	printf("solo '$' len == %d\n", len);				
-		add_token(token, "$", WORD, *space); 								// case: single $ followed by non-var char
+		add_token(token, "$", WORD, *space, false); 								// case: single $ followed by non-var char
 		*space = false;
 		return (i + 1);
 	}
@@ -59,7 +59,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, 
 	if (!expanded)
 		expanded = "";
 	// printf("space [%d]in expand normal\n", *space);
-	add_token(token, expanded, WORD, *space);
+	add_token(token, expanded, WORD, *space, false);
 	if (input[i] && !f_isspace(input[i]))
 		*space = false;
 	// else

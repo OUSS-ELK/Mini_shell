@@ -28,7 +28,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			if (len == -1 || !part)
 				return (0);
 			// printf(BLUE"word_inside_quote = %s\n", part);
-			add_token(token, part, WORD, space);												// Create Node with its type
+			add_token(token, part, WORD, space, true);												// Create Node with its type
 			space = f_isspace(input[i]);
 
 			if (heredoc)
@@ -45,7 +45,7 @@ int lexer_input(t_token **token, char *input, t_env *env)
 			if (!part)
 				return (0);
 			// printf(BLUE"word = %s\n"RESET, part);
-			add_token(token, part, WORD, space);
+			add_token(token, part, WORD, space, false);
 			space = f_isspace(input[i]);
 			if (heredoc)
     			heredoc = false;

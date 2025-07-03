@@ -30,7 +30,8 @@ typedef struct s_token
 {
 	char			*token;
 	t_token_type	type;
-	bool			space;				// for mergine words that are no space bitween them
+	bool			space;				// for merge words that are no space bitween them
+	bool			quote;
 	struct s_token	*next;
 } t_token;
 
@@ -80,8 +81,8 @@ char	*ft_getenv(char *key, t_env *env);
 // parsing
 int		check_quote(char *input);
 int		inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc);
-t_token	*creat_token(char *input, t_token_type type, bool space);
-void	add_token(t_token **token, char *input, t_token_type type, bool space);
+t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
+void	add_token(t_token **token, char *input, t_token_type type, bool space, bool quote);
 int		check_operator(char *input, int i, t_token **token, bool space, bool *heredoc);
 int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc);
 char	*expand_var_str(char *str, t_env *env, bool heredoc);

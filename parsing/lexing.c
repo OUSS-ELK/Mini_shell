@@ -39,7 +39,7 @@ int	inside_quote(char *input, int start, char **output, t_env *env, bool *heredo
 	return (i + 1);
 }
 
-t_token	*creat_token(char *input, t_token_type type, bool space)
+t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 {
 	t_token	*new;
 
@@ -49,16 +49,17 @@ t_token	*creat_token(char *input, t_token_type type, bool space)
 	new->token = ft_strdup(input);
 	new->type = type;
 	new->space = space;
+	new->quote = quote;
 	new->next = NULL;
 	return (new);
 }
 
-void	add_token(t_token **token, char *input, t_token_type type, bool space)
+void	add_token(t_token **token, char *input, t_token_type type, bool space, bool quote)
 {
 	t_token	*new;
 	t_token	*tmp;
 
-	new = creat_token(input, type, space);
+	new = creat_token(input, type, space, quote);
 	if (!new)
 		return ;
 	if (*token == NULL)
@@ -94,11 +95,11 @@ int	check_operator(char *input, int i, t_token **token, bool space, bool *heredo
 		if (type == HEREDOC)
 			*heredoc = true;
 	// printf("heredoc flag = %d\n", *heredoc);
-		add_token(token, ft_substr(input, i, 2), type, space);
+		add_token(token, ft_substr(input, i, 2), type, space, false);
 		// *heredoc = false;
 		return (i + 2);
 	}
-	add_token(token, ft_substr(input, i, 1), type, space);
+	add_token(token, ft_substr(input, i, 1), type, space, false);
 	return (i + 1);
 }
 
