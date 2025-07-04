@@ -13,7 +13,7 @@ int	expand_exit_status(t_token **token, bool *space)
 	return (0);
 }
 
-int	expand_braced_var(t_token **token, char *input, int start, t_env *env, bool *space)
+int	expand_bracket_var(t_token **token, char *input, int start, t_env *env, bool *space)
 {
 	int		len = 0;
 	char	*var_name;
@@ -71,7 +71,7 @@ int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, 
 	}
 	if (input[start] == '{')
 	{
-		ret = expand_braced_var(token, input, start + 1, env, space);
+		ret = expand_bracket_var(token, input, start + 1, env, space);
 		if (ret == -1)
 			return (-1);
 		return (ret + 1);
@@ -227,7 +227,7 @@ char	*exit_status(char *result, int *i)
 	return (result);
 }
 
-char	*expand_braced_qt(char *str, int *i, t_env *env, char *result)
+char	*expand_bracket_qt(char *str, int *i, t_env *env, char *result)
 {
 	int		start;
 	char	*tmp;
@@ -277,7 +277,7 @@ char	*expand_loop(char *str, t_env *env, bool heredoc, char *result)
 			else if (str[i] == '?')
 				result = exit_status(result, &i);
 			else if (str[i] == '{')
-				result = expand_braced_qt(str, &i, env, result);
+				result = expand_bracket_qt(str, &i, env, result);
 			else if (ft_isalpha(str[i]) || str[i] == '_')
 				result = expand_simple_qt(str, &i, env, result);
 			else

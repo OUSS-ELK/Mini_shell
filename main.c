@@ -9,13 +9,13 @@ int main(int argc, char **argv, char **env)
 	(void)argc;
 	(void)argv;
 
-	// atexit(ll);
+	atexit(ll);
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
-		if (!input)																// Ctrl + D (EOF) 
+		if (!input)																	// Ctrl + D (EOF) 
 			break ;
-		if (all_space(input))													// Empty or spaces
+		if (all_space(input))														// Empty or spaces
 		{
 			free(input);
 			continue ;
@@ -23,20 +23,18 @@ int main(int argc, char **argv, char **env)
 		if (input)
 		{
 			token = NULL;
+			cmd = NULL;
 			add_history(input);
 			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
 			if (!parsing_function(&token, input, env, &cmd))
 			{
-				write_error(1);													// function to return error depends on num
-				free_tokens(token); 											// function to free the linked list from tokens
-				free_cmd(cmd);
+				write_error(1);
+				cleanup(token, cmd, input);
 				continue ;
 			}
 			print_cmds(cmd);
 		}
-		free_tokens(token);
-		free_cmd(cmd);
-		free(input);
+		cleanup(token, cmd, input);
 	}
 	return (0);
 }

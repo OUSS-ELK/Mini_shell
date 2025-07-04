@@ -20,6 +20,16 @@ void	write_error(int	n)
 		write(2, "Error\n", 6);
 }
 
+void	cleanup(t_token *token, t_cmd *cmd, char *input)
+{
+	if (token)
+		free_tokens(token);
+	if (cmd)
+		free_cmd(cmd);
+	if (input)
+		free(input);
+}
+
 void	free_cmd(t_cmd *cmd)
 {
 	t_cmd	*tmp;

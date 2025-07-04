@@ -117,21 +117,20 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
 		return (0);																						//	return 0 for error & 1 for success 
 	if (!check_quote(input))
 	{
+		printf("check_quote function\n");
 		write_error(2);
-		free_env(envr);
-		return (0);
+		return (free_env(envr), 0);
 	}
 	if (!lexer_input(token, input, envr))
 	{
 		// printf("lexer function error\n");
 		write_error(3);
-		free_env(envr);
-		return (0);
+		return (free_env(envr), 0);
 	}
 	// printf("lexer function pass\n");
 	*cmd = parse_cmd(token);
 	if (!*cmd)
-		return (0);
+		return (free_env(envr), 0);
 	// printf("parse cmd function pass\n");
 	free_env(envr);
 	return (1);

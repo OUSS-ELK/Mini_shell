@@ -73,12 +73,21 @@ typedef struct s_exec
 	bool	is_pipe;
 }	t_exec;
 
-typedef struct s_lexvars
+typedef struct s_lexer_vars			// Lexer variables
 {
 	int		i;
 	bool	space;
 	bool	heredoc;
 }	t_lexvars;
+
+
+typedef struct	s_token_vars
+{
+	char	*value;
+	int		type;
+	bool	space;
+	bool	quoted;
+}	t_token_vars;
 
 
 //env_func
@@ -100,6 +109,7 @@ int 	parsing_function(t_token **token, char *input, char **env, t_cmd **cmd);
 
 // helper function
 void	write_error(int	n);
+void	cleanup(t_token *token, t_cmd *cmd, char *input);
 void	free_cmd(t_cmd *cmd);
 void	free_redir(t_redir *redir);
 void	free_tokens(t_token *token);
