@@ -1,43 +1,93 @@
 #include "../minishell.h"
 
-// find the closing quote & return index & expand inside Double_quote
-int	inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc)
+char	*extract_quoted_content(char *input, int start, int *end)
 {
-	char	quote;
-	char	*expand;
-	char	*str;
 	int		i;
+	char	*str;
+	char	quote;
 
-	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
-	quote = input[start];												// Save the opening quote
+	quote = input[start];
 	i = start + 1;
 	while (input[i] && input[i] != quote)
 		i++;
-	str = ft_substr(input, start + 1, i - start - 1);					// Take what inside quotes
+	if (input[i] != quote)
+		return (NULL);
+	str = ft_substr(input, start + 1, i - start - 1);
+	if (!str)
+		return (NULL);
+	*end = i;
+	return (str);
+}
+
+char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc)
+{
+	char	*expand;
+
+	if (heredoc || quote == '\'')
+		expand = ft_strdup(str);
+	else
+		expand = expand_var_str(str, env, heredoc);
+	return (expand);
+}
+
+
+int inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc)
+{
+	char	*str;
+	char	*expand;
+	int		end;
+	char	quote;
+
+	quote = input[start];
+	str = extract_quoted_content(input, start, &end);
 	if (!str)
 		return (-1);
-	if (*heredoc)
-	{
-		expand = ft_strdup(str);
-		if (!expand)
-			return (free(str), -1);
-	}
-	else if (quote == '"')													// Expanding inside DQ
-	{
-		expand = expand_var_str(str, env, *heredoc);
-		if (!expand)
-			return (free(str), -1);
-	}
-	else																// Normal word inside quotes
-	{
-		expand = ft_strdup(str);
-		if (!expand)
-			return (free(str), -1);
-	}
+	expand = handle_quote_expansion(str, quote, env, *heredoc);
 	free(str);
+	if (!expand)
+		return (-1);
 	*output = expand;
-	return (i + 1);
+	return (end + 1);
 }
+
+//// find the closing quote & return index & expand inside Double_quote
+// int	inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc)
+// {
+// 	char	quote;
+// 	char	*expand;
+// 	char	*str;
+// 	int		i;
+
+// 	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
+// 	quote = input[start];												// Save the opening quote
+// 	i = start + 1;
+// 	while (input[i] && input[i] != quote)
+// 		i++;
+// 	str = ft_substr(input, start + 1, i - start - 1);					// Take what inside quotes
+// 	if (!str)
+// 		return (-1);
+// 	if (*heredoc)
+// 	{
+// 		expand = ft_strdup(str);
+// 		if (!expand)
+// 			return (free(str), -1);
+// 	}
+// 	else if (quote == '"')													// Expanding inside DQ
+// 	{
+// 		expand = expand_var_str(str, env, *heredoc);
+// 		if (!expand)
+// 			return (free(str), -1);
+// 	}
+// 	else																// Normal word inside quotes
+// 	{
+// 		expand = ft_strdup(str);
+// 		if (!expand)
+// 			return (free(str), -1);
+// 	}
+// 	free(str);
+// 	*output = expand;
+// 	return (i + 1);
+// }
 
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 {
@@ -134,3 +184,4 @@ void	merge_words(t_token **token)                            		     // function 
 			curr = curr->next;
 	}
 }
+

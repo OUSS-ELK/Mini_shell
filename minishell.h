@@ -73,6 +73,13 @@ typedef struct s_exec
 	bool	is_pipe;
 }	t_exec;
 
+typedef struct s_lexvars
+{
+	int		i;
+	bool	space;
+	bool	heredoc;
+}	t_lexvars;
+
 
 //env_func
 t_env	*collect_env(char **env);
@@ -107,7 +114,7 @@ int		is_alpha(char input);
 int		all_space(char *input);
 t_token	*get_last_token(t_token *token);
 
-int	handle_word(t_token **token, char *input, bool *space);
+// int	handle_word(t_token **token, char *input, bool *space);
 
 
 // debug

@@ -1,71 +1,147 @@
 #include "../minishell.h"
 
-int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc)
+int	expand_exit_status(t_token **token, bool *space)
 {
-	int		start;
-	int		len;
+	char *expanded;
+
+	expanded = ft_itoa(0);
+	if (!expanded)
+		return (-1);
+	add_token(token, expanded, WORD, *space, false);
+	*space = false;
+	free(expanded);
+	return (0);
+}
+
+int	expand_braced_var(t_token **token, char *input, int start, t_env *env, bool *space)
+{
+	int		len = 0;
 	char	*var_name;
 	char	*expanded;
 
-	if (!heredoc)
-		start = i + 1;
-	else
-		start = i;
-	len = 0;
+	while (input[start + len] && input[start + len] != '}')
+		len++;
+	if (input[start + len] != '}')
+		return (-1);
+	var_name = ft_substr(input, start, len);
+	if (!var_name)
+		return (-1);
+	expanded = ft_getenv(var_name, env);
+	free(var_name);
+	if (!expanded)
+		expanded = "";
+	add_token(token, expanded, WORD, *space, false);
+	*space = false;
+	free(expanded);
+	return (start + len + 1);
+}
+
+int	expand_simple_var(t_token **token, char *input, int start, t_env *env, bool *space)
+{
+	int		len = 0;
+	char	*var_name;
+	char	*expanded;
+
+	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
+		len++;
+	var_name = ft_substr(input, start, len);
+	if (!var_name)
+		return (-1);
+	expanded = ft_getenv(var_name, env);
+	free(var_name);
+	if (!expanded)
+		expanded = "";
+	add_token(token, expanded, WORD, *space, false);
+	*space = false;
+	return (start + len - 1);
+}
+
+int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc)
+{
+	int		start;
+	int		ret;
+
+	start = heredoc ? i : i + 1;
 	if (input[start] == '?')
 	{
-		expanded = ft_itoa(0);												// Should change 0 with exit_status comming from exec
-		if (!expanded)
+		ret = expand_exit_status(token, space);
+		if (ret == -1)
 			return (-1);
-		add_token(token, expanded, WORD, *space, false);
-		space = false;
-		free(expanded);
 		return (start + 1);
 	}
 	if (input[start] == '{')
 	{
-		start++; 															// skip '{'
-		while (input[start + len] && input[start + len] != '}')
-			len++;
-		if (input[start + len] != '}')
-			return (-1); 													// invalid syntax: missing '}'
-		var_name = ft_substr(input, start, len);
-		if (!var_name)
+		ret = expand_braced_var(token, input, start + 1, env, space);
+		if (ret == -1)
 			return (-1);
-		expanded = ft_getenv(var_name, env);
-		free(var_name);
-		if (!expanded)
-			expanded = "";
-		add_token(token, expanded, WORD, *space, false);
-		*space = false;
-		return (start + len + 2); 											// +2 for ${ and }
+		return (ret + 1);
 	}
-	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
-		len++;
-	if (len == 0)
-	{	printf("solo '$' len == %d\n", len);				
-		add_token(token, "$", WORD, *space, false); 								// case: single $ followed by non-var char
-		*space = false;
-		return (i + 1);
-	}
-	// printf("input + len[%c]  | len = %d\n", input[start + len], len);
-	var_name = ft_substr(input, start, len);
-	// printf("var_name = %s\n", var_name);
-	if (!var_name)
+	ret = expand_simple_var(token, input, start, env, space);
+	if (ret == -1)
 		return (-1);
-	expanded = ft_getenv(var_name, env);
-	// printf("expanded = %s\n", expanded);
-	free(var_name);
-	if (!expanded)
-		expanded = "";
-	// printf("space [%d]in expand normal\n", *space);
-	add_token(token, expanded, WORD, *space, false);
-	if (input[i] && !f_isspace(input[i]))
-		*space = false;
-	// else
-	// 	*space = true;
-	return (start + len);
+	return (ret + 1);
 }
+
+// int expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc)
+// {
+// 	int		start;
+// 	int		len;
+// 	char	*var_name;
+// 	char	*expanded;
+
+// 	if (!heredoc)
+// 		start = i + 1;
+// 	else
+// 		start = i;
+// 	len = 0;
+// 	if (input[start] == '?')
+// 	{
+// 		expanded = ft_itoa(0);												// Should change 0 with exit_status comming from exec
+// 		if (!expanded)
+// 			return (-1);
+// 		add_token(token, expanded, WORD, *space, false);
+// 		space = false;
+// 		free(expanded);
+// 		return (start + 1);
+// 	}
+// 	if (input[start] == '{')
+// 	{
+// 		start++; 															// skip '{'
+// 		while (input[start + len] && input[start + len] != '}')
+// 			len++;
+// 		if (input[start + len] != '}')
+// 			return (-1); 													// invalid syntax: missing '}'
+// 		var_name = ft_substr(input, start, len);
+// 		if (!var_name)
+// 			return (-1);
+// 		expanded = ft_getenv(var_name, env);
+// 		free(var_name);
+// 		if (!expanded)
+// 			expanded = "";
+// 		add_token(token, expanded, WORD, *space, false);
+// 		*space = false;
+// 		return (start + len + 2); 											// +2 for ${ and }
+// 	}
+// 	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
+// 		len++;
+// 	// printf("input + len[%c]  | len = %d\n", input[start + len], len);
+// 	var_name = ft_substr(input, start, len);
+// 	// printf("var_name = %s\n", var_name);
+// 	if (!var_name)
+// 		return (-1);
+// 	expanded = ft_getenv(var_name, env);
+// 	// printf("expanded = %s\n", expanded);
+// 	free(var_name);
+// 	if (!expanded)
+// 		expanded = "";
+// 	// printf("space [%d]in expand normal\n", *space);
+// 	add_token(token, expanded, WORD, *space, false);
+// 	if (input[i] && !f_isspace(input[i]))
+// 		*space = false;
+// 	// else
+// 	// 	*space = true;
+// 	return (start + len);
+// }
 
 t_env	*collect_env(char **env)
 {
@@ -127,6 +203,7 @@ char	*ft_getenv(char *key, t_env *env)
 char	*f_strjoin_free(char *s1, char *s2)
 {
 	char 	*joined;
+
 	joined = ft_strjoin(s1, s2);
 	free(s1);
 	return (joined);
@@ -139,12 +216,57 @@ char	*f_strjoin_char(char *s, char c)
 	return f_strjoin_free(s, str);
 }
 
-char	*expand_var_str(char *str, t_env *env, bool heredoc)
+char	*exit_status(char *result, int *i)
 {
-	char	*result = ft_strdup("");
-	int		i = 0, start;
-	char	*tmp, *value;
+	char *tmp;
 
+	tmp = ft_itoa(0);
+	result = f_strjoin_free(result, tmp);
+	free(tmp);
+	(*i)++;
+	return (result);
+}
+
+char	*expand_braced_qt(char *str, int *i, t_env *env, char *result)
+{
+	int		start;
+	char	*tmp;
+	char	*value;
+
+	start = ++(*i);
+	while (str[*i] && str[*i] != '}')
+		(*i)++;
+	if (str[*i] != '}')
+		return (result);
+	tmp = ft_substr(str, start, *i - start);
+	value = ft_getenv(tmp, env);
+	result = f_strjoin_free(result, value ? value : "");
+	free(tmp);
+	(*i)++;
+	return (result);
+}
+
+char	*expand_simple_qt(char *str, int *i, t_env *env, char *result)
+{
+	int		start;
+	char	*tmp;
+	char	*value;
+
+	start = *i;
+	while (ft_isalnum(str[*i]) || str[*i] == '_')
+		(*i)++;
+	tmp = ft_substr(str, start, *i - start);
+	value = ft_getenv(tmp, env);
+	result = f_strjoin_free(result, value ? value : "");
+	free(tmp);
+	return (result);
+}
+
+char	*expand_loop(char *str, t_env *env, bool heredoc, char *result)
+{
+	int	i;
+
+	i = 0;
 	while (str[i])
 	{
 		if (str[i] == '$')
@@ -152,36 +274,12 @@ char	*expand_var_str(char *str, t_env *env, bool heredoc)
 			i++;
 			if (heredoc)
 				i--;
-			if (str[i] == '?')
-			{
-				tmp = ft_itoa(0);
-				result = f_strjoin_free(result, tmp);
-				free(tmp);
-				i++;
-			}
-			else if (str[i] == '{') 										// handle ${VAR}
-			{
-				start = ++i;
-				while (str[i] && str[i] != '}')
-					i++;
-				if (str[i] != '}')
-					return (result);
-				tmp = ft_substr(str, start, i - start);
-				value = ft_getenv(tmp, env);
-				result = f_strjoin_free(result, value ? value : "");
-				free(tmp);
-				i++;
-			}
+			else if (str[i] == '?')
+				result = exit_status(result, &i);
+			else if (str[i] == '{')
+				result = expand_braced_qt(str, &i, env, result);
 			else if (ft_isalpha(str[i]) || str[i] == '_')
-			{
-				start = i;
-				while (ft_isalnum(str[i]) || str[i] == '_')
-					i++;
-				tmp = ft_substr(str, start, i - start);
-				value = ft_getenv(tmp, env);
-				result = f_strjoin_free(result, value ? value : "");
-				free(tmp);
-			}
+				result = expand_simple_qt(str, &i, env, result);
 			else
 				result = f_strjoin_char(result, '$');
 		}
@@ -191,26 +289,47 @@ char	*expand_var_str(char *str, t_env *env, bool heredoc)
 	return (result);
 }
 
+char	*expand_var_str(char *str, t_env *env, bool heredoc)
+{
+	char	*result;
 
-// char	*expand_var_str(char *str, t_env *env)   		//  add check for '${USER'} => sould expand
+	result = ft_strdup("");
+	if (!result)
+		return (NULL);
+	return (expand_loop(str, env, heredoc, result));
+}
+
+
+// char	*expand_var_str(char *str, t_env *env, bool heredoc)
 // {
-// 	char	*result;
-// 	int		i;
-// 	char	*tmp;
-// 	int		start;
-// 	char	*value;
+// 	char	*result = ft_strdup("");
+// 	int		i = 0, start;
+// 	char	*tmp, *value;
 
-// 	i = 0;
-// 	result = ft_strdup("");
 // 	while (str[i])
 // 	{
 // 		if (str[i] == '$')
 // 		{
 // 			i++;
+// 			if (heredoc)
+// 				i--;
 // 			if (str[i] == '?')
 // 			{
-// 				tmp = ft_itoa(0);
+// 				tmp = ft_itoa(0);											// should replace 0 with exit_status
 // 				result = f_strjoin_free(result, tmp);
+// 				free(tmp);
+// 				i++;
+// 			}
+// 			else if (str[i] == '{') 										// handle ${VAR}
+// 			{
+// 				start = ++i;
+// 				while (str[i] && str[i] != '}')
+// 					i++;
+// 				if (str[i] != '}')
+// 					return (result);
+// 				tmp = ft_substr(str, start, i - start);
+// 				value = ft_getenv(tmp, env);
+// 				result = f_strjoin_free(result, value ? value : "");
 // 				free(tmp);
 // 				i++;
 // 			}
@@ -221,20 +340,14 @@ char	*expand_var_str(char *str, t_env *env, bool heredoc)
 // 					i++;
 // 				tmp = ft_substr(str, start, i - start);
 // 				value = ft_getenv(tmp, env);
-// 				if (value)
-// 					result = f_strjoin_free(result, value);
-// 				else
-// 					result = f_strjoin_free(result, "");
+// 				result = f_strjoin_free(result, value ? value : "");
 // 				free(tmp);
 // 			}
 // 			else
 // 				result = f_strjoin_char(result, '$');
 // 		}
 // 		else
-// 		{
-// 			result = f_strjoin_char(result, str[i]);
-// 			i++;
-// 		}
+// 			result = f_strjoin_char(result, str[i++]);
 // 	}
 // 	return (result);
 // }
