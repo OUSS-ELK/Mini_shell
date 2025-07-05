@@ -20,20 +20,17 @@ int main(int argc, char **argv, char **env)
 			free(input);
 			continue ;
 		}
-		if (input)
+		token = NULL;
+		cmd = NULL;
+		add_history(input);
+		printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
+		if (!parsing_function(&token, input, env, &cmd))
 		{
-			token = NULL;
-			cmd = NULL;
-			add_history(input);
-			printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
-			if (!parsing_function(&token, input, env, &cmd))
-			{
-				write_error(1);
-				cleanup(token, cmd, input);
-				continue ;
-			}
-			print_cmds(cmd);
+			write_error(1);
+			cleanup(token, cmd, input);
+			continue ;
 		}
+		print_cmds(cmd);
 		cleanup(token, cmd, input);
 	}
 	return (0);

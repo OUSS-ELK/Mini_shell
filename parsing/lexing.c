@@ -50,45 +50,6 @@ int inside_quote(char *input, int start, char **output, t_env *env, bool *heredo
 	return (end + 1);
 }
 
-//// find the closing quote & return index & expand inside Double_quote
-// int	inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc)
-// {
-// 	char	quote;
-// 	char	*expand;
-// 	char	*str;
-// 	int		i;
-
-// 	// printf(RED"(inside quote function) input = [%c] | start = [%d]\n" RESET, input[start], start);
-// 	quote = input[start];												// Save the opening quote
-// 	i = start + 1;
-// 	while (input[i] && input[i] != quote)
-// 		i++;
-// 	str = ft_substr(input, start + 1, i - start - 1);					// Take what inside quotes
-// 	if (!str)
-// 		return (-1);
-// 	if (*heredoc)
-// 	{
-// 		expand = ft_strdup(str);
-// 		if (!expand)
-// 			return (free(str), -1);
-// 	}
-// 	else if (quote == '"')													// Expanding inside DQ
-// 	{
-// 		expand = expand_var_str(str, env, *heredoc);
-// 		if (!expand)
-// 			return (free(str), -1);
-// 	}
-// 	else																// Normal word inside quotes
-// 	{
-// 		expand = ft_strdup(str);
-// 		if (!expand)
-// 			return (free(str), -1);
-// 	}
-// 	free(str);
-// 	*output = expand;
-// 	return (i + 1);
-// }
-
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 {
 	t_token	*new;
@@ -104,12 +65,14 @@ t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 	return (new);
 }
 
-void	add_token(t_token **token, char *input, t_token_type type, bool space, bool quote)
+void add_token(t_token **token, t_token_vars *vars)
 {
 	t_token	*new;
 	t_token	*tmp;
 
-	new = creat_token(input, type, space, quote);
+	if (!vars || !vars->value)
+		return ;
+	new = creat_token(vars->value, vars->type, vars->space, vars->quoted);
 	if (!new)
 		return ;
 	if (*token == NULL)
@@ -123,34 +86,43 @@ void	add_token(t_token **token, char *input, t_token_type type, bool space, bool
 	tmp->next = new;
 }
 
-int	check_operator(char *input, int i, t_token **token, bool space, bool *heredoc)
+static t_token_type	get_opr_type(char *input, int i)
+{
+	if (input[i] == '>' && input[i + 1] == '>')
+		return (APPEND);
+	if (input[i] == '<' && input[i + 1] == '<')
+		return (HEREDOC);
+	if (input[i] == '>')
+		return (REDIR_OUT);
+	if (input[i] == '<')
+		return (REDIR_IN);
+	if (input[i] == '|')
+		return (PIPE);
+	return (0);
+}
+
+int	check_operator(t_oprvars *op_vars)
 {
 	t_token_type	type;
+	t_token_vars	vars;
 
-	// printf("inside check operator\n");
-	if (input[i] == '>' && input[i + 1] == '>')
-		type = APPEND;
-	else if (input[i] == '<' && input[i + 1] == '<')
-		type = HEREDOC;
-	else if (input[i] == '>')
-		type = REDIR_OUT;
-	else if (input[i] == '<')
-		type = REDIR_IN;
-	else if (input[i] == '|')
-		type = PIPE;
-	else
-		type = 0;
+	type = get_opr_type(op_vars->input, op_vars->i);
+	vars.type = type;
+	vars.space = op_vars->space;
+	vars.quoted = false;
 	if (type == APPEND || type == HEREDOC)
 	{
 		if (type == HEREDOC)
-			*heredoc = true;
-	// printf("heredoc flag = %d\n", *heredoc);
-		add_token(token, ft_substr(input, i, 2), type, space, false);
-		// *heredoc = false;
-		return (i + 2);
+			*(op_vars->heredoc) = true;
+		vars.value = ft_substr(op_vars->input, op_vars->i, 2);
+		add_token(op_vars->token, &vars);
+		free(vars.value);
+		return (op_vars->i + 2);
 	}
-	add_token(token, ft_substr(input, i, 1), type, space, false);
-	return (i + 1);
+	vars.value = ft_substr(op_vars->input, op_vars->i, 1);
+	add_token(op_vars->token, &vars);
+	free(vars.value);
+	return (op_vars->i + 1);
 }
 
 void	merge_words(t_token **token)                            		     // function to handle mixed word (if space true d'ont merge)
@@ -174,7 +146,6 @@ void	merge_words(t_token **token)                            		     // function 
 				return ;
 			free(curr->token);
 			curr->token = merged;
-
 			tmp = curr->next;
 			curr->next = tmp->next;
 			free(tmp->token);
@@ -184,4 +155,3 @@ void	merge_words(t_token **token)                            		     // function 
 			curr = curr->next;
 	}
 }
-

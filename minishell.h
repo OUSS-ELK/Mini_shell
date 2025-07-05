@@ -11,10 +11,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
-// globale exit status
-// int	global_status = 0;
-
-// token type
+// Token type
 typedef enum s_token_type
 {
 	WORD = 1,
@@ -81,7 +78,7 @@ typedef struct s_lexer_vars			// Lexer variables
 }	t_lexvars;
 
 
-typedef struct	s_token_vars
+typedef struct	s_token_vars		// Add token var
 {
 	char	*value;
 	int		type;
@@ -89,6 +86,42 @@ typedef struct	s_token_vars
 	bool	quoted;
 }	t_token_vars;
 
+typedef struct s_expand_vars		// Normal expanding vars
+{
+	t_token	**token;
+	int		i;
+	char	*input;
+	t_env	*env;
+	bool	*space;
+	bool	heredoc;
+}	t_expndvars;
+
+typedef struct s_expand_str_vars	// Expnade inside quotes var
+{
+	char	*str;
+	int		i;
+	t_env	*env;
+	char	*result;
+	bool	heredoc;
+}	t_exp_strvars;
+
+typedef struct s_quote_vars			// Quotes vars
+{
+	char	*input;
+	int		start;
+	char	**output;
+	t_env	*env;
+	bool	*heredoc;
+}	t_quotevars;
+
+typedef struct s_operator_vars		// Operator check vars
+{
+	char		*input;
+	t_token		**token;
+	bool		space;
+	bool		*heredoc;
+	int			i;
+}	t_oprvars;
 
 //env_func
 t_env	*collect_env(char **env);
@@ -98,9 +131,9 @@ char	*ft_getenv(char *key, t_env *env);
 int		check_quote(char *input);
 int		inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc);
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
-void	add_token(t_token **token, char *input, t_token_type type, bool space, bool quote);
-int		check_operator(char *input, int i, t_token **token, bool space, bool *heredoc);
-int 	expanding_var(t_token **token, int i, char *input, t_env *env, bool *space, bool heredoc);
+void	add_token(t_token **token, t_token_vars *vars);
+int		check_operator(t_oprvars *op_vars);
+int 	expanding_var(t_expndvars *exp_var);
 char	*expand_var_str(char *str, t_env *env, bool heredoc);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);

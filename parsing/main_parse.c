@@ -2,24 +2,41 @@
 
 int handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
-	int	new_i;
+	t_expndvars	exp_var;
+	int			new_i;
 
-	new_i = expanding_var(token, st->i, input, env, &st->space, st->heredoc);
+	exp_var.token = token;
+	exp_var.i = st->i;
+	exp_var.input = input;
+	exp_var.env = env;
+	exp_var.space = &st->space;
+	exp_var.heredoc = st->heredoc;
+
+	new_i = expanding_var(&exp_var);
 	if (new_i == -1)
 		return (0);
 	st->i = new_i;
 	return (1);
 }
-
+       
 int handle_operator(t_token **token, char *input, int i, t_lexvars *st)
 {
-	return check_operator(input, i, token, st->space, &st->heredoc);
+	t_oprvars op_vars;
+
+	op_vars.input = input;
+	op_vars.i = i;
+	op_vars.token = token;
+	op_vars.space = st->space;
+	op_vars.heredoc = &st->heredoc;
+
+	return (check_operator(&op_vars));
 }
 
 int handle_word(t_token **token, char *input, t_lexvars *st)
 {
-	int		start;
-	char	*part;
+	t_token_vars	vars;
+	int				start;
+	char			*part;
 
 	start = st->i;
 	while (input[st->i] && is_word_start(input[st->i]))
@@ -27,7 +44,11 @@ int handle_word(t_token **token, char *input, t_lexvars *st)
 	part = ft_substr(input, start, st->i - start);
 	if (!part)
 		return (0);
-	add_token(token, part, WORD, st->space, false);
+	vars.value = part;
+	vars.type = WORD;
+	vars.space = st->space;
+	vars.quoted = false;
+	add_token(token, &vars);
 	st->space = f_isspace(input[st->i]);
 	if (st->heredoc)
 		st->heredoc = false;
@@ -36,18 +57,38 @@ int handle_word(t_token **token, char *input, t_lexvars *st)
 
 int handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
-	char	*part;
-	int		len;
+	t_token_vars	vars;
+	char			*part;
+	int				len;
 
 	len = inside_quote(input, st->i, &part, env, &st->heredoc);
 	if (len == -1 || !part)
 		return (0);
-	add_token(token, part, WORD, st->space, true);
+	vars.value = part;
+	vars.type = WORD;
+	vars.space = st->space;
+	vars.quoted = true;
+	add_token(token, &vars);
 	st->space = f_isspace(input[len]);
 	st->i = len;
 	if (st->heredoc)
 		st->heredoc = false;
 	return (1);
+}
+
+void else_case(t_token **token, char *input, t_lexvars *st)
+{
+	t_token_vars	vars;
+
+	if (input[st->i + 1] && input[st->i] == '$' && input[st->i + 1] == '\0')
+	{
+		vars.value = "$";
+		vars.type = WORD;
+		vars.space = st->space;
+		vars.quoted = false;
+		add_token(token, &vars);
+	}
+	st->i++;
 }
 
 void handle_space(char *input, t_lexvars *st)
@@ -57,12 +98,6 @@ void handle_space(char *input, t_lexvars *st)
 	st->space = true;
 }
 
-void	else_case(t_token **token, char *input, t_lexvars *st)
-{
-	if (input[st->i + 1] && input[st->i] == '$' && input[st->i + 1] == '\0')
-			add_token(token, "$", WORD, st->space, false);
-	st->i++;
-}
 
 int lexing(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
@@ -135,85 +170,3 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
 	free_env(envr);
 	return (1);
 }
-
-// int lexer_input(t_token **token, char *input, t_env *env)
-// {
-// 	int 	i;
-// 	int 	len;
-// 	int 	start;
-// 	char	*part;
-// 	bool	space;
-// 	bool	heredoc;
-
-// 	i = 0;
-// 	space = false;
-// 	heredoc = false;
-// 	// printf(BOLDGREEN "(LEXER_FUNCTION) \n" RESET);
-// 	while (input[i])
-// 	{
-// 		if (input[i] && f_isspace(input[i]))															// Skip spaces
-// 		{
-// 			// printf(CYAN"find_space\n"RESET);
-// 			space = true;																				// Flag for space after words
-// 			i++;
-// 		}
-// 		else if (input[i] && is_quote(input[i]))														//	Inside quotes
-// 		{
-// 			// printf(YELLOW"find_quote\n"RESET);
-// 			len = inside_quote(input, i, &part, env, &heredoc);
-// 			if (len == -1 || !part)
-// 				return (0);
-// 			// printf(BLUE"word_inside_quote = %s\n", part);
-// 			add_token(token, part, WORD, space, true);												// Create Node with its type
-// 			space = f_isspace(input[i]);
-
-// 			if (heredoc)
-//     			heredoc = false;
-// 			i = len;
-// 		}
-// 		else if (input[i] && is_word_start(input[i]))													// If find word create a token for it 
-// 		{
-// 			// printf(MAGENTA"find_word | input[%c] | \n"RESET, input[i]);
-// 			start = i;
-// 			while (input[i] && is_word_start(input[i]))
-// 				i++;
-// 			part = ft_substr(input, start, i - start);
-// 			if (!part)
-// 				return (0);
-// 			// printf(BLUE"word = %s\n"RESET, part);
-// 			add_token(token, part, WORD, space, false);
-// 			space = f_isspace(input[i]);
-// 			if (heredoc)
-//     			heredoc = false;
-// 		}
-// 		else if (input[i] && is_operator(input[i]))														// Check for operator
-// 		{
-// 			i = check_operator(input, i, token, space, &heredoc);
-// 			// if (heredoc)
-//     		// 	heredoc = false;
-// 			// printf("after operator\n");
-// 		}
-// 		else if (input[i] && input[i + 1] && valid_expand(input[i], input[i + 1]) == 1) 				// Expanding in normale
-// 		{
-// 			printf(GREEN"expand_outside_quotes\n" RESET);
-// 			// if (input[i + 1] == '$')
-// 			// 	i += 1;
-// 			i = expanding_var(token, i, input, env, &space, heredoc);
-// 			if (i == -1)
-// 				return (0);
-// 		}
-// 		else
-// 		{
-// 			printf("else\n");
-// 			i++;
-// 		}
-// 	}
-// 	// printf("i = %d\n", i);
-// 	// printf("Before merge ===>>\n");
-// 	// print_tokens(*token);
-// 	if (i > 0)
-// 		merge_words(token);																				// Merge words thath are no space bitween them 
-// 	// printf("Last Tokens ===>>\n");
-// 	// print_tokens(*token);
-// 	return (1);
-// }
