@@ -1,5 +1,29 @@
 #include "minishell.h"
 
+int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
+{
+	t_env	*envr;
+
+	envr = collect_env(env); 																			// 	collecte environement variables
+	if (!envr)
+		return (0);																						//	return 0 for error & 1 for success 
+	if (!check_quote(input))
+	{
+		write_error(2);
+		return (free_env(envr), 0);
+	}
+	if (!lexer_input(token, input, envr))
+	{
+		write_error(3);
+		return (free_env(envr), 0);
+	}
+	*cmd = parse_cmd(token);
+	if (!*cmd)
+		return (free_env(envr), 0);
+	free_env(envr);
+	return (1);
+}
+
 int main(int argc, char **argv, char **env)
 {
 	t_token *token;

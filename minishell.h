@@ -61,7 +61,7 @@ typedef struct s_cmd
 typedef struct s_exec
 {
 	t_env	*env_lst;
-	char	**env_arr; // t_env to char ** for execve()
+	char	**env_arr; 				// t_env to char ** for execve()
 	int		exit_status;
 	int		pipe_fd[2];
 	int		stdin_backup;
@@ -129,7 +129,7 @@ char	*ft_getenv(char *key, t_env *env);
 
 // parsing
 int		check_quote(char *input);
-int		inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc);
+int		inside_quote(t_quotevars *qt_var);
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
 void	add_token(t_token **token, t_token_vars *vars);
 int		check_operator(t_oprvars *op_vars);
@@ -137,7 +137,23 @@ int 	expanding_var(t_expndvars *exp_var);
 char	*expand_var_str(char *str, t_env *env, bool heredoc);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);
+int 	lexer_input(t_token **token, char *input, t_env *env);
 int 	parsing_function(t_token **token, char *input, char **env, t_cmd **cmd);
+int		handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st);
+int 	handle_operator(t_token **token, char *input, int i, t_lexvars *st);
+int 	handle_word(t_token **token, char *input, t_lexvars *st);
+char	*extract_quoted_content(char *input, int start, int *end);
+char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc);
+
+int		is_only_space(char *filename);
+int 	is_oper(int type);
+t_cmd	*alloc_new_cmd(void);
+char	**handl_word(char **args, char *new_arg);
+char	**handl_word(char **args, char *new_arg);
+int 	is_valid_redir_filename(t_token *op_token);
+void	add_redirection(t_redir **redir_list, t_redir *new_redir);
+int 	create_and_add_redir(t_cmd *cmd, t_token *redir_token);
+int 	handle_redirection(t_cmd *cmd, t_token **curr_token);
 
 
 // helper function
@@ -156,9 +172,6 @@ int		valid_expand(char input, char next);
 int		is_alpha(char input);
 int		all_space(char *input);
 t_token	*get_last_token(t_token *token);
-
-// int	handle_word(t_token **token, char *input, bool *space);
-
 
 // debug
 void	print_tokens(t_token *token);

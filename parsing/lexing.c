@@ -1,55 +1,5 @@
 #include "../minishell.h"
 
-char	*extract_quoted_content(char *input, int start, int *end)
-{
-	int		i;
-	char	*str;
-	char	quote;
-
-	quote = input[start];
-	i = start + 1;
-	while (input[i] && input[i] != quote)
-		i++;
-	if (input[i] != quote)
-		return (NULL);
-	str = ft_substr(input, start + 1, i - start - 1);
-	if (!str)
-		return (NULL);
-	*end = i;
-	return (str);
-}
-
-char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc)
-{
-	char	*expand;
-
-	if (heredoc || quote == '\'')
-		expand = ft_strdup(str);
-	else
-		expand = expand_var_str(str, env, heredoc);
-	return (expand);
-}
-
-
-int inside_quote(char *input, int start, char **output, t_env *env, bool *heredoc)
-{
-	char	*str;
-	char	*expand;
-	int		end;
-	char	quote;
-
-	quote = input[start];
-	str = extract_quoted_content(input, start, &end);
-	if (!str)
-		return (-1);
-	expand = handle_quote_expansion(str, quote, env, *heredoc);
-	free(str);
-	if (!expand)
-		return (-1);
-	*output = expand;
-	return (end + 1);
-}
-
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 {
 	t_token	*new;
@@ -65,7 +15,7 @@ t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 	return (new);
 }
 
-void add_token(t_token **token, t_token_vars *vars)
+void	add_token(t_token **token, t_token_vars *vars)
 {
 	t_token	*new;
 	t_token	*tmp;
@@ -86,7 +36,7 @@ void add_token(t_token **token, t_token_vars *vars)
 	tmp->next = new;
 }
 
-static t_token_type	get_opr_type(char *input, int i)
+t_token_type	get_opr_type(char *input, int i)
 {
 	if (input[i] == '>' && input[i + 1] == '>')
 		return (APPEND);
@@ -134,13 +84,10 @@ void	merge_words(t_token **token)                            		     // function 
 	curr = *token;
 	if (!curr || !curr->next)
 		return ;
-	// printf("inside merge word\n");
 	while (curr && curr->next)
 	{
-		// should merge if no space after word.
 		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
 		{
-			// printf("mix \n");
 			merged = ft_strjoin(curr->token, curr->next->token);
 			if (!merged)
 				return ;
