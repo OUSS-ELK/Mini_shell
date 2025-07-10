@@ -1,12 +1,12 @@
 #include "minishell.h"
 
-int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
+int	parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
 {
 	t_env	*envr;
 
-	envr = collect_env(env); 																			// 	collecte environement variables
+	envr = collect_env(env);
 	if (!envr)
-		return (0);																						//	return 0 for error & 1 for success 
+		return (0);
 	if (!check_quote(input))
 	{
 		write_error(2);
@@ -24,22 +24,21 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd)
 	return (1);
 }
 
-int main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **env)
 {
-	t_token *token;
+	t_token	*token;
 	char	*input;
 	t_cmd	*cmd;
 
 	(void)argc;
 	(void)argv;
-
-	atexit(ll);
+	// atexit(ll);
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
-		if (!input)																	// Ctrl + D (EOF) 
+		if (!input)
 			break ;
-		if (all_space(input))														// Empty or spaces
+		if (all_space(input))
 		{
 			free(input);
 			continue ;

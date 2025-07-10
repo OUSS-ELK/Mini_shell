@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 22:41:10 by ouelkhar          #+#    #+#             */
-/*   Updated: 2024/11/30 16:12:02 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/10 13:38:55 by oussama-elk      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	*ft_free(char **src)
 	char	**new;
 
 	new = src;
-	while (*src) 
+	while (*src)
 	{
 		free(*src);
 		src++;
