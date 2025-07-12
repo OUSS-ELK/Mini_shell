@@ -16,6 +16,7 @@
 # include <readline/history.h>
 # include <errno.h>
 # include <signal.h>
+#include <sys/wait.h>
 
 extern int	g_exit_status;
 
@@ -302,12 +303,10 @@ void    handle_signals(void);
 
 
 // expand heredoc
-void	ms_expand_vars_in_str(char **str, t_env *env);
 int	handle_heredoc_break(char *line, char *delim);
 /* Expansion and string helpers */
-char	*ms_strjoin_free(char *s1, char *s2);
-int		ms_strcmp(const char *s1, const char *s2);
-void	ms_expand_vars_in_str(char **str, t_env *env);
+char	*ft_strjoin_free(char *s1, char *s2);
+void	ft_expand_vars_in_str(char **str, t_env *env);
 
 
 // === TEXT COLORS ===
