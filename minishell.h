@@ -149,7 +149,6 @@ int		is_only_space(char *filename);
 int 	is_oper(int type);
 t_cmd	*alloc_new_cmd(void);
 char	**handl_word(char **args, char *new_arg);
-char	**handl_word(char **args, char *new_arg);
 int 	is_valid_redir_filename(t_token *op_token);
 void	add_redirection(t_redir **redir_list, t_redir *new_redir);
 int 	create_and_add_redir(t_cmd *cmd, t_token *redir_token);

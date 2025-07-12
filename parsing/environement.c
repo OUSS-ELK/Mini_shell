@@ -80,9 +80,11 @@ char	*f_strjoin_free(char *s1, char *s2)
 
 char	*f_strjoin_char(char *s, char c)
 {
-	char str[2] = {c, 0};
-
-	return f_strjoin_free(s, str);
+	char	str[2];
+	
+	str[0] = c;
+	str[1] = 0;
+	return (f_strjoin_free(s, str));
 }
 
 char	*expand_bracket_qt(t_exp_strvars *exp_var)
