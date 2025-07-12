@@ -21,7 +21,7 @@ int	is_builtin(t_cmd *cmd)
 	return (0);
 }
 
-int	run_builtin(t_cmd *cmd, t_env **env)
+int	run_builtin(t_cmd *cmd, t_env **env, t_exec *exec)
 {
 	int	result;
 
@@ -35,7 +35,7 @@ int	run_builtin(t_cmd *cmd, t_env **env)
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 		result = ft_pwd(env);
 	// else if (ft_strcmp(cmd->args[0], "export") == 0)
-	// 	result = ft_export(cmd->args, env);
+	// 	result = ft_export(cmd->args, env, exec);
 	else if (ft_strcmp(cmd->args[0], "unset") == 0)
 		result = ft_unset(cmd->args, env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)

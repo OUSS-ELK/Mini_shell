@@ -10,17 +10,18 @@
  *    - exits on completion / failure
  */
 
-static void	exec_builtin(t_cmd *cmd, t_env *env)
+static void	exec_builtin(t_cmd *cmd, t_env *env, t_exec *exec)
 {
 	if (cmd && cmd->args && cmd->args[0] && is_builtin(cmd) == 1) // sep
 	{
-		if (run_builtin(cmd, &env)) // sep
+		if (run_builtin(cmd, &env, exec)) // sep
 			exit(g_exit_status);
 	}
 }
 
 void	child_process(t_exec *exec, t_cmd *cmd, int in_fd, t_env *env)
  {
+	(void)env;
 	setup_child_sigs();
 	if (in_fd != STDIN_FILENO && dup2(in_fd, STDIN_FILENO) == -1)
 		custom_error(NULL, "dup2 fail", 1);
@@ -35,7 +36,7 @@ void	child_process(t_exec *exec, t_cmd *cmd, int in_fd, t_env *env)
 	}
 	/* deal with <, >, >>, << */
 	handle_redir(cmd);
-	exec_builtin(cmd, env);
+	exec_builtin(cmd, env, exec);
 	exec_external(cmd, exec);
  }
 

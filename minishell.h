@@ -166,7 +166,7 @@ int 	handle_redirection(t_cmd *cmd, t_token **curr_token);
 
 // helper function
 void	write_error(int	n);
-void	cleanup(t_token *token, t_cmd *cmd, char *input);
+void	cleanup(t_token *token, t_cmd *cmd, char *input, t_env *env);
 void	free_cmd(t_cmd *cmd);
 void	free_redir(t_redir *redir);
 void	free_tokens(t_token *token);
@@ -190,7 +190,7 @@ void    ll(void);
 
 // Builtins
 int		is_builtin(t_cmd *cmd);
-int		run_builtin(t_cmd *cmd, t_env **env);
+int	run_builtin(t_cmd *cmd, t_env **env, t_exec *exec);
 int	builtin_fd_opener(t_redir *r);
 void	builtin_r_err(char *err_msg, char *f_name, int err);
 int	builtin_append(t_redir *r, bool last_flag);
@@ -207,6 +207,7 @@ void	builtin_reset_fds(t_exec *exec);
 int	ft_cd(char **args, t_env **env_ptr);
 int	ft_echo(t_cmd *cmd);
 int	ft_env(t_env **env);
+
 int	ft_exit(t_cmd *cmd, t_env **env);
 
 void	replace_env_value(t_env *tmp, char *value);
@@ -214,9 +215,11 @@ void	append_env_value(t_env *tmp, char *value);
 void	add_to_env(t_env **env_lst, char *key, char *value);
 char	*get_value(char *str);
 char	*get_key(char *str);
-int	ft_export(char **args, t_env **env_list, t_exec *exec);
+// int	ft_export(char **args, t_env **env_list, t_exec *exec);
 int	ft_pwd(t_env **env);
 int ft_unset(char **cmd, t_env **env);
+
+// export uti
 
 
 // ========== EXEC ===========

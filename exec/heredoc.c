@@ -99,7 +99,7 @@ int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
 {
 	char	*delim;
 
-	close(pipefd[0]);                         /* child only writes          */
+	close(pipefd[0]);                       /* child only writes          */
 	setup_heredoc_sig();
 	delim = NULL;
 	delim = delim_join(heredoc->filename, "\n");

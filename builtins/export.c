@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 10:18:33 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/11 22:01:17 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/12 21:20:13 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static void	update_or_add_env(char *arg, t_env **env_list)
 	if (existing)
 	{
 		if (is_append && existing->value)
-			handle_append(existing, value);
+			handle_append(existing);
 		else
 			replace_value(existing, value);
 		free(key);
@@ -247,7 +247,7 @@ void	export_assign_helper(char **key, char **value, char *cmd)
 	*value = NULL;
 }
 
-void	append_env_value(t_env *existing, char **key, char **value)
+void	export_append_env_value(t_env *existing, char **key, char **value)
 {
 	char	*tmp;
 

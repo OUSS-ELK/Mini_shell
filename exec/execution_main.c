@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 13:49:34 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/12 18:34:47 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/12 22:36:53 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,7 @@ int	execution_main(t_exec *exec, t_cmd *cmd_list, t_env *env)
 			return (0);
 		}
 		if (pid == 0) // child
-		{
 			child_process(exec, cmd_list, prev_pipe_read, env);
-			printf("Last exec main\n");
-		
-		}
 		else // parent
 		{
 			exec->last_pid = pid;

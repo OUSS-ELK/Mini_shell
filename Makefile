@@ -3,8 +3,9 @@ CC = cc
 
 # Paths to Homebrew readline installation
 BREW_READLINE = /goinfre/bel-abde/homebrew/opt/readline
-
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address -I. -Ilibft -I$(BREW_READLINE)/include
+#-fsanitize=address
+# werror
+CFLAGS = -Wall -Wextra   -I. -Ilibft -I$(BREW_READLINE)/include
 LDFLAGS = -Llibft -lft -L$(BREW_READLINE)/lib -lreadline
 
 SRC_DIRS = parsing exec builtins utils

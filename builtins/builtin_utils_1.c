@@ -108,7 +108,7 @@ int	builtin_check_execute(t_cmd *cmd, t_exec *exec, t_env **env) // check return
 				builtin_reset_fds(exec);
 			return (1);
 		}
-		if (run_builtin(cmd, env) == 1)
+		if (run_builtin(cmd, env, exec) == 1)
 		{
 			if (cmd->redir)
 				builtin_reset_fds(exec);

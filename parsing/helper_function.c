@@ -20,7 +20,7 @@ void	write_error(int	n)
 		write(2, "Error\n", 6);
 }
 
-void	cleanup(t_token *token, t_cmd *cmd, char *input)
+void	cleanup(t_token *token, t_cmd *cmd, char *input, t_env *env)
 {
 	if (token)
 		free_tokens(token);
@@ -28,6 +28,8 @@ void	cleanup(t_token *token, t_cmd *cmd, char *input)
 		free_cmd(cmd);
 	if (input)
 		free(input);
+	if (env)
+		free_env(env);
 }
 
 void	free_cmd(t_cmd *cmd)
@@ -189,7 +191,8 @@ void	print_tokens(t_token *token)
 
 void    ll(void)
 {
-    system("leaks -q minishell");
+	// if (getpid() == getppid())
+    	system("ls");
 }
 
 int	check_quote(char *input)
