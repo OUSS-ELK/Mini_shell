@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_substr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 22:58:50 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/10 13:39:09 by oussama-elk      ###   ########.fr       */
+/*   Updated: 2024/11/30 17:22:27 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,6 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	if (!sub)
 		return (NULL);
 	sub = ft_memcpy(sub, s, s_len);
-	sub[s_len] = '\0';
+	sub[s_len] = '\0'; 
 	return (sub);
 }

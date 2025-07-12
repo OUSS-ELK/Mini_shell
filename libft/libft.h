@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 12:40:24 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/06/28 15:33:39 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/11 23:49:43 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,6 @@ void	ft_putstr_fd(char *s, int fd);
 void	ft_putendl_fd(char *s, int fd);
 void	ft_striteri(char *s, void (*f)(unsigned int, char*));
 void	ft_putnbr_fd(int n, int fd);
+int		ft_strcmp(const char *s1, const char *s2);
 
 #endif

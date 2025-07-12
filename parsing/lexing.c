@@ -36,6 +36,45 @@ void	add_token(t_token **token, t_token_vars *vars)
 	tmp->next = new;
 }
 
+t_token_type	get_opr_type(char *input, int i)
+{
+	if (input[i] == '>' && input[i + 1] == '>')
+		return (APPEND);
+	if (input[i] == '<' && input[i + 1] == '<')
+		return (HEREDOC);
+	if (input[i] == '>')
+		return (REDIR_OUT);
+	if (input[i] == '<')
+		return (REDIR_IN);
+	if (input[i] == '|')
+		return (PIPE);
+	return (0);
+}
+
+int	check_operator(t_oprvars *op_vars)
+{
+	t_token_type	type;
+	t_token_vars	vars;
+
+	type = get_opr_type(op_vars->input, op_vars->i);
+	vars.type = type;
+	vars.space = op_vars->space;
+	vars.quoted = false;
+	if (type == APPEND || type == HEREDOC)
+	{
+		if (type == HEREDOC)
+			*(op_vars->heredoc) = true;
+		vars.value = ft_substr(op_vars->input, op_vars->i, 2);
+		add_token(op_vars->token, &vars);
+		free(vars.value);
+		return (op_vars->i + 2);
+	}
+	vars.value = ft_substr(op_vars->input, op_vars->i, 1);
+	add_token(op_vars->token, &vars);
+	free(vars.value);
+	return (op_vars->i + 1);
+}
+
 void	merge_words(t_token **token)                            		     // function to handle mixed word (if space true d'ont merge)
 {
 	t_token	*curr;

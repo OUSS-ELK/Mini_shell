@@ -80,11 +80,9 @@ char	*f_strjoin_free(char *s1, char *s2)
 
 char	*f_strjoin_char(char *s, char c)
 {
-	char	str[2];
-	
-	str[0] = c;
-	str[1] = 0;
-	return (f_strjoin_free(s, str));
+	char str[2] = {c, 0};
+
+	return f_strjoin_free(s, str);
 }
 
 char	*expand_bracket_qt(t_exp_strvars *exp_var)
@@ -133,35 +131,36 @@ char	*exit_status(char *result, int *i)
 	return (result);
 }
 
-char	*handle_dollar_expansion(t_exp_strvars *exp_var)
+void	init_expand_var(t_exp_strvars *exp_var, char *str, t_env *env, bool heredoc, char *result)
 {
-	exp_var->i++;
-	if (exp_var->heredoc)
-		exp_var->i--;
-	else if (exp_var->str[exp_var->i] == '?')
-		exp_var->result = exit_status(exp_var->result, &exp_var->i);
-	else if (exp_var->str[exp_var->i] == '{')
-		exp_var->result = expand_bracket_qt(exp_var);
-	else if (ft_isalpha(exp_var->str[exp_var->i]) || exp_var->str[exp_var->i] == '_')
-		exp_var->result = expand_simple_qt(exp_var);
-	else
-		exp_var->result = f_strjoin_char(exp_var->result, '$');
-	return (exp_var->result);
+	exp_var->str = str;
+	exp_var->i = 0;
+	exp_var->env = env;
+	exp_var->result = result;
+	exp_var->heredoc = heredoc;
 }
 
 char	*expand_loop(char *str, t_env *env, bool heredoc, char *result)
 {
 	t_exp_strvars	exp_var;
 
-	exp_var.str = str;
-	exp_var.i = 0;
-	exp_var.env = env;
-	exp_var.result = result;
-	exp_var.heredoc = heredoc;
+	init_expand_var(&exp_var, str, env, heredoc, result);
 	while (exp_var.str[exp_var.i])
 	{
 		if (exp_var.str[exp_var.i] == '$')
-			exp_var.result = handle_dollar_expansion(&exp_var);
+		{
+			exp_var.i++;
+			if (exp_var.heredoc)
+				exp_var.i--;
+			else if (exp_var.str[exp_var.i] == '?')
+				exp_var.result = exit_status(exp_var.result, &exp_var.i);
+			else if (exp_var.str[exp_var.i] == '{')
+				exp_var.result = expand_bracket_qt(&exp_var);
+			else if (ft_isalpha(exp_var.str[exp_var.i]) || exp_var.str[exp_var.i] == '_')
+				exp_var.result = expand_simple_qt(&exp_var);
+			else
+				exp_var.result = f_strjoin_char(exp_var.result, '$');
+		}
 		else
 			exp_var.result = f_strjoin_char(exp_var.result, exp_var.str[exp_var.i++]);
 	}

@@ -1,143 +1,141 @@
+#include "minishell.h"
 
-#include "execution.h"
 
-/*
-Scan tokens for heredocs.
-
-Create a pipe and fork a child for each heredoc.
-
-The child process collects heredoc input until it sees the delimiter.
-
-That input is written into the write end of the pipe.
-
-The parent closes the write end and uses the read end for redirection.
-
-The redir->fd[0] stores the read-end of that pipe, so it can be used later for input redirection (e.g. in dup2()).
-
-*/
-
-// Go through all the tokens and apply handle_herdocs func on the right token
-bool	exec_heredoc(t_cmd *cmds, t_exec *exec)
+static t_redir	*get_last_heredoc(t_redir *r)
 {
-	t_cmd	*curr_cmd;
+	t_redir	*last;
 
-	curr_cmd = cmds;
-	while (curr_cmd)
+	last = NULL;
+	while (r)
 	{
-		if (handle_heredoc_redir(curr_cmd->redir, exec))
-			return (true);
-		curr_cmd = curr_cmd->next;
+		if (r->type == HEREDOC)
+			last = r;
+		r = r->next;
 	}
-	// t_token	*curr;
-	// t_redir	redir;
-
-	// curr = tokens;
-	// while (curr)
-	// {
-	// 	if (curr->type == HEREDOC && curr->next)
-	// 	{
-	// 		redir.type = HEREDOC;
-	// 		redir.filename = curr->next->token;
-	// 		redir.next = NULL;
-	// 		if (handle_herdoc_redir(&redir, exec));
-	// 			return (true);
-	// 	}
-	// 	curr = curr->next;
-	// }
-	return (false);
+	return (last);
 }
 
-bool	handle_heredoc_redir(t_redir *redir, t_exec *exec)
+// interate over every heredoc in every cmd
+int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 {
-	char	*tmp;
-	int		fd;
+	t_cmd	*cmd;
+	t_redir	*r;
+	t_redir	*last_heredoc;
 
-	while (redir)
+	g_exit_status = 0;
+	cmd = first_cmd;
+	if (!cmd)
+		return (1);
+	while (cmd)
 	{
-		if (redir->type == HEREDOC)
+		last_heredoc = get_last_heredoc(cmd->redir);
+		setup_parent_heredoc_sigs();
+		r = cmd->redir;
+		while (r)
 		{
-			tmp = ft_strdup(redir->filename);
-			if (!tmp)
-				return (true);
-			fd = create_heredoc_pipe(tmp, exec);
-			free(tmp);
-			if (fd < 0)
-				return (true);
-			redir->fd[0] = fd;
-			if (expander(exec, redir)) // Expand $VAR inside heredoc
+			if (r->type == HEREDOC)
 			{
-				close(redir->fd[0]);
-				return (true);
+				if (handle_one_heredoc(r, env_lst, (r == last_heredoc)) == -1
+					|| g_exit_status == 1)
+					return (0);
 			}
+			r = r->next;
 		}
-		redir = redir->next;
+		restore_sigs();
+		cmd = cmd->next;
 	}
-	// while (redir)
-	// {
-	// 	if (redir->type == HEREDOC)
-	// 	{
-	// 		tmp = ft_strdup(redir->filename);
-	// 		if (!tmp)
-	// 			return (true);
-	// 		fd = create_herdoc_pipe(tmp, exec);
-	// 		free(redir->filename);
-	// 		free(tmp);
-	// 		if (fd < 0)
-	// 			return (true);
-	// 		redir->fd[0] = fd;
-	// 		if (expander(exec, redir))
-	// 			{close(redir->fd); return (true);}
-	// 	}
-	// 	redir = redir->next;
-	// }
-	return (false);
+	// printf("Heredoc test\n");
+	return (1);
 }
 
-int	create_heredoc_pipe(char *tmp, t_exec *exec)
+// Handle one heredoc redir
+int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 {
-	int		pipe_fd[2];
+	int	pipefd[2];
 	pid_t	pid;
-	int		status;
-
-	if (pipe(pipe_fd) == -1)
-		return (perror("pipe"), -1);
+	if (r == NULL || r->type != HEREDOC)
+		return (1);
+	setup_parent_heredoc_sigs();
+	if (pipe(pipefd) == -1)
+		return (custom_error(NULL, "pipe fail\n", 1), -1);
 	pid = fork();
-	if (pid < 0)
-		return (perror("fork"), -1);
+	if (pid == -1)
+		return (custom_error(NULL, "fork fail\n", 1), -1);
 	if (pid == 0)
-		heredoc_child(pipe_fd, tmp);
-	waitpid(pid, &status, 0);
-	// reset terminal mode here
-	close(pipe_fd[1]); // close write end for parent
-	if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+		open_heredoc_child(r, pipefd, env, last);
+	else
 	{
-		close(pipe_fd[0]);
-		exec->exit_status = 1;
-		return (-1);
+		parent_heredoc(pipefd, pid, r, last);
+		restore_sigs();
 	}
-	return (pipe_fd[0]); // return read-end for redirection
+	if (g_exit_status == 0)
+		return (1);
+	else
+		return (-1);
 }
 
-static void	heredoc_child(int pipe_fd[2], char *tmp)
+// wait for child, keep read end if child succeeds (exit 0)
+void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
 {
-	char	*line;
-	char	*tmp2;
+	int	status;
+	sig_t	old_handler;
 
-	close(pipe_fd[0]);
-	while (1)
+	close(pipefd[1]);                         /* parent only reads          */
+	old_handler = signal(SIGINT, SIG_IGN);
+	waitpid(pid, &status, 0);
+	signal(SIGINT, old_handler);
+	g_exit_status = WEXITSTATUS(status);
+	if (g_exit_status == 0 && last)
+		r->fd[0] = pipefd[0];                 /* store read end in redir    */
+	else
 	{
-		line = readline("> ");
-		if (!line || ft_strcmp(line, tmp) == 0)
-			break ;
-		tmp2 = ft_strjoin(line, "\n", NULL);
-		if (tmp2)
-		{
-			write(pipe_fd[1], tmp2, ft_strlen(tmp2));
-			free(tmp2);
-		}
-		free(line);
+		close(pipefd[0]);                    /* error → close & mark -1    */
+		r->fd[0] = -1;
 	}
-	free(line);
-	close(pipe_fd[1]);
+}
+
+//  CHILD: read stdin until delimiter, write to pipe, exit
+int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
+{
+	char	*delim;
+
+	close(pipefd[0]);                         /* child only writes          */
+	setup_heredoc_sig();
+	delim = NULL;
+	delim = delim_join(heredoc->filename, "\n");
+	if (!delim)
+		custom_error(NULL, "heredoc delim fail\n", 1);
+	ft_read_line(delim, pipefd, heredoc, env, last);
+	free(delim);
+	printf("Exiting child\n");
 	exit(0);
+}
+
+char	*delim_join(char *s1, char *s2)
+{
+	char	*new_str;
+	size_t	total_len;
+	size_t	i;
+	size_t	j;
+
+	if (!s1)
+		return (ft_strdup(s2));
+	if (!s2)
+		return (ft_strdup(s1));
+	total_len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	new_str = (char *)malloc(total_len * sizeof(char));
+	if (!new_str)
+	{
+		free(s1);
+		return (NULL);
+	}
+	i = -1;
+	while (s1[++i])
+		new_str[i] = s1[i];
+	j = -1;
+	while (s2[++j])
+		new_str[i++] = s2[j];
+	new_str[i] = '\0';
+	free(s1);
+	return (new_str);
 }

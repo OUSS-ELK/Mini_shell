@@ -29,11 +29,11 @@ int handle_word_token(t_cmd *curr, t_token **curr_token)
 int handle_cmd(t_cmd **curr, t_token **curr_token, t_cmd **head)
 {
 	if ((*curr_token)->type == PIPE)
-		return (handle_pipe(curr, curr_token, head));
+		return handle_pipe(curr, curr_token, head);
 	else if (is_oper((*curr_token)->type))
-		return (handle_redirection(*curr, curr_token));
+		return handle_redirection(*curr, curr_token);
 	else if ((*curr_token)->type == WORD)
-		return (handle_word_token(*curr, curr_token));
+		return handle_word_token(*curr, curr_token);
 	else
 		*curr_token = (*curr_token)->next;
 	return (1);

@@ -1,20 +1,5 @@
 #include "../minishell.h"
 
-void	else_case(t_token **token, char *input, t_lexvars *st)
-{
-	t_token_vars	vars;
-
-	if (input[st->i] == '$' && input[st->i + 1] == '\0')
-	{
-		vars.value = "$";
-		vars.type = WORD;
-		vars.space = st->space;
-		vars.quoted = false;
-		add_token(token, &vars);
-	}
-	st->i++;
-}
-
 int handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
 	t_token_vars	vars;
@@ -43,6 +28,20 @@ int handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st)
 	return (1);
 }
 
+void	else_case(t_token **token, char *input, t_lexvars *st)
+{
+	t_token_vars	vars;
+
+	if (input[st->i] == '$' && input[st->i + 1] == '\0')
+	{
+		vars.value = "$";
+		vars.type = WORD;
+		vars.space = st->space;
+		vars.quoted = false;
+		add_token(token, &vars);
+	}
+	st->i++;
+}
 
 void	handle_space(char *input, t_lexvars *st)
 {

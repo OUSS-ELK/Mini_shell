@@ -6,11 +6,11 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:14:20 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/06/28 12:27:30 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/11 21:59:44 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "builtins.h"
+#include "../minishell.h"
 
 char	*get_key(char *str)
 {
