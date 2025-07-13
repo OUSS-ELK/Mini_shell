@@ -20,7 +20,7 @@ int	open_file(char *filename, int mode, bool quoted)
 
 	fd = open(filename, flags, 0644);
 	if (fd == -1)
-		custom_error(filename, ": open failed\n", 1);
+		custom_error(filename, ": No such file or directory.\n", 1);
 	return (fd);
 }
 

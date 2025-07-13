@@ -15,7 +15,7 @@ void	write_error(int	n)
 	else if (n == 6)
 		write(1, "Syntax error empty command after pipe\n", 38);
 	else if (n == 7)
-		write(1, "Syntax error ambiguous redirect\n", 32);
+		write(1, "Parsing Syntax error ambiguous redirect\n", 32);
 	else if (8)
 		write(1, "fatal fork/pipe error\n", 22);
 	else
@@ -419,21 +419,41 @@ char	**handl_word(char **args, char *new_arg)
 	return (new_args);
 }
 
+// int is_valid_redir_filename(t_token *op_token)
+// {
+// 	char *filename;
+
+// 	filename = op_token->next->token;
+// 	if (!filename || filename[0] != '\0')
+// 	{
+// 		if (op_token->type != HEREDOC)
+// 		{
+// 			write_error(7);
+// 			return (0);
+// 		}
+// 	}
+// 	return (1);
+// }
+
 int is_valid_redir_filename(t_token *op_token)
 {
 	char *filename;
 
+	if (!op_token || !op_token->next)
+		return (write_error(4), 0);
+
 	filename = op_token->next->token;
-	if (!filename || filename[0] != '\0')
+	if (!filename || filename[0] == '\0') // 🛠️ check if filename is empty or NULL
 	{
 		if (op_token->type != HEREDOC)
 		{
-			write_error(7);
+			write_error(7); // ambiguous redirect or missing filename
 			return (0);
 		}
 	}
 	return (1);
 }
+
 
 void	add_redirection(t_redir **redir_list, t_redir *new_redir)
 {
@@ -478,10 +498,52 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
 		write_error(4);
 		return (0);
 	}
+
 	if (!is_valid_redir_filename(*curr_token))
 		return (0);
+	if (is_ambiguous_redirection(cmd, (*curr_token)->type))
+	{
+		write_error(7); // Ambiguous redirect
+		return (0);
+	}
 	if (!create_and_add_redir(cmd, *curr_token))
 		return (0);
+
 	*curr_token = (*curr_token)->next->next;
 	return (1);
+}
+
+
+// int handle_redirection(t_cmd *cmd, t_token **curr_token)
+// {
+// 	if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
+// 	{
+// 		write_error(4);
+// 		return (0);
+// 	}
+// 	if (!is_valid_redir_filename(*curr_token))
+// 		return (0);
+// 	if (!create_and_add_redir(cmd, *curr_token))
+// 		return (0);
+// 	*curr_token = (*curr_token)->next->next;
+// 	return (1);
+// }
+
+int	is_ambiguous_redirection(t_cmd *cmd, t_token_type new_type)
+{
+	t_redir *r = cmd->redir;
+
+	while (r)
+	{
+		if ((new_type == REDIR_IN || new_type == HEREDOC) &&
+			(r->type == REDIR_IN || r->type == HEREDOC))
+			return (1);
+
+		if ((new_type == REDIR_OUT || new_type == APPEND) &&
+			(r->type == REDIR_OUT || r->type == APPEND))
+			return (1);
+
+		r = r->next;
+	}
+	return (0);
 }

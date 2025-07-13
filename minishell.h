@@ -137,6 +137,7 @@ t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
 
 // parsing
+int	is_ambiguous_redirection(t_cmd *cmd, t_token_type new_type);
 int		check_quote(char *input);
 int		inside_quote(t_quotevars *qt_var);
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
