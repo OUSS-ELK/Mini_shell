@@ -30,7 +30,8 @@ int main(int argc, char **argv, char **env)
 	t_cmd	*cmd;
 	t_exec	exec;
 	t_env	*envr;
-
+        int original_stdin = dup(STDIN_FILENO);
+        int original_stdout = dup(STDOUT_FILENO);
 	(void)argc;
 	(void)argv;
 	envr = NULL;
@@ -59,6 +60,7 @@ int main(int argc, char **argv, char **env)
 			cleanup(token, cmd, input, envr);
 			continue ;
 		}
+		exec.env_lst = envr;
 		// print_env(exec.env_lst);
 		printf("DEBUG: parsing_function returned success\n");
 		print_cmds(cmd);
@@ -70,7 +72,8 @@ int main(int argc, char **argv, char **env)
 			cleanup(token, cmd, input, envr);
 			continue;              /* back to prompt */
 		}
-		/* 3) SINGLE BUILTIN ? ------------------------------------------ */
+		printf("Heredoc chck finished\n");
+		// 3) SINGLE BUILTIN ? ------------------------------------------ */
 		exec.is_pipe = (cmd && cmd->next);      /*  true if pipeline */
 		// printf("DEBUG: Checking for builtins...\n");
 		if (builtin_check_execute(cmd, &exec, &envr) == 1)
@@ -86,6 +89,8 @@ int main(int argc, char **argv, char **env)
 			write_error(1);        /* fatal fork/pipe error */
 		}
 		cleanup(token, cmd, input, envr);
+		dup2(original_stdin, STDIN_FILENO);
+        dup2(original_stdout, STDOUT_FILENO);
 		// printf("Finished\n");
 	}
 	return (0);

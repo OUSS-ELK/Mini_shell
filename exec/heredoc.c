@@ -106,7 +106,8 @@ int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
 	if (!delim)
 		custom_error(NULL, "heredoc delim fail\n", 1);
 	ft_read_line(delim, pipefd, heredoc, env, last);
-	free(delim);
+	if (delim)
+		free(delim);
 	printf("Exiting child\n");
 	exit(0);
 }

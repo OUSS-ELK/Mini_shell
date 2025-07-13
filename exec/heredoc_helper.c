@@ -29,7 +29,7 @@ void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env, bool last)
 		line = get_next_line(STDIN_FILENO);
 		if (handle_heredoc_break(line, delim))
 			break ;
-		if (!r->quoted)
+		if (r->quoted)
 			ft_expand_vars_in_str(&line, env);
 		if (last)
 			write(*fd_pipe, line, ft_strlen(line));

@@ -21,7 +21,6 @@ static void	exec_builtin(t_cmd *cmd, t_env *env, t_exec *exec)
 
 void	child_process(t_exec *exec, t_cmd *cmd, int in_fd, t_env *env)
  {
-	(void)env;
 	setup_child_sigs();
 	if (in_fd != STDIN_FILENO && dup2(in_fd, STDIN_FILENO) == -1)
 		custom_error(NULL, "dup2 fail", 1);
