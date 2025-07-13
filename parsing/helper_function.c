@@ -501,17 +501,36 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
 
 	if (!is_valid_redir_filename(*curr_token))
 		return (0);
-	if (is_ambiguous_redirection(cmd, (*curr_token)->type))
-	{
-		write_error(7); // Ambiguous redirect
-		return (0);
-	}
+
 	if (!create_and_add_redir(cmd, *curr_token))
 		return (0);
 
 	*curr_token = (*curr_token)->next->next;
 	return (1);
 }
+
+
+// int handle_redirection(t_cmd *cmd, t_token **curr_token)
+// {
+// 	if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
+// 	{
+// 		write_error(4);
+// 		return (0);
+// 	}
+
+// 	if (!is_valid_redir_filename(*curr_token))
+// 		return (0);
+// 	if (is_ambiguous_redirection(cmd, (*curr_token)->type))
+// 	{
+// 		write_error(7); // Ambiguous redirect
+// 		return (0);
+// 	}
+// 	if (!create_and_add_redir(cmd, *curr_token))
+// 		return (0);
+
+// 	*curr_token = (*curr_token)->next->next;
+// 	return (1);
+// }
 
 
 // int handle_redirection(t_cmd *cmd, t_token **curr_token)
