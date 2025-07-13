@@ -48,6 +48,7 @@ int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 	return (1);
 }
 
+
 // Handle one heredoc redir
 int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 {
@@ -74,7 +75,8 @@ int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 		return (-1);
 }
 
-// wait for child, keep read end if child succeeds (exit 0)
+
+// // wait for child, keep read end if child succeeds (exit 0)
 void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
 {
 	int	status;
@@ -93,6 +95,40 @@ void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
 		r->fd[0] = -1;
 	}
 }
+// void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
+// {
+// 	int	status;
+// 	sig_t	old_handler;
+// 	char	buf[1024];
+
+
+// 	old_handler = signal(SIGINT, SIG_IGN);
+// 	waitpid(pid, &status, 0);
+// 	signal(SIGINT, old_handler);
+// 	g_exit_status = WEXITSTATUS(status);
+// 	close(pipefd[1]);                         /* parent only reads          */
+// 	if (g_exit_status == 0 && last)
+// 	{
+// 		r->fd[0] = pipefd[0];                 /* store read end in redir    */
+// 			int		nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
+// 		printf("bytes value: %d\n", nbytes);
+// 		printf("r fd not closed\n");
+// 					while (nbytes)
+// 			{
+// 				printf("bytes value: %d\n", nbytes);
+// 				buf[nbytes] = '\0';
+// 				write(STDERR_FILENO, buf, nbytes);
+// 				nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
+// 			}
+// 		printf("while end\n");
+// 	}
+// 	else
+// 	{
+// 		printf("fd closed");
+// 		close(pipefd[0]);                    /* error → close & mark -1    */
+// 		r->fd[0] = -1;
+// 	}
+// }
 
 //  CHILD: read stdin until delimiter, write to pipe, exit
 int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
@@ -106,9 +142,7 @@ int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
 	if (!delim)
 		custom_error(NULL, "heredoc delim fail\n", 1);
 	ft_read_line(delim, pipefd, heredoc, env, last);
-	if (delim)
-		free(delim);
-	printf("Exiting child\n");
+	free(delim);
 	exit(0);
 }
 

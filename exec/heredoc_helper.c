@@ -27,12 +27,20 @@ void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env, bool last)
 	{
 		write(STDOUT_FILENO, "> ", 2);
 		line = get_next_line(STDIN_FILENO);
+		// printf("Line = %s\n", line);
 		if (handle_heredoc_break(line, delim))
 			break ;
-		if (r->quoted)
-			ft_expand_vars_in_str(&line, env);
+		// if (!r->quoted)
+		// {
+		// 	printf("Need to expand here.\n");
+		// 	ft_expand_vars_in_str(&line, env);
+		// }
 		if (last)
-			write(*fd_pipe, line, ft_strlen(line));
+			write(fd_pipe[1], line, ft_strlen(line));
+		// ssize_t w = write(fd_pipe[1], line, ft_strlen(line));
+		// if (w == -1)
+    	// perror("heredoc write error");
+		// fprintf(stderr, "write returned %zd for line: %s", w, line);
 		free(line);
 	}
 	close(fd_pipe[1]);

@@ -23,6 +23,38 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd, t_en
 	return (1);
 }
 
+static void	print_heredoc_content_main(t_cmd *cmd)
+{
+	t_redir	*r = cmd->redir;
+	char	buf[1024];
+	ssize_t	nbytes;
+
+	while (r)
+	{
+		if (r->type == HEREDOC && r->fd[0] >= 0)
+		{
+			fprintf(stderr, "DEBUG MAIN: heredoc for [%s] (fd=%d):\n", r->filename, r->fd[0]);
+
+			int tmp_fd = dup(r->fd[0]);
+			if (tmp_fd == -1)
+			{
+				perror("dup failed");
+				r = r->next;
+				continue;
+			}
+
+			while ((nbytes = read(tmp_fd, buf, sizeof(buf) - 1)) > 0)
+			{
+				buf[nbytes] = '\0';
+				write(STDERR_FILENO, buf, nbytes);
+			}
+			close(tmp_fd);
+		}
+		r = r->next;
+	}
+}
+
+
 int main(int argc, char **argv, char **env)
 {
 	t_token *token;
@@ -72,15 +104,23 @@ int main(int argc, char **argv, char **env)
 			cleanup(token, cmd, input, envr);
 			continue;              /* back to prompt */
 		}
-		printf("Heredoc chck finished\n");
+		// printf("Heredoc chck finished\n");
+// 		t_redir *r = cmd->redir;
+// while (r)
+// {
+// 	if (r->type == HEREDOC)
+// 		fprintf(stderr, "DEBUG parent: r->fd[0] = %d\n", r->fd[0]);
+// 	r = r->next;
+// }
+	// print_heredoc_content_main(cmd);
 		// 3) SINGLE BUILTIN ? ------------------------------------------ */
 		exec.is_pipe = (cmd && cmd->next);      /*  true if pipeline */
 		// printf("DEBUG: Checking for builtins...\n");
-		if (builtin_check_execute(cmd, &exec, &envr) == 1)
-		{
-			cleanup(token, cmd, input, envr);
-			continue;              /* builtin handled */
-		}
+		// if (builtin_check_execute(cmd, &exec, &envr) == 1)
+		// {
+		// 	cleanup(token, cmd, input, envr);
+		// 	continue;              /* builtin handled */
+		// }
 		// printf("DEBUG: Running execution_main\n");
 
 		/* 4) PIPELINE / EXTERNAL --------------------------------------- */

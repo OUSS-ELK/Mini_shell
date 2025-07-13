@@ -19,6 +19,37 @@ static void	exec_builtin(t_cmd *cmd, t_env *env, t_exec *exec)
 	}
 }
 
+static void	print_heredoc_content_debug(t_cmd *cmd)
+{
+	t_redir	*r = cmd->redir;
+	char	buf[1024];
+	ssize_t	nbytes;
+
+	while (r)
+	{
+		if (r->type == HEREDOC && r->fd[0] > 0)
+		{
+			fprintf(stderr, "DEBUG: Heredoc content for [%s]:\n", r->filename);
+			fprintf(stderr, "DEBUG child: r->fd[0] = %d\n", r->fd[0]);
+			// int tmp_fd = dup(r->fd[0]); // duplicate to avoid consuming it
+			// if (tmp_fd == -1)
+			// {
+			// 	perror("dup failed");
+			// 	r = r->next;
+			// 	continue;
+			// }
+			// while ((nbytes = read(tmp_fd, buf, sizeof(buf) - 1)) > 0)
+			// {
+			// 	buf[nbytes] = '\0';
+			// 	write(STDERR_FILENO, buf, nbytes);
+			// }
+			// close(tmp_fd);
+		}
+		r = r->next;
+	}
+}
+
+
 void	child_process(t_exec *exec, t_cmd *cmd, int in_fd, t_env *env)
  {
 	setup_child_sigs();
@@ -34,6 +65,7 @@ void	child_process(t_exec *exec, t_cmd *cmd, int in_fd, t_env *env)
 		close(exec->pipe_fd[1]);
 	}
 	/* deal with <, >, >>, << */
+	// print_heredoc_content_debug(cmd);
 	handle_redir(cmd);
 	exec_builtin(cmd, env, exec);
 	exec_external(cmd, exec);
