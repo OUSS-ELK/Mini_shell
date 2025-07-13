@@ -10,16 +10,16 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd, t_en
 	if (!check_quote(input))
 	{
 		write_error(2);
-		return (free_env(*envr), 0);
+		return (0);
 	}
 	if (!lexer_input(token, input, *envr))
 	{
 		write_error(3);
-		return (free_env(*envr), 0);
+		return (0);
 	}
 	*cmd = parse_cmd(token);
 	if (!*cmd)
-		return (free_env(*envr), 0);
+		return (0);
 	return (1);
 }
 
@@ -44,6 +44,7 @@ int main(int argc, char **argv, char **env)
 			printf("Input error");															// Ctrl + D (EOF) 
 			break ;
 		}
+		add_history(input);
 		if (all_space(input))														// Empty or spaces
 		{
 			free(input);
@@ -51,7 +52,6 @@ int main(int argc, char **argv, char **env)
 		}
 		token = NULL;
 		cmd = NULL;
-		add_history(input);
 		// printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
 		if (!parsing_function(&token, input, env, &cmd, &envr))
 		{
@@ -59,13 +59,12 @@ int main(int argc, char **argv, char **env)
 			cleanup(token, cmd, input, envr);
 			continue ;
 		}
-		exec.env_lst = envr; //
 		// print_env(exec.env_lst);
 		printf("DEBUG: parsing_function returned success\n");
 		print_cmds(cmd);
 
 		/* 2) HEREDOC ---------------------------------------------------- */
-		if (!check_heredocs(cmd, exec.env_lst))
+		if (!check_heredocs(cmd, envr))
 		{
 			printf("Error heredoc\n");
 			cleanup(token, cmd, input, envr);
@@ -73,13 +72,13 @@ int main(int argc, char **argv, char **env)
 		}
 		/* 3) SINGLE BUILTIN ? ------------------------------------------ */
 		exec.is_pipe = (cmd && cmd->next);      /*  true if pipeline */
-		printf("DEBUG: Checking for builtins...\n");
+		// printf("DEBUG: Checking for builtins...\n");
 		if (builtin_check_execute(cmd, &exec, &envr) == 1)
 		{
 			cleanup(token, cmd, input, envr);
 			continue;              /* builtin handled */
 		}
-printf("DEBUG: Running execution_main\n");
+		// printf("DEBUG: Running execution_main\n");
 
 		/* 4) PIPELINE / EXTERNAL --------------------------------------- */
 		if (!execution_main(&exec, cmd, envr))
@@ -87,7 +86,7 @@ printf("DEBUG: Running execution_main\n");
 			write_error(1);        /* fatal fork/pipe error */
 		}
 		cleanup(token, cmd, input, envr);
-		printf("Finished\n");
+		// printf("Finished\n");
 	}
 	return (0);
 }

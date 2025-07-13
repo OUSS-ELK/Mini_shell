@@ -16,6 +16,8 @@ void	write_error(int	n)
 		write(1, "Syntax error empty command after pipe\n", 38);
 	else if (n == 7)
 		write(1, "Syntax error ambiguous redirect\n", 32);
+	else if (8)
+		write(1, "fatal fork/pipe error\n", 22);
 	else
 		write(2, "Error\n", 6);
 }
@@ -422,7 +424,7 @@ int is_valid_redir_filename(t_token *op_token)
 	char *filename;
 
 	filename = op_token->next->token;
-	if (!filename || filename[0] == '\0')
+	if (!filename || filename[0] != '\0')
 	{
 		if (op_token->type != HEREDOC)
 		{
@@ -457,7 +459,7 @@ int create_and_add_redir(t_cmd *cmd, t_token *redir_token)
 	if (!new_redir)
 		return (0);
 	new_redir->filename = ft_strdup(filename);
-	if (!new_redir->filename || !is_only_space(new_redir->filename))
+	if (!new_redir->filename /*|| !is_only_space(new_redir->filename)*/)
 	{
 		free(new_redir);
 		return (0);
