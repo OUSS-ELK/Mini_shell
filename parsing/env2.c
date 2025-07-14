@@ -5,7 +5,7 @@ int expand_exit_status(t_token **token, bool *space)
 	t_token_vars	vars;
 	char			*expanded;
 
-	expanded = ft_itoa(0);
+	expanded = ft_itoa(g_exit_status);
 	if (!expanded)
 		return (-1);
 	vars.value = expanded;
