@@ -137,6 +137,7 @@ t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
 
 // parsing
+t_env *handle_special_env(char *env_var, int *skip);
 int	is_ambiguous_redirection(t_cmd *cmd, t_token_type new_type);
 int		check_quote(char *input);
 int		inside_quote(t_quotevars *qt_var);

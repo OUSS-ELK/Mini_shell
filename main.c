@@ -85,12 +85,12 @@ int main(int argc, char **argv, char **env)
 		// 3) SINGLE BUILTIN ? ------------------------------------------ */
 		exec.is_pipe = (cmd && cmd->next);      /*  true if pipeline */
 		// printf("DEBUG: Checking for builtins...\n");
-		// if (builtin_check_execute(cmd, &exec, &envr) == 1)
-		// {
-		// 	cleanup(token, cmd, input, envr);
-		// 	continue;              /* builtin handled */
-		// }
-		// printf("DEBUG: Running execution_main\n");
+		if (builtin_check_execute(cmd, &exec, &envr) == 1)
+		{
+			cleanup(token, cmd, input, envr);
+			continue;              /* builtin handled */
+		}
+		printf("DEBUG: Running execution_main\n");
 
 		/* 4) PIPELINE / EXTERNAL --------------------------------------- */
 		if (!execution_main(&exec, cmd, envr))
