@@ -2,11 +2,8 @@
 
 int	g_exit_status = 0;
 
-int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd, t_env **envr)
+int parsing_function(t_token **token, char *input, t_cmd **cmd, t_env **envr)
 {
-	*envr = collect_env(env); 																			// 	collecte environement variables
-	if (!*envr)
-		return (0);																						//	return 0 for error & 1 for success 
 	if (!check_quote(input))
 	{
 		write_error(2);
@@ -23,7 +20,6 @@ int parsing_function(t_token **token, char *input, char **env, t_cmd **cmd, t_en
 	return (1);
 }
 
-
 int main(int argc, char **argv, char **env)
 {
 	t_token *token;
@@ -31,76 +27,76 @@ int main(int argc, char **argv, char **env)
 	t_cmd	*cmd;
 	t_exec	exec;
 	t_env	*envr;
-        int original_stdin = dup(STDIN_FILENO);
-        int original_stdout = dup(STDOUT_FILENO);
+	int		original_stdin = dup(STDIN_FILENO);
+	int		original_stdout = dup(STDOUT_FILENO);
+
 	(void)argc;
 	(void)argv;
-	envr = NULL;
-	// atexit(ll);
+
+	envr = collect_env(env);  // ✅ collect only once at startup
+	if (!envr)
+	{
+		write(2, "minishell: failed to collect env\n", 33);
+		return (1);
+	}
+
 	handle_signals();
+
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
 		if (!input)
 		{
-			printf("Input error");															// Ctrl + D (EOF) 
-			break ;
+			printf("Input error\n");  // Ctrl + D
+			break;
 		}
 		add_history(input);
-		if (all_space(input))														// Empty or spaces
+		if (all_space(input))
 		{
 			free(input);
-			continue ;
+			continue;
 		}
+
 		token = NULL;
 		cmd = NULL;
-		// printf(BOLDCYAN "INPUT BY READLINE [%s]\n" RESET, input);
-		if (!parsing_function(&token, input, env, &cmd, &envr))
+
+		if (!parsing_function(&token, input, &cmd, &envr))  // ✅ pass envr directly
 		{
 			write_error(1);
-			cleanup(token, cmd, input, envr);
-			continue ;
+			cleanup(token, cmd, input, NULL);  // Don't clean envr here
+			continue;
 		}
+
 		exec.env_lst = envr;
-		// print_env(exec.env_lst);
+		exec.is_pipe = (cmd && cmd->next);
+
 		printf("DEBUG: parsing_function returned success\n");
 		print_cmds(cmd);
 
-		/* 2) HEREDOC ---------------------------------------------------- */
 		if (!check_heredocs(cmd, envr))
 		{
 			printf("Error heredoc\n");
-			cleanup(token, cmd, input, envr);
-			continue;              /* back to prompt */
+			cleanup(token, cmd, input, NULL);
+			continue;
 		}
-		// printf("Heredoc chck finished\n");
-// 		t_redir *r = cmd->redir;
-// while (r)
-// {
-// 	if (r->type == HEREDOC)
-// 		fprintf(stderr, "DEBUG parent: r->fd[0] = %d\n", r->fd[0]);
-// 	r = r->next;
-// }
-	// print_heredoc_content_main(cmd);
-		// 3) SINGLE BUILTIN ? ------------------------------------------ */
-		exec.is_pipe = (cmd && cmd->next);      /*  true if pipeline */
-		// printf("DEBUG: Checking for builtins...\n");
+
 		if (builtin_check_execute(cmd, &exec, &envr) == 1)
 		{
-			cleanup(token, cmd, input, envr);
-			continue;              /* builtin handled */
+			cleanup(token, cmd, input, NULL);
+			continue;
 		}
+
 		printf("DEBUG: Running execution_main\n");
 
-		/* 4) PIPELINE / EXTERNAL --------------------------------------- */
 		if (!execution_main(&exec, cmd, envr))
 		{
-			write_error(1);        /* fatal fork/pipe error */
+			write_error(1);
 		}
-		cleanup(token, cmd, input, envr);
+
+		cleanup(token, cmd, input, NULL);  // envr remains persistent
+
 		dup2(original_stdin, STDIN_FILENO);
-        dup2(original_stdout, STDOUT_FILENO);
-		// printf("Finished\n");
+		dup2(original_stdout, STDOUT_FILENO);
 	}
 	return (0);
 }

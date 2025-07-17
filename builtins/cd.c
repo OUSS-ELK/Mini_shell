@@ -6,11 +6,32 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:28:16 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/11 23:48:05 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/17 08:48:17 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	add_env_node(t_env **env, const char *key, const char *value)
+{
+	t_env *new = malloc(sizeof(t_env));
+	if (!new)
+		return;
+	new->key = ft_strdup(key);
+	new->value = ft_strdup(value);
+	new->next = NULL;
+
+	// Append at the end
+	t_env *tmp = *env;
+	if (!tmp)
+	{
+		*env = new;
+		return;
+	}
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new;
+}
 
 /* Helper: Get size of double pointer array */
 int	get_args_count(char **args)
@@ -52,7 +73,8 @@ void	update_pwd_vars(t_env *env, char *new_path, char *old_path)
 		free(oldpwd->value);
 		oldpwd->value = ft_strdup(old_path);
 	}
-	free(old_path);
+	else
+		add_env_node(&env, "OLDPWD", old_path);  // ✅ Add it if missing
 
 	if (pwd)
 	{
@@ -60,10 +82,10 @@ void	update_pwd_vars(t_env *env, char *new_path, char *old_path)
 		pwd->value = cwd;
 	}
 	else
-		free(cwd);
-
-	free(new_path);
+		add_env_node(&env, "PWD", cwd);  // ✅ Add it if missing
 }
+
+
 
 /* Expands `~` into $HOME if present */
 char	*expand_tilde(char *input, t_env *env)
