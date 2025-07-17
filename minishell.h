@@ -308,7 +308,7 @@ void    handle_signals(void);
 int	handle_heredoc_break(char *line, char *delim);
 /* Expansion and string helpers */
 char	*ft_strjoin_free(char *s1, char *s2);
-void	ft_expand_vars_in_str(char **str, t_env *env);
+void	ft_expand_vars_in_heredoc(char **str, t_env *env);
 
 
 // === TEXT COLORS ===

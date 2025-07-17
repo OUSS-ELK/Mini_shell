@@ -130,25 +130,6 @@ char	*f_strjoin_char(char *s, char c)
 	return f_strjoin_free(s, str);
 }
 
-char	*expand_bracket_qt(t_exp_strvars *exp_var)
-{
-	char	*tmp;
-	char	*value;
-	int		start;
-
-	start = ++exp_var->i;
-	while (exp_var->str[exp_var->i] && exp_var->str[exp_var->i] != '}')
-		exp_var->i++;
-	if (exp_var->str[exp_var->i] != '}')
-		return (exp_var->result);
-	tmp = ft_substr(exp_var->str, start, exp_var->i - start);
-	value = ft_getenv(tmp, exp_var->env);
-	exp_var->result = f_strjoin_free(exp_var->result, value ? value : "");
-	free(tmp);
-	exp_var->i++;
-	return (exp_var->result);
-}
-
 char	*expand_simple_qt(t_exp_strvars *exp_var)
 {
 	char	*tmp;
@@ -199,8 +180,6 @@ char	*expand_loop(char *str, t_env *env, bool heredoc, char *result)
 				exp_var.i--;
 			else if (exp_var.str[exp_var.i] == '?')
 				exp_var.result = exit_status(exp_var.result, &exp_var.i);
-			else if (exp_var.str[exp_var.i] == '{')
-				exp_var.result = expand_bracket_qt(&exp_var);
 			else if (ft_isalpha(exp_var.str[exp_var.i]) || exp_var.str[exp_var.i] == '_')
 				exp_var.result = expand_simple_qt(&exp_var);
 			else

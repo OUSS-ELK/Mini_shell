@@ -47,7 +47,7 @@ int main(int argc, char **argv, char **env)
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
 		if (!input)
 		{
-			printf("Input error\n");  // Ctrl + D
+			// printf("Input error\n");  // Ctrl + D
 			break;
 		}
 		add_history(input);
@@ -70,7 +70,7 @@ int main(int argc, char **argv, char **env)
 		exec.env_lst = envr;
 		exec.is_pipe = (cmd && cmd->next);
 
-		printf("DEBUG: parsing_function returned success\n");
+		// printf("DEBUG: parsing_function returned success\n");
 		print_cmds(cmd);
 
 		if (!check_heredocs(cmd, envr))
@@ -86,11 +86,11 @@ int main(int argc, char **argv, char **env)
 			continue;
 		}
 
-		printf("DEBUG: Running execution_main\n");
+		// printf("DEBUG: Running execution_main\n");
 
 		if (!execution_main(&exec, cmd, envr))
 		{
-			write_error(1);
+			write_error(8);
 		}
 
 		cleanup(token, cmd, input, NULL);  // envr remains persistent

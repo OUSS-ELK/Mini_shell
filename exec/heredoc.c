@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 
 static t_redir	*get_last_heredoc(t_redir *r)

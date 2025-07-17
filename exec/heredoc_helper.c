@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 int	handle_heredoc_break(char *line, char *delim)
 {
@@ -17,7 +17,19 @@ int	handle_heredoc_break(char *line, char *delim)
 	}
 	return (0);
 }
-// 
+
+int	valide_exp_heredoc(char *line)
+{
+	int i = 0;
+	while (line[i])
+	{
+		if (valid_expand(line[i], line[i + 1]))
+			return 1;
+		i++;
+
+	}
+	return 0;
+}
 
 void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env, bool last)
 {
@@ -30,11 +42,11 @@ void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env, bool last)
 		// printf("Line = %s\n", line);
 		if (handle_heredoc_break(line, delim))
 			break ;
-		// if (!r->quoted)
-		// {
-		// 	printf("Need to expand here.\n");
-		// 	ft_expand_vars_in_str(&line, env);
-		// }
+		if (!r->quoted && valide_exp_heredoc(line))
+		{
+			printf("Need to expand here.\n");
+			ft_expand_vars_in_heredoc(&line, env);
+		}
 		if (last)
 			write(fd_pipe[1], line, ft_strlen(line));
 		// ssize_t w = write(fd_pipe[1], line, ft_strlen(line));

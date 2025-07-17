@@ -1,4 +1,4 @@
-#include "minishell.h"
+#include "../minishell.h"
 
 // open() simple wrapper
 int	open_file(char *filename, int mode, bool quoted)
