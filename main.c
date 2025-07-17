@@ -70,7 +70,7 @@ int main(int argc, char **argv, char **env)
 		exec.env_lst = envr;
 		exec.is_pipe = (cmd && cmd->next);
 
-		// printf("DEBUG: parsing_function returned success\n");
+		printf("DEBUG: parsing_function returned success\n");
 		print_cmds(cmd);
 
 		if (!check_heredocs(cmd, envr))

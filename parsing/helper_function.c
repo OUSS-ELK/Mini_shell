@@ -170,7 +170,7 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (ft_isalnum(next) || next == '{' || next == '_' || next == '?' || next == '$'));
+	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?'));
 }
 
 void	print_env(t_env *env)

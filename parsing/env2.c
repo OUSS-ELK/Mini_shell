@@ -25,8 +25,13 @@ int expand_simple_var(t_token **token, char *input, int start, t_env *env, bool 
 	char			*var_name;
 	char			*expanded;
 
-	while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
-		len++;
+	if (ft_isdigit(input[start]))
+		len = 1;
+	else
+	{
+		while (input[start + len] && (ft_isalnum(input[start + len]) || input[start + len] == '_'))
+			len++;
+	}
 	var_name = ft_substr(input, start, len);
 	if (!var_name)
 		return (-1);
@@ -34,13 +39,12 @@ int expand_simple_var(t_token **token, char *input, int start, t_env *env, bool 
 	free(var_name);
 	if (!expanded)
 		expanded = "";
-	vars.value = ft_strdup(expanded);
+	vars.value = expanded;
 	vars.type = WORD;
 	vars.space = *space;
 	vars.quoted = false;
 	add_token(token, &vars);
 	*space = false;
-	free(vars.value);
 	return (start + len - 1);
 }
 

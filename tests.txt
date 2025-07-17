@@ -1,0 +1,539 @@
+# Comprehensive Minishell Test Cases
+
+## 1. Basic Command Execution
+
+### Simple Commands
+```bash
+# Basic commands
+echo hello
+ls
+pwd
+whoami
+date
+uname -a
+
+# Commands with arguments
+echo "Hello World"
+ls -la
+ls -l /tmp
+cat /etc/passwd
+grep root /etc/passwd
+```
+
+### Command Not Found
+```bash
+# Should return command not found
+nonexistent_command
+./nonexistent_file
+/bin/nonexistent
+```
+
+## 2. Built-in Commands
+
+### echo
+```bash
+echo hello
+echo "hello world"
+echo 'single quotes'
+echo hello world
+echo -n hello
+echo -n "no newline"
+echo -nnnnn hello
+echo -n -n hello
+echo "-n" hello
+echo -n-n hello
+echo $USER
+echo "$USER"
+echo '$USER'
+echo ""
+echo ''
+echo
+```
+
+### cd
+```bash
+cd /tmp
+pwd
+cd ~
+pwd
+cd
+pwd
+cd ..
+pwd
+cd /
+pwd
+cd ~/Desktop
+cd -
+cd nonexistent_dir
+cd ""
+cd /etc
+cd ../../
+```
+
+### pwd
+```bash
+pwd
+cd /tmp
+pwd
+cd ~
+pwd
+```
+
+### env
+```bash
+env
+env | grep USER
+env | head -5
+```
+
+### export
+```bash
+export TEST=hello
+echo $TEST
+export TEST="hello world"
+echo $TEST
+export TEST=
+echo $TEST
+export TEST
+export 123=invalid
+export =invalid
+export TEST=value OTHER=value2
+export TEST="value with spaces"
+```
+
+### unset
+```bash
+export TEST=hello
+echo $TEST
+unset TEST
+echo $TEST
+unset nonexistent_var
+unset USER
+env | grep USER
+```
+
+### exit
+```bash
+exit
+exit 0
+exit 42
+exit 256
+exit -1
+exit hello
+exit 1 2 3
+```
+
+## 3. Environment Variables
+
+### Variable Expansion
+```bash
+echo $USER
+echo $HOME
+echo $PATH
+echo $PWD
+echo $OLDPWD
+echo $?
+echo $$
+echo $0
+echo $nonexistent
+
+# With quotes
+echo "$USER"
+echo '$USER'
+echo "User: $USER"
+echo 'User: $USER'
+
+# Complex expansions
+echo $USER$HOME
+echo "$USER$HOME"
+echo ${USER}
+echo ${USER}home
+echo $USER/bin
+```
+
+### Exit Status
+```bash
+echo hello
+echo $?
+ls /nonexistent 2>/dev/null
+echo $?
+false
+echo $?
+true
+echo $?
+```
+
+## 4. Quoting
+
+### Single Quotes
+```bash
+echo 'hello world'
+echo 'hello $USER'
+echo 'hello "world"'
+echo 'hello'\''world'
+echo ''
+echo 'multiple words with spaces'
+```
+
+### Double Quotes
+```bash
+echo "hello world"
+echo "hello $USER"
+echo "hello 'world'"
+echo "hello \"world\""
+echo ""
+echo "multiple words with spaces"
+echo "Today is $(date)"
+```
+
+### Mixed Quotes
+```bash
+echo hello"world"
+echo hello'world'
+echo "hello"world
+echo 'hello'world
+echo "hello"'world'
+echo 'hello'"world"
+```
+
+## 5. Redirections
+
+### Output Redirection (>)
+```bash
+echo hello > file.txt
+cat file.txt
+echo world > file.txt
+cat file.txt
+ls > output.txt
+cat output.txt
+
+# Error cases
+echo hello > ""
+echo hello > " "
+echo hello > 
+echo hello > /root/file 2>/dev/null
+```
+
+### Append Redirection (>>)
+```bash
+echo hello > file.txt
+echo world >> file.txt
+cat file.txt
+echo again >> file.txt
+cat file.txt
+
+# Error cases
+echo hello >> ""
+echo hello >> " "
+echo hello >> 
+```
+
+### Input Redirection (<)
+```bash
+echo "hello world" > input.txt
+cat < input.txt
+wc < input.txt
+grep hello < input.txt
+
+# Error cases
+cat < nonexistent.txt
+cat < ""
+cat < " "
+```
+
+### Heredoc (<<)
+```bash
+cat << EOF
+hello
+world
+EOF
+
+cat << ""
+hello
+world
+
+
+cat << " "
+hello
+world
+ 
+
+cat << END
+This is a test
+$USER
+END
+
+cat << 'EOF'
+$USER will not expand
+EOF
+
+# Nested quotes in heredoc
+cat << EOF
+"hello"
+'world'
+EOF
+```
+
+### Multiple Redirections
+```bash
+echo hello > file1.txt > file2.txt
+cat file1.txt file2.txt
+echo hello > file.txt >> file.txt
+cat file.txt
+```
+
+## 6. Pipes
+
+### Simple Pipes
+```bash
+echo hello | cat
+ls | grep txt
+ps | grep bash
+echo "hello world" | wc -w
+cat /etc/passwd | head -5
+```
+
+### Multiple Pipes
+```bash
+ls | grep txt | wc -l
+ps | grep bash | wc -l
+echo "hello world test" | tr ' ' '\n' | sort | uniq
+cat /etc/passwd | grep root | cut -d: -f1
+```
+
+### Pipes with Redirections
+```bash
+echo hello | cat > output.txt
+ls | grep txt > files.txt
+echo "hello world" | cat << EOF
+input from heredoc
+EOF
+```
+
+## 7. Error Handling
+
+### Syntax Errors
+```bash
+# Pipe errors
+|
+| echo hello
+echo hello |
+echo hello | | cat
+echo hello | 
+
+# Redirection errors
+>
+< 
+>>
+<<
+echo hello >
+echo hello <
+echo hello >>
+echo hello <<
+
+# Quote errors
+echo "hello
+echo 'hello
+echo "hello'
+echo 'hello"
+```
+
+### Permission Errors
+```bash
+# Try to write to read-only location
+echo hello > /etc/test.txt
+cat > /bin/test.txt
+
+# Try to execute non-executable file
+echo "echo hello" > script.txt
+./script.txt
+```
+
+## 8. Signal Handling
+
+### Ctrl+C (SIGINT)
+```bash
+# Run these and press Ctrl+C
+sleep 10
+cat
+yes
+```
+
+### Ctrl+D (EOF)
+```bash
+# Press Ctrl+D at prompt
+# Should exit shell
+
+# Press Ctrl+D with heredoc
+cat << EOF
+# Press Ctrl+D here
+```
+
+### Ctrl+\ (SIGQUIT)
+```bash
+# Run these and press Ctrl+\
+sleep 10
+cat
+```
+
+## 9. Edge Cases
+
+### Empty Commands
+```bash
+# Empty input
+
+# Only spaces
+   
+	
+
+# Only tabs and spaces
+```
+
+### Special Characters
+```bash
+echo "hello;world"
+echo 'hello;world'
+echo hello\;world
+echo hello\\world
+echo hello\$world
+echo "hello\$world"
+```
+
+### Long Commands
+```bash
+# Very long command line
+echo this is a very long command line with many arguments and it should work properly even if it exceeds normal buffer sizes
+
+# Long paths
+ls /very/long/path/that/does/not/exist/and/should/give/error
+```
+
+### Stress Tests
+```bash
+# Many pipes
+echo hello | cat | cat | cat | cat | cat | cat | cat | cat | cat | cat
+
+# Many redirections
+echo hello > file1 > file2 > file3 > file4 > file5
+
+# Complex combinations
+echo "hello world" | grep hello | cat > output.txt | cat
+
+# Nested quotes and variables
+echo "User $USER said 'hello world' and \"goodbye\""
+```
+
+## 10. Interactive Features
+
+### History (if implemented)
+```bash
+# Run commands, then use up arrow to recall
+echo hello
+ls
+# Press up arrow to get previous commands
+```
+
+### Tab completion (if implemented)
+```bash
+# Type partial command and press tab
+ec<TAB>
+ls /et<TAB>
+```
+
+## 11. Memory and Resource Tests
+
+### Large Files
+```bash
+# Create large file and test
+dd if=/dev/zero of=large.txt bs=1M count=10
+cat large.txt | wc -l
+```
+
+### Many Processes
+```bash
+# Test with many pipes
+ps aux | grep bash | head -10 | tail -5 | wc -l
+```
+
+## 12. Compatibility Tests
+
+### Compare with bash
+```bash
+# Test same command in bash and minishell
+echo $?
+echo "$USER"
+echo '$USER'
+cd /tmp && pwd
+ls | wc -l
+```
+
+### Environment inheritance
+```bash
+# Set variable in parent shell
+export TEST=value
+# Start minishell and check
+echo $TEST
+```
+
+## 13. File Operations
+
+### File creation and manipulation
+```bash
+# Create files
+touch test.txt
+echo "content" > test.txt
+cat test.txt
+
+# File permissions
+chmod 644 test.txt
+ls -l test.txt
+cat test.txt
+
+# Directory operations
+mkdir testdir
+cd testdir
+pwd
+cd ..
+rmdir testdir
+```
+
+## 14. Advanced Redirection Cases
+
+### Redirection with variables
+```bash
+FILE=output.txt
+echo hello > $FILE
+cat $FILE
+
+# Quoted redirections
+echo hello > "output file.txt"
+cat "output file.txt"
+```
+
+### Multiple heredocs
+```bash
+cat << EOF1 << EOF2
+first heredoc
+EOF1
+second heredoc
+EOF2
+```
+
+## How to Run Tests
+
+1. **Manual testing**: Copy and paste each test case into your minishell
+2. **Automated testing**: Create a test script that compares output with bash
+3. **Systematic testing**: Test each category thoroughly before moving to the next
+4. **Error testing**: Pay special attention to error cases and edge conditions
+5. **Memory testing**: Use valgrind to check for memory leaks
+
+## Expected Behaviors
+
+- **Exit codes**: Should match bash behavior for similar commands
+- **Error messages**: Should be clear and helpful
+- **Memory management**: No memory leaks or corruption
+- **Signal handling**: Proper response to Ctrl+C, Ctrl+D, Ctrl+\
+- **Environment**: Proper variable expansion and inheritance
+- **Redirections**: Should work exactly like bash
+- **Pipes**: Should handle multiple pipes correctly
+- **Quoting**: Should preserve/expand as appropriate

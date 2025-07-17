@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_main.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 13:49:34 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/13 13:40:55 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/17 23:25:09 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@ int	execution_main(t_exec *exec, t_cmd *cmd_list, t_env *env)
 	prev_pipe_read = STDIN_FILENO;
 	while (cmd_list)
 	{
+		// ✅ Skip empty commands (after expansion like: $NOTEXISTabc)
+		if (!cmd_list->args || !cmd_list->args[0] || cmd_list->args[0][0] == '\0')
+		{
+			cmd_list = cmd_list->next;
+			continue;
+		}
 		// create pupe only if there is a next cmd
 		if (cmd_list->next && !create_pipe(exec))
 			return (0);
