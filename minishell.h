@@ -150,6 +150,7 @@ void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);
 int 	lexer_input(t_token **token, char *input, t_env *env);
 
+int		handle_invalide_expand(t_token **token, char *input, t_lexvars *st);
 int		handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st);
 int 	handle_operator(t_token **token, char *input, int i, t_lexvars *st);
 int 	handle_word(t_token **token, char *input, t_lexvars *st);

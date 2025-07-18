@@ -32,14 +32,18 @@ void	else_case(t_token **token, char *input, t_lexvars *st)
 {
 	t_token_vars	vars;
 
+	printf("Else Case\n");
 	if (input[st->i] == '$' && input[st->i + 1] == '\0')
 	{
+		printf("$ -> '0'\n");
 		vars.value = "$";
 		vars.type = WORD;
 		vars.space = st->space;
 		vars.quoted = false;
 		add_token(token, &vars);
 	}
+	if (input[st->i] == '\\')
+		st->i++;
 	st->i++;
 }
 
@@ -61,16 +65,23 @@ int	lexing(t_token **token, char *input, t_env *env, t_lexvars *st)
 	}
 	else if (is_word_start(input[st->i]))
 	{
+		printf("Is word\n");
 		if (!handle_word(token, input, st))
+			return (0);
+	}
+	else if (input[st->i + 1] && !valid_expand(input[st->i], input[st->i + 1]))
+	{
+		printf("Invalide expand\n");
+		handle_invalide_expand(token, input, st);
+	}
+	else if (input[st->i + 1] && valid_expand(input[st->i], input[st->i + 1]))
+	{
+		printf("Valide expand\n");
+		if (!handle_expansion(token, input, env, st))
 			return (0);
 	}
 	else if (is_operator(input[st->i]))
 		st->i = handle_operator(token, input, st->i, st);
-	else if (input[st->i + 1] && valid_expand(input[st->i], input[st->i + 1]))
-	{
-		if (!handle_expansion(token, input, env, st))
-			return (0);
-	}
 	else
 		else_case(token, input, st);
 	return (1);

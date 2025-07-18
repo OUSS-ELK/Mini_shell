@@ -136,7 +136,7 @@ int	all_space(char *input)
 		return (1);
 	while (input[i])
 	{
-		if (!f_isspace(input[i]) && input[i] != '$')
+		if (!f_isspace(input[i]) && input[i] != ':')
 			return (0);
 		i++;
 	}
@@ -253,6 +253,34 @@ void	print_cmds(t_cmd *cmd)
 	}
 }
 
+int handle_invalide_expand(t_token **token, char *input, t_lexvars *st)
+{
+	t_token_vars	vars;
+	int				start;
+	int				len;
+
+	start = st->i;
+	len = 1;
+	while (input[st->i + len] && is_word_start(input[st->i + len]))
+		len++;
+	char *part = ft_substr(input, start, len);
+	if (!part)
+		return (0);
+
+	vars.value = part;
+	vars.type = WORD;
+	vars.space = st->space;
+	vars.quoted = false;
+	add_token(token, &vars);
+	free(part);
+	st->i += len;
+	st->space = f_isspace(input[st->i]);
+	if (st->heredoc)
+		st->heredoc = false;
+	return (1);
+}
+
+
 int handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
 	t_expndvars	exp_var;
@@ -285,6 +313,27 @@ int handle_operator(t_token **token, char *input, int i, t_lexvars *st)
 	return (check_operator(&op_vars));
 }
 
+char *f_esccape(char *str)
+{
+	char *result;
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	result = malloc(ft_strlen(str) + 1);
+	if (!result)
+		return (NULL);
+	while (str[i])
+	{
+		if (str[i] == '\\' && str[i + 1])
+			i++;
+		result[j++] = str[i++];
+	}
+	result[j] = '\0';
+	return (result);
+}
+
 int handle_word(t_token **token, char *input, t_lexvars *st)
 {
 	t_token_vars	vars;
@@ -293,16 +342,22 @@ int handle_word(t_token **token, char *input, t_lexvars *st)
 
 	start = st->i;
 	while (input[st->i] && is_word_start(input[st->i]))
-		st->i++;
+	{
+		if (input[st->i] == '\\' && input[st->i + 1])
+			st->i += 2;
+		else
+			st->i++;
+	}
 	part = ft_substr(input, start, st->i - start);
 	if (!part)
 		return (0);
-	vars.value = part;
+	vars.value = f_esccape(part);
 	vars.type = WORD;
 	vars.space = st->space;
 	vars.quoted = false;
 	add_token(token, &vars);
 	free(part);
+	free(vars.value);
 	st->space = f_isspace(input[st->i]);
 	if (st->heredoc)
 		st->heredoc = false;
@@ -501,52 +556,17 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
 
 	if (!is_valid_redir_filename(*curr_token))
 		return (0);
-
+	// if (is_ambiguous_redirection(cmd, (*curr_token)->type))
+	// {
+	// 	write_error(7); // Ambiguous redirect
+	// 	return (0);
+	// }
 	if (!create_and_add_redir(cmd, *curr_token))
 		return (0);
 
 	*curr_token = (*curr_token)->next->next;
 	return (1);
 }
-
-
-// int handle_redirection(t_cmd *cmd, t_token **curr_token)
-// {
-// 	if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
-// 	{
-// 		write_error(4);
-// 		return (0);
-// 	}
-
-// 	if (!is_valid_redir_filename(*curr_token))
-// 		return (0);
-// 	if (is_ambiguous_redirection(cmd, (*curr_token)->type))
-// 	{
-// 		write_error(7); // Ambiguous redirect
-// 		return (0);
-// 	}
-// 	if (!create_and_add_redir(cmd, *curr_token))
-// 		return (0);
-
-// 	*curr_token = (*curr_token)->next->next;
-// 	return (1);
-// }
-
-
-// int handle_redirection(t_cmd *cmd, t_token **curr_token)
-// {
-// 	if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
-// 	{
-// 		write_error(4);
-// 		return (0);
-// 	}
-// 	if (!is_valid_redir_filename(*curr_token))
-// 		return (0);
-// 	if (!create_and_add_redir(cmd, *curr_token))
-// 		return (0);
-// 	*curr_token = (*curr_token)->next->next;
-// 	return (1);
-// }
 
 int	is_ambiguous_redirection(t_cmd *cmd, t_token_type new_type)
 {
