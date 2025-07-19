@@ -170,8 +170,19 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?'));
+	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?' ||  next == '"' ||  next == '\''));
 }
+// int valid_expand(char c, char next)
+// {
+// 	if (c != '$')
+// 		return 0;
+// 	if (next == '\0' || f_isspace(next) || is_operator(next))
+// 		return 0;
+// 	if (ft_isalnum(next) || next == '_' || next == '?' ||  next == '"' ||  next == '\'')
+// 		return 1;
+// 	return 0;
+// }
+
 
 void	print_env(t_env *env)
 {
@@ -313,26 +324,26 @@ int handle_operator(t_token **token, char *input, int i, t_lexvars *st)
 	return (check_operator(&op_vars));
 }
 
-char *f_esccape(char *str)
-{
-	char *result;
-	int i;
-	int j;
+// char *f_esccape(char *str)
+// {
+// 	char *result;
+// 	int i;
+// 	int j;
 
-	i = 0;
-	j = 0;
-	result = malloc(ft_strlen(str) + 1);
-	if (!result)
-		return (NULL);
-	while (str[i])
-	{
-		if (str[i] == '\\' && str[i + 1])
-			i++;
-		result[j++] = str[i++];
-	}
-	result[j] = '\0';
-	return (result);
-}
+// 	i = 0;
+// 	j = 0;
+// 	result = malloc(ft_strlen(str) + 1);
+// 	if (!result)
+// 		return (NULL);
+// 	while (str[i])
+// 	{
+// 		if (str[i] == '\\' && str[i + 1])
+// 			i++;
+// 		result[j++] = str[i++];
+// 	}
+// 	result[j] = '\0';
+// 	return (result);
+// }
 
 int handle_word(t_token **token, char *input, t_lexvars *st)
 {
@@ -343,21 +354,21 @@ int handle_word(t_token **token, char *input, t_lexvars *st)
 	start = st->i;
 	while (input[st->i] && is_word_start(input[st->i]))
 	{
-		if (input[st->i] == '\\' && input[st->i + 1])
-			st->i += 2;
-		else
+		// if (input[st->i] == '\\' && input[st->i + 1])
+		// 	st->i += 2;
+		// else
 			st->i++;
 	}
 	part = ft_substr(input, start, st->i - start);
 	if (!part)
 		return (0);
-	vars.value = f_esccape(part);
+	vars.value = part;//f_esccape(part);
 	vars.type = WORD;
 	vars.space = st->space;
 	vars.quoted = false;
 	add_token(token, &vars);
 	free(part);
-	free(vars.value);
+	// free(vars.value);
 	st->space = f_isspace(input[st->i]);
 	if (st->heredoc)
 		st->heredoc = false;
