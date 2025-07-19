@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 10:18:33 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/12 21:20:13 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/19 19:11:57 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ void	print_export_env_vars(t_env *head)
 				printf("declare -x %s\n", head->key);
 			else
 			{
-				printf("declare -x %s=", head->key);
+				// printf("declare -x %s=", head->key);
 				if (head->value[0] == '\0')
 					printf("\"\"\n");
 				else

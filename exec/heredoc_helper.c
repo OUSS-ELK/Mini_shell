@@ -44,7 +44,7 @@ void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env, bool last)
 			break ;
 		if (!r->quoted && valide_exp_heredoc(line))
 		{
-			printf("Need to expand here.\n");
+			// printf("Need to expand here.\n");
 			ft_expand_vars_in_heredoc(&line, env);
 		}
 		if (last)

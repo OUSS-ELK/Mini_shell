@@ -8,7 +8,7 @@ BREW_READLINE = /goinfre/ouelkhar/homebrew/opt/readline
 CFLAGS = -Wall -Wextra   -I. -Ilibft -I$(BREW_READLINE)/include
 LDFLAGS = -Llibft -lft -L$(BREW_READLINE)/lib -lreadline
 
-SRC_DIRS = parsing exec builtins utils
+SRC_DIRS = parsing exec builtins
 
 # Exclude specific files
 EXCLUDED_FILES = builtins/export.c builtins/export_utils.c

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helper_function.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/19 19:33:43 by ouelkhar          #+#    #+#             */
+/*   Updated: 2025/07/19 20:13:38 by ouelkhar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 void	write_error(int	n)
@@ -170,7 +182,7 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?' ||  next == '"' ||  next == '\''));
+	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?' ||  next == '"'));
 }
 // int valid_expand(char c, char next)
 // {
@@ -205,7 +217,7 @@ void	print_tokens(t_token *token)
 void    ll(void)
 {
 	// if (getpid() == getppid())
-    	system("ls");
+    	system("leaks minishell");
 }
 
 int	check_quote(char *input)
@@ -270,6 +282,7 @@ int handle_invalide_expand(t_token **token, char *input, t_lexvars *st)
 	int				start;
 	int				len;
 
+	printf("Invalide expansion\n");
 	start = st->i;
 	len = 1;
 	while (input[st->i + len] && is_word_start(input[st->i + len]))
@@ -297,12 +310,15 @@ int handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st)
 	t_expndvars	exp_var;
 	int			new_i;
 
+	printf("Valide expansion\n");
 	exp_var.token = token;
 	exp_var.i = st->i;
 	exp_var.input = input;
 	exp_var.env = env;
 	exp_var.space = &st->space;
-	exp_var.heredoc = st->heredoc;
+	exp_var.heredoc = &st->heredoc;
+	printf("2 heredoc = %d\n", exp_var.heredoc);
+
 
 	new_i = expanding_var(&exp_var);
 	if (new_i == -1)
@@ -567,11 +583,11 @@ int handle_redirection(t_cmd *cmd, t_token **curr_token)
 
 	if (!is_valid_redir_filename(*curr_token))
 		return (0);
-	// if (is_ambiguous_redirection(cmd, (*curr_token)->type))
-	// {
-	// 	write_error(7); // Ambiguous redirect
-	// 	return (0);
-	// }
+	if (is_ambiguous_redirection(cmd, (*curr_token)->type))
+	{
+		write_error(7); // Ambiguous redirect
+		return (0);
+	}
 	if (!create_and_add_redir(cmd, *curr_token))
 		return (0);
 

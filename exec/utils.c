@@ -9,7 +9,7 @@ void	custom_error(char *cmd, char *error, int status)
 		write(2, ": ", 2);
 	}
 	write(2, error, ft_strlen(error));
-	printf("Before exit\n");
+	// printf("Before exit\n");
 	exit(status);
 }
 
