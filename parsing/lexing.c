@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:38 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/19 19:35:27 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/20 21:52:38 by oussama-elk      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,28 @@ int	check_operator(t_oprvars *op_vars)
 			*(op_vars->heredoc) = true;
 		vars.value = ft_substr(op_vars->input, op_vars->i, 2);
 		add_token(op_vars->token, &vars);
+		printf("Operator [%s]\n", vars.value);
 		free(vars.value);
 		return (op_vars->i + 2);
 	}
 	vars.value = ft_substr(op_vars->input, op_vars->i, 1);
 	add_token(op_vars->token, &vars);
+	printf("Operator [%s]\n", vars.value);
 	free(vars.value);
 	return (op_vars->i + 1);
+}
+
+int	has_mergeable_words(t_token *token)
+{
+	t_token	*curr = token;
+	
+	while (curr && curr->next)
+	{
+		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
+			return (1);
+		curr = curr->next;
+	}
+	return (0);
 }
 
 void	merge_words(t_token **token)                            		     // function to handle mixed word (if space true d'ont merge)
@@ -96,6 +111,7 @@ void	merge_words(t_token **token)                            		     // function 
 	curr = *token;
 	if (!curr || !curr->next)
 		return ;
+	printf("INSIDE MERGE WORD\n");
 	while (curr && curr->next)
 	{
 		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)

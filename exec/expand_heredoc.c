@@ -65,13 +65,14 @@ static int	handle_dollar(char **result, char *str, ssize_t *i, t_env *env)
 	ret = handle_variable_expansion(&temp_token, str, *i, env, &space);
 	if (ret == -1)
 	{
-		free_tokens(&temp_token);
+		free_tokens(temp_token);
 		free(*result);
 		return (-1);
 	}
 	expanded = token_list_to_str(temp_token);
 	*result = ft_strjoin_free(*result, expanded);
 	free(expanded);
+	free_tokens(temp_token);
 	*i = ret;
 	return (0);
 }

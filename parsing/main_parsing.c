@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_parsing.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:32 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/19 21:33:52 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/21 02:09:27 by oussama-elk      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,18 +44,16 @@ void	else_case(t_token **token, char *input, t_lexvars *st)
 {
 	t_token_vars	vars;
 
-	// printf("Else Case\n");
+	printf("Else Case\n");
 	if (input[st->i] == '$' && input[st->i + 1] == '\0')
 	{
-		// printf("$ -> '0'\n");
+		printf("$ -> '0'\n");
 		vars.value = "$";
 		vars.type = WORD;
 		vars.space = st->space;
 		vars.quoted = false;
 		add_token(token, &vars);
 	}
-	// if (input[st->i] == '\\')
-	// 	st->i++;
 	st->i++;
 }
 
@@ -84,39 +82,31 @@ int	expansion(t_token **token, char *input, t_env *env, t_lexvars *st)
 int	lexing(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
 	if (f_isspace(input[st->i]))
+	{
+		printf("Is Space\n");
 		handle_space(input, st);
+	}
 	else if (is_quote(input[st->i]))
 	{
-		printf("Quote\n");
+		printf("Is Quote\n");
 		if (!handle_quote(token, input, env, st))
-			return (0);
-	}
-	else if (is_word_start(input[st->i]))
-	{
-		printf("Word\n");
-		if (!handle_word(token, input, st))
 			return (0);
 	}
 	else if (input[st->i] == '$' && input[st->i + 1] && !st->heredoc)
 	{
-		printf("Valide expand\n");
-		printf("heredoc = %d\n", st->heredoc);
-		if (input[st->i + 1] && !valid_expand(input[st->i], input[st->i + 1]))
-		{
-			if (!handle_invalide_expand(token, input, st))
-				return (0);
-		}
-		else
-		{
-			if (!handle_expansion(token, input, env, st))
-				return (0);
-		}
-		// if (!expansion(token, input, env, st))
-		// 	return (0);
+		printf("EXPANSION    $ -> & !0 & !heredoc[%d] \n", st->heredoc);
+		if (!expansion(token, input, env, st))
+			return (0);
+	}
+	else if (is_word_start(input[st->i]))
+	{
+		printf("Is Word\n");
+		if (!handle_word(token, input, st))
+			return (0);
 	}
 	else if (is_operator(input[st->i]))
 	{
-		printf("Operator\n");
+		printf("Is Operator\n");
 		st->i = handle_operator(token, input, st->i, st);
 	}
 	else
@@ -131,12 +121,13 @@ int lexer_input(t_token **token, char *input, t_env *env)
 	st.i = 0;
 	st.space = false;
 	st.heredoc = false;
+	printf("INSIDE LEXING\n");
 	while (input[st.i])
 	{
 		if (!lexing(token, input, env, &st))
 			return (0);
 	}
-	if (st.i > 0)
+	if (*token && has_mergeable_words(*token))
 		merge_words(token);
 	return (1);
 }

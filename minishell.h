@@ -146,6 +146,7 @@ void	add_token(t_token **token, t_token_vars *vars);
 int		check_operator(t_oprvars *op_vars);
 int 	expanding_var(t_expndvars *exp_var);
 char	*expand_var_str(char *str, t_env *env, bool heredoc);
+int	has_mergeable_words(t_token *token);
 void	merge_words(t_token **token);
 t_cmd	*parse_cmd(t_token **token);
 int 	lexer_input(t_token **token, char *input, t_env *env);
@@ -157,7 +158,6 @@ int 	handle_word(t_token **token, char *input, t_lexvars *st);
 char	*extract_quoted_content(char *input, int start, int *end);
 char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc);
 
-int		is_only_space(char *filename);
 int 	is_oper(int type);
 t_cmd	*alloc_new_cmd(void);
 char	**handl_word(char **args, char *new_arg);
@@ -190,7 +190,6 @@ void	print_tokens(t_token *token);
 void	print_env(t_env *env);
 void	print_array(char **arr);
 void	print_cmds(t_cmd *cmd);
-void    ll(void);
 
 // Builtins
 int		is_builtin(t_cmd *cmd);

@@ -6,12 +6,12 @@ int parsing_function(t_token **token, char *input, t_cmd **cmd, t_env **envr)
 {
 	if (!check_quote(input))
 	{
-		write_error(2);
+		write_error(3);
 		return (0);
 	}
 	if (!lexer_input(token, input, *envr))
 	{
-		write_error(3);
+		write_error(2);
 		return (0);
 	}
 	*cmd = parse_cmd(token);
@@ -53,6 +53,7 @@ int main(int argc, char **argv, char **env)
 		add_history(input);
 		if (all_space(input))
 		{
+			printf("All spaces or :\n");
 			free(input);
 			continue;
 		}
@@ -98,5 +99,6 @@ int main(int argc, char **argv, char **env)
 		dup2(original_stdin, STDIN_FILENO);
 		dup2(original_stdout, STDOUT_FILENO);
 	}
+	free_env(envr);
 	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   helper_function.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:43 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/19 20:13:38 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/21 02:13:51 by oussama-elk      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	write_error(int	n)
 	else if (n == 6)
 		write(1, "Syntax error empty command after pipe\n", 38);
 	else if (n == 7)
-		write(1, "Parsing Syntax error ambiguous redirect\n", 32);
+		write(1, "Parsing Syntax error ambiguous redirect\n", 40);
 	else if (8)
 		write(1, "fatal fork/pipe error\n", 22);
 	else
@@ -182,7 +182,7 @@ int	is_alpha(char input)
 
 int	valid_expand(char input, char next)
 {
-	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?' ||  next == '"'));
+	return (input == '$' && (ft_isalnum(next) || next == '_' || next == '?' ||  next == '"' ||  next == '\''));
 }
 // int valid_expand(char c, char next)
 // {
@@ -194,7 +194,6 @@ int	valid_expand(char input, char next)
 // 		return 1;
 // 	return 0;
 // }
-
 
 void	print_env(t_env *env)
 {
@@ -212,12 +211,6 @@ void	print_tokens(t_token *token)
 		printf(BLUE"TOKEN [%s] | TYPE [%d] | space[%d] | quote[%d]\n" RESET, token->token, token->type, token->space, token->quote);
 		token = token->next;
 	}
-}
-
-void    ll(void)
-{
-	// if (getpid() == getppid())
-    	system("leaks minishell");
 }
 
 int	check_quote(char *input)
@@ -239,6 +232,7 @@ int	check_quote(char *input)
 	}
 	if (sq || dq)
 		return (0);
+	printf("Quote are safe\n");
 	return (1);
 }
 
@@ -295,6 +289,7 @@ int handle_invalide_expand(t_token **token, char *input, t_lexvars *st)
 	vars.type = WORD;
 	vars.space = st->space;
 	vars.quoted = false;
+	printf("Invalide expansion [%s]\n", part);
 	add_token(token, &vars);
 	free(part);
 	st->i += len;
@@ -316,9 +311,7 @@ int handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st)
 	exp_var.input = input;
 	exp_var.env = env;
 	exp_var.space = &st->space;
-	exp_var.heredoc = &st->heredoc;
-	printf("2 heredoc = %d\n", exp_var.heredoc);
-
+	exp_var.heredoc = st->heredoc;
 
 	new_i = expanding_var(&exp_var);
 	if (new_i == -1)
@@ -340,27 +333,6 @@ int handle_operator(t_token **token, char *input, int i, t_lexvars *st)
 	return (check_operator(&op_vars));
 }
 
-// char *f_esccape(char *str)
-// {
-// 	char *result;
-// 	int i;
-// 	int j;
-
-// 	i = 0;
-// 	j = 0;
-// 	result = malloc(ft_strlen(str) + 1);
-// 	if (!result)
-// 		return (NULL);
-// 	while (str[i])
-// 	{
-// 		if (str[i] == '\\' && str[i + 1])
-// 			i++;
-// 		result[j++] = str[i++];
-// 	}
-// 	result[j] = '\0';
-// 	return (result);
-// }
-
 int handle_word(t_token **token, char *input, t_lexvars *st)
 {
 	t_token_vars	vars;
@@ -368,23 +340,19 @@ int handle_word(t_token **token, char *input, t_lexvars *st)
 	char			*part;
 
 	start = st->i;
+	// printf("{word}input [%c]\n", input[start]);
 	while (input[st->i] && is_word_start(input[st->i]))
-	{
-		// if (input[st->i] == '\\' && input[st->i + 1])
-		// 	st->i += 2;
-		// else
-			st->i++;
-	}
+		st->i++;
 	part = ft_substr(input, start, st->i - start);
+	printf("word [%s]\n", part);
 	if (!part)
 		return (0);
-	vars.value = part;//f_esccape(part);
+	vars.value = part;
 	vars.type = WORD;
 	vars.space = st->space;
 	vars.quoted = false;
 	add_token(token, &vars);
 	free(part);
-	// free(vars.value);
 	st->space = f_isspace(input[st->i]);
 	if (st->heredoc)
 		st->heredoc = false;
@@ -415,9 +383,15 @@ char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc)
 	char	*expand;
 
 	if (heredoc || quote == '\'')
+	{
 		expand = ft_strdup(str);
+		printf("heredoc || quote ' [%s]\n", expand);	
+	}
 	else
+	{
 		expand = expand_var_str(str, env, heredoc);
+		printf("else [%s]\n", expand);	
+	}
 	return (expand);
 }
 
@@ -433,25 +407,12 @@ int inside_quote(t_quotevars *qt_var)
 	if (!str)
 		return (-1);
 	expand = handle_quote_expansion(str, quote, qt_var->env, *(qt_var->heredoc));
+	printf("Quote_Word [%s]\n", expand);
 	free(str);
 	if (!expand)
 		return (-1);
 	*(qt_var->output) = expand;
 	return (end + 1);
-}
-
-int	is_only_space(char *filename)
-{
-	int	i;
-
-	i = 0;
-	while (filename[i])
-	{
-		if (!f_isspace(filename[i]))
-			return (1);
-		i++;
-	}
-	return (0);
 }
 
 int is_oper(int type)
@@ -501,22 +462,6 @@ char	**handl_word(char **args, char *new_arg)
 	return (new_args);
 }
 
-// int is_valid_redir_filename(t_token *op_token)
-// {
-// 	char *filename;
-
-// 	filename = op_token->next->token;
-// 	if (!filename || filename[0] != '\0')
-// 	{
-// 		if (op_token->type != HEREDOC)
-// 		{
-// 			write_error(7);
-// 			return (0);
-// 		}
-// 	}
-// 	return (1);
-// }
-
 int is_valid_redir_filename(t_token *op_token)
 {
 	char *filename;
@@ -561,7 +506,7 @@ int create_and_add_redir(t_cmd *cmd, t_token *redir_token)
 	if (!new_redir)
 		return (0);
 	new_redir->filename = ft_strdup(filename);
-	if (!new_redir->filename /*|| !is_only_space(new_redir->filename)*/)
+	if (!new_redir->filename)
 	{
 		free(new_redir);
 		return (0);
@@ -575,23 +520,26 @@ int create_and_add_redir(t_cmd *cmd, t_token *redir_token)
 
 int handle_redirection(t_cmd *cmd, t_token **curr_token)
 {
+	printf("INSIDE handle redirection \n");
 	if (!(*curr_token)->next || (*curr_token)->next->type != WORD)
 	{
+		printf(" after redirection no word\n");
 		write_error(4);
 		return (0);
 	}
 
 	if (!is_valid_redir_filename(*curr_token))
 		return (0);
-	if (is_ambiguous_redirection(cmd, (*curr_token)->type))
-	{
-		write_error(7); // Ambiguous redirect
-		return (0);
-	}
+	// if (is_ambiguous_redirection(cmd, (*curr_token)->type))
+	// {
+	// 	write_error(7); // Ambiguous redirect
+	// 	return (0);
+	// }
 	if (!create_and_add_redir(cmd, *curr_token))
 		return (0);
 
 	*curr_token = (*curr_token)->next->next;
+	printf("create and add redirection to cmd list & skip operator and file name \n");
 	return (1);
 }
 
