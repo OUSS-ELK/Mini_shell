@@ -1,20 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parse.c                                            :+:      :+:    :+:   */
+/*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:28 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/21 00:52:29 by oussama-elk      ###   ########.fr       */
+/*   Updated: 2025/07/22 02:38:24 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int handle_pipe(t_cmd **curr, t_token **curr_token, t_cmd **head)
+int	handle_pipe(t_cmd **curr, t_token **curr_token, t_cmd **head)
 {
-	printf("INSIDE handle Pipe\n");
 	if (!(*curr)->args && !(*curr)->redir)
 		return (write_error(5), 0);
 	if (!(*curr_token)->next)
@@ -27,9 +26,8 @@ int handle_pipe(t_cmd **curr, t_token **curr_token, t_cmd **head)
 	return (1);
 }
 
-int handle_word_token(t_cmd *curr, t_token **curr_token)
+int	handle_word_token(t_cmd *curr, t_token **curr_token)
 {
-	printf("INSIDE handle word token\n");
 	if (!curr->redir || (curr->redir && curr->redir->filename))
 	{
 		curr->args = handl_word(curr->args, (*curr_token)->token);
@@ -40,9 +38,8 @@ int handle_word_token(t_cmd *curr, t_token **curr_token)
 	return (1);
 }
 
-int handle_cmd(t_cmd **curr, t_token **curr_token, t_cmd **head)
+int	handle_cmd(t_cmd **curr, t_token **curr_token, t_cmd **head)
 {
-	printf("INSIDE (while) handle cmd\n");
 	if ((*curr_token)->type == PIPE)
 		return (handle_pipe(curr, curr_token, head));
 	else if (is_oper((*curr_token)->type))
@@ -54,7 +51,7 @@ int handle_cmd(t_cmd **curr, t_token **curr_token, t_cmd **head)
 	return (1);
 }
 
-int init_parse_vars(t_cmd **head, t_cmd **curr)
+int	init_parse_vars(t_cmd **head, t_cmd **curr)
 {
 	*head = alloc_new_cmd();
 	if (!*head)
@@ -71,7 +68,6 @@ t_cmd	*parse_cmd(t_token **token)
 
 	if (!token)
 		return (NULL);
-	printf("INSIDE PARSE CMD\n");
 	if (!init_parse_vars(&head, &curr))
 		return (NULL);
 	curr_token = *token;

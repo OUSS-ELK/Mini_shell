@@ -2,24 +2,6 @@
 
 int	g_exit_status = 0;
 
-int parsing_function(t_token **token, char *input, t_cmd **cmd, t_env **envr)
-{
-	if (!check_quote(input))
-	{
-		write_error(3);
-		return (0);
-	}
-	if (!lexer_input(token, input, *envr))
-	{
-		write_error(2);
-		return (0);
-	}
-	*cmd = parse_cmd(token);
-	if (!*cmd)
-		return (0);
-	return (1);
-}
-
 int main(int argc, char **argv, char **env)
 {
 	t_token *token;
@@ -53,7 +35,6 @@ int main(int argc, char **argv, char **env)
 		add_history(input);
 		if (all_space(input))
 		{
-			printf("All spaces or :\n");
 			free(input);
 			continue;
 		}
@@ -63,8 +44,7 @@ int main(int argc, char **argv, char **env)
 
 		if (!parsing_function(&token, input, &cmd, &envr))  // ✅ pass envr directly
 		{
-			write_error(1);
-			cleanup(token, cmd, input, NULL);  // Don't clean envr here
+			cleanup(token, cmd, input);  // Don't clean envr here
 			continue;
 		}
 
@@ -77,13 +57,13 @@ int main(int argc, char **argv, char **env)
 		if (!check_heredocs(cmd, envr))
 		{
 			printf("Error heredoc\n");
-			cleanup(token, cmd, input, NULL);
+			cleanup(token, cmd, input);
 			continue;
 		}
 
 		if (builtin_check_execute(cmd, &exec, &envr) == 1)
 		{
-			cleanup(token, cmd, input, NULL);
+			cleanup(token, cmd, input);
 			continue;
 		}
 
@@ -94,7 +74,7 @@ int main(int argc, char **argv, char **env)
 			write_error(8);
 		}
 
-		cleanup(token, cmd, input, NULL);  // envr remains persistent
+		cleanup(token, cmd, input);  // envr remains persistent
 
 		dup2(original_stdin, STDIN_FILENO);
 		dup2(original_stdout, STDOUT_FILENO);

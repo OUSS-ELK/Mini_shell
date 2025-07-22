@@ -36,7 +36,7 @@ typedef struct s_token
 {
 	char			*token;
 	t_token_type	type;
-	bool			space;				// for merge words that are no space bitween them
+	bool			space;
 	bool			quote;
 	struct s_token	*next;
 } t_token;
@@ -105,6 +105,15 @@ typedef struct s_expand_vars		// Normal expanding vars
 	bool	heredoc;
 }	t_expndvars;
 
+typedef struct s_simple_expand_vars
+{
+	t_token		**token;
+	char		*input;
+	int			start;
+	t_env		*env;
+	bool		*space;
+}	t_spl_exp_vars;
+
 typedef struct s_expand_str_vars	// Expnade inside quotes var
 {
 	char	*str;
@@ -123,6 +132,8 @@ typedef struct s_quote_vars			// Quotes vars
 	bool	*heredoc;
 }	t_quotevars;
 
+
+
 typedef struct s_operator_vars		// Operator check vars
 {
 	char		*input;
@@ -135,28 +146,44 @@ typedef struct s_operator_vars		// Operator check vars
 //env_func
 t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
+t_env	*handle_special_env(char *env_var, int *skip);
 
-// parsing
-t_env *handle_special_env(char *env_var, int *skip);
-int	is_ambiguous_redirection(t_cmd *cmd, t_token_type new_type);
-int		check_quote(char *input);
-int		inside_quote(t_quotevars *qt_var);
-t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
-void	add_token(t_token **token, t_token_vars *vars);
-int		check_operator(t_oprvars *op_vars);
-int 	expanding_var(t_expndvars *exp_var);
-char	*expand_var_str(char *str, t_env *env, bool heredoc);
-int	has_mergeable_words(t_token *token);
-void	merge_words(t_token **token);
-t_cmd	*parse_cmd(t_token **token);
+
+/*			====	Parsing	& Lexing	====		*/ 
+int		parsing_function(t_token **token, char *input, t_cmd **cmd, t_env **envr);
 int 	lexer_input(t_token **token, char *input, t_env *env);
+void	add_token(t_token **token, t_token_vars *vars);
 
-int		handle_invalide_expand(t_token **token, char *input, t_lexvars *st);
-int		handle_expansion(t_token **token, char *input, t_env *env, t_lexvars *st);
-int 	handle_operator(t_token **token, char *input, int i, t_lexvars *st);
+/* 			====	Handling Quotes		====		*/
+int		check_quote(char *input);
+int		handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st);
+
+/* 			====	Expansion			====		*/
+int		valid_expand(char input, char next);
+int		expansion(t_token **token, char *input, t_env *env, t_lexvars *st);
+int 	expanding_var(t_expndvars *exp_var);
+
+/* 		==		Handling Word & operator	==		*/
+int		is_word_start(char c);
 int 	handle_word(t_token **token, char *input, t_lexvars *st);
-char	*extract_quoted_content(char *input, int start, int *end);
-char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc);
+int 	handle_operator(t_token **token, char *input, int i, t_lexvars *st);
+
+/* 			====	Merging words		====		*/
+int		is_mergeable_words(t_token *token);
+void	merge_words(t_token **token);
+
+/* 			====		Cleaning		====		*/
+void	free_tokens(t_token *token);
+void	free_env(t_env *env);
+void	free_array(char **str);
+void	free_redir(t_redir *redir);
+void	free_cmd(t_cmd *cmd);
+
+
+t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
+char	*expand_var_str(char *str, t_env *env, bool heredoc);
+t_cmd	*parse_cmd(t_token **token);
+
 
 int 	is_oper(int type);
 t_cmd	*alloc_new_cmd(void);
@@ -170,25 +197,17 @@ int 	handle_redirection(t_cmd *cmd, t_token **curr_token);
 
 // helper function
 void	write_error(int	n);
-void	cleanup(t_token *token, t_cmd *cmd, char *input, t_env *env);
-void	free_cmd(t_cmd *cmd);
-void	free_redir(t_redir *redir);
-void	free_tokens(t_token *token);
-void	free_env(t_env *env);
-void	free_array(char **str);
+void	cleanup(t_token *token, t_cmd *cmd, char *input);
 int 	f_isspace(char c);
 int		is_quote(char quote);
 int		is_operator(char oper);
-int		is_word_start(char c);
-int		valid_expand(char input, char next);
-int		is_alpha(char input);
 int		all_space(char *input);
 t_token	*get_last_token(t_token *token);
 
-// debug
-void	print_tokens(t_token *token);
-void	print_env(t_env *env);
-void	print_array(char **arr);
+// // debug
+// void	print_tokens(t_token *token);
+// void	print_env(t_env *env);
+// void	print_array(char **arr);
 void	print_cmds(t_cmd *cmd);
 
 // Builtins
@@ -302,7 +321,6 @@ void	handle_parent_sigint(int sig);
 void	handle_parent_heredoc_sigint(int sig);
 void	handle_heredoc_sigint(int sig);
 void    handle_signals(void);
-
 
 // expand heredoc
 int	handle_heredoc_break(char *line, char *delim);

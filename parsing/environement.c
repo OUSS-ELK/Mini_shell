@@ -6,7 +6,7 @@
 /*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:47 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/19 19:35:22 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/22 00:58:58 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,9 +137,11 @@ char	*f_strjoin_free(char *s1, char *s2)
 
 char	*f_strjoin_char(char *s, char c)
 {
-	char str[2] = {c, 0};
+	char str[2];
+	str[0] = c;
+	str[1] = 0;
 
-	return f_strjoin_free(s, str);
+	return (f_strjoin_free(s, str));
 }
 
 char	*expand_simple_qt(t_exp_strvars *exp_var)
@@ -162,7 +164,7 @@ char	*exit_status(char *result, int *i)
 {
 	char *tmp;
 
-	tmp = ft_itoa(0);
+	tmp = ft_itoa(g_exit_status);
 	result = f_strjoin_free(result, tmp);
 	free(tmp);
 	(*i)++;

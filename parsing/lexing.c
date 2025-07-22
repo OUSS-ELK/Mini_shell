@@ -3,14 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   lexing.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:38 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/20 21:52:38 by oussama-elk      ###   ########.fr       */
+/*   Updated: 2025/07/22 02:35:41 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+t_cmd	*alloc_new_cmd(void)
+{
+	t_cmd	*new;
+
+	new = ft_calloc(1, sizeof(t_cmd));
+	if (!new)
+		return (NULL);
+	new->args = NULL;
+	new->redir = NULL;
+	new->next = NULL;
+	return (new);
+}
 
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote)
 {
@@ -48,73 +61,34 @@ void	add_token(t_token **token, t_token_vars *vars)
 	tmp->next = new;
 }
 
-t_token_type	get_opr_type(char *input, int i)
+int	is_mergeable_words(t_token *token)
 {
-	if (input[i] == '>' && input[i + 1] == '>')
-		return (APPEND);
-	if (input[i] == '<' && input[i + 1] == '<')
-		return (HEREDOC);
-	if (input[i] == '>')
-		return (REDIR_OUT);
-	if (input[i] == '<')
-		return (REDIR_IN);
-	if (input[i] == '|')
-		return (PIPE);
-	return (0);
-}
+	t_token	*curr;
 
-int	check_operator(t_oprvars *op_vars)
-{
-	t_token_type	type;
-	t_token_vars	vars;
-
-	type = get_opr_type(op_vars->input, op_vars->i);
-	vars.type = type;
-	vars.space = op_vars->space;
-	vars.quoted = false;
-	if (type == APPEND || type == HEREDOC)
-	{
-		if (type == HEREDOC)
-			*(op_vars->heredoc) = true;
-		vars.value = ft_substr(op_vars->input, op_vars->i, 2);
-		add_token(op_vars->token, &vars);
-		printf("Operator [%s]\n", vars.value);
-		free(vars.value);
-		return (op_vars->i + 2);
-	}
-	vars.value = ft_substr(op_vars->input, op_vars->i, 1);
-	add_token(op_vars->token, &vars);
-	printf("Operator [%s]\n", vars.value);
-	free(vars.value);
-	return (op_vars->i + 1);
-}
-
-int	has_mergeable_words(t_token *token)
-{
-	t_token	*curr = token;
-	
+	curr = token;
+	if (!curr || !curr->next)
+		return (0);
 	while (curr && curr->next)
 	{
-		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
+		if (curr->type == WORD && curr->next->type == WORD
+			&& curr->next->space == false)
 			return (1);
 		curr = curr->next;
 	}
 	return (0);
 }
 
-void	merge_words(t_token **token)                            		     // function to handle mixed word (if space true d'ont merge)
+void	merge_words(t_token **token)
 {
 	t_token	*curr;
-	t_token *tmp;
+	t_token	*tmp;
 	char	*merged;
 
 	curr = *token;
-	if (!curr || !curr->next)
-		return ;
-	printf("INSIDE MERGE WORD\n");
 	while (curr && curr->next)
 	{
-		if (curr->type == WORD && curr->next->type == WORD && curr->next->space == false)
+		if (curr->type == WORD && curr->next->type == WORD
+			&& curr->next->space == false)
 		{
 			merged = ft_strjoin(curr->token, curr->next->token);
 			if (!merged)

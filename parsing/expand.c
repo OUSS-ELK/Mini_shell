@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env2.c                                             :+:      :+:    :+:   */
+/*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 19:33:50 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/21 02:47:48 by oussama-elk      ###   ########.fr       */
+/*   Updated: 2025/07/22 02:44:17 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,60 +25,68 @@ int	expand_exit_status(t_token **token, bool *space)
 	vars.space = *space;
 	vars.quoted = false;
 	add_token(token, &vars);
-	printf("exit status[%s]\n", expanded);
 	*space = false;
 	free(expanded);
 	return (0);
 }
 
-int	expand_simple_var(t_token **token, char *input, int start, t_env *env, bool *space)
+void	grap_key(char *input, int start, int *len)
+{
+	*len = 0;
+	if (ft_isdigit(input[start]))
+		*len = 1;
+	else
+	{
+		while (input[start + *len] && (ft_isalnum(input[start + *len])
+				|| input[start + *len] == '_'))
+			(*len)++;
+	}
+}
+
+int	expand_simple_var(t_spl_exp_vars *var)
 {
 	t_token_vars	vars;
 	int				len;
 	char			*var_name;
 	char			*expanded;
 
-	len = 0;
-	if (ft_isdigit(input[start]))
-		len = 1;
-	else
-	{
-		while (input[start + len] && (ft_isalnum(input[start + len])
-				|| input[start + len] == '_'))
-			len++;
-	}
-	var_name = ft_substr(input, start, len);
-	// printf("inside expand simple var\n");
+	grap_key(var->input, var->start, &len);
+	var_name = ft_substr(var->input, var->start, len);
 	if (!var_name)
 		return (-1);
-	expanded = ft_getenv(var_name, env);
+	expanded = ft_getenv(var_name, var->env);
 	free(var_name);
 	if (!expanded || expanded[0] == '\0')
-		return (start + len - 1);
+		return (var->start + len - 1);
 	vars.value = expanded;
 	vars.type = WORD;
-	vars.space = *space;
+	vars.space = *(var)->space;
 	vars.quoted = false;
-	// printf("Valide expanded [%s]\n", expanded);
-	add_token(token, &vars);
-	*space = false;
-	return (start + len - 1);
+	add_token(var->token, &vars);
+	*(var)->space = false;
+	return (var->start + len - 1);
 }
 
-int expanding_var(t_expndvars *exp_var)
+int	expanding_var(t_expndvars *exp_var)
 {
-	int	start;
-	int	ret;
+	int				start;
+	int				ret;
+	t_spl_exp_vars	var;
 
 	start = exp_var->i + 1;
+	var.token = exp_var->token;
+	var.input = exp_var->input;
+	var.start = start;
+	var.env = exp_var->env;
+	var.space = exp_var->space;
 	if (exp_var->input[start] == '?')
 	{
-		ret = expand_exit_status(exp_var->token,exp_var->space);
+		ret = expand_exit_status(exp_var->token, exp_var->space);
 		if (ret == -1)
 			return (-1);
 		return (start + 1);
 	}
-	ret = expand_simple_var(exp_var->token,exp_var->input, start, exp_var->env,exp_var->space);
+	ret = expand_simple_var(&var);
 	if (ret == -1)
 		return (-1);
 	return (ret + 1);
