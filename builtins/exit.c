@@ -1,15 +1,22 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 08:53:54 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/21 13:13:02 by bel-abde         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define EXIT_ERROR "exit: numeric argument required\n"
+#include "../minishell.h"
 
-/*
- * Checks if a string is a valid numeric string.
- * Accepts optional leading + or -.
- */
 int	is_digit(char *str)
 {
-	int	i = 0;
+	int	i;
 
+	i = 0;
 	if (!str || !*str)
 		return (0);
 	if (str[i] == '+' || str[i] == '-')
@@ -23,9 +30,6 @@ int	is_digit(char *str)
 	return (1);
 }
 
-/*
- * Frees the environment list.
- */
 static void	exit_free_env(t_env **env)
 {
 	t_env	*tmp;
@@ -45,9 +49,6 @@ static void	exit_free_env(t_env **env)
 	*env = NULL;
 }
 
-/*
- * Prints error message and exits with status 255.
- */
 static void	print_and_exit(t_env **env)
 {
 	g_exit_status = 255;
@@ -56,16 +57,27 @@ static void	print_and_exit(t_env **env)
 	exit(g_exit_status);
 }
 
-/*
- * Exit builtin: exits the shell with provided status (or g_exit_status).
- * Handles too many arguments, non-numeric input, and proper cleanup.
- */
-int	ft_exit(t_cmd *cmd, t_env **env)
+static void	handle_exit_with_arg(t_cmd *cmd, t_env **env)
 {
 	int	status;
-	int	args_count = 0;
 
-	// Count args (args[0] is "exit")
+	if (!is_digit(cmd->args[1]))
+		print_and_exit(env);
+	status = atoi(cmd->args[1]);
+	if (status < 0)
+		status = 256 + status;
+	if (status > 255)
+		status = status % 256;
+	g_exit_status = status;
+	exit_free_env(env);
+	exit(g_exit_status);
+}
+
+int	ft_exit(t_cmd *cmd, t_env **env)
+{
+	int	args_count;
+
+	args_count = 0;
 	while (cmd->args[args_count])
 		args_count++;
 	write(1, "exit\n", 5);
@@ -76,18 +88,12 @@ int	ft_exit(t_cmd *cmd, t_env **env)
 		return (1);
 	}
 	else if (args_count == 2)
-	{
-		if (!is_digit(cmd->args[1]))
-			print_and_exit(env);
-		status = atoi(cmd->args[1]);
-		if (status < 0)
-			status = 256 + status;
-		if (status > 255)
-			status = status % 256;
-		g_exit_status = status;
-	}
+		handle_exit_with_arg(cmd, env);
 	else
+	{
 		g_exit_status = 0;
-	exit_free_env(env);
-	exit(g_exit_status);
+		exit_free_env(env);
+		exit(g_exit_status);
+	}
+	return (0);
 }

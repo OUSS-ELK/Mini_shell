@@ -1,4 +1,120 @@
-#include "minishell.h"
+#include "../minishell.h"
+
+// char	*token_list_to_str(t_token *token)
+// {
+// 	char	*result;
+// 	char	*tmp;
+
+// 	result = ft_strdup("");
+// 	while (token)
+// 	{
+// 		tmp = result;
+// 		result = ft_strjoin(result, token->token);
+// 		free(tmp);
+// 		token = token->next;
+// 	}
+// 	return (result);
+// }
+
+// char	*ft_strjoin_free(char *s1, char *s2)
+// {
+// 	size_t	len1;
+// char	*token_list_to_str(t_token *token)
+// {
+// 	char	*result;
+// 	char	*tmp;
+
+// 	result = ft_strdup("");
+// 	while (token)
+// 	{
+// 		tmp = result;
+// 		result = ft_strjoin(result, token->token);
+// 		free(tmp);
+// 		token = token->next;
+// 	}
+// 	return (result);
+// }
+
+// char	*ft_strjoin_free(char *s1, char *s2)
+// {
+// 	size_t	len1;
+// 	size_t	len2;
+// 	char	*joined;
+
+// 	len1 = ft_strlen(s1);
+// 	len2 = ft_strlen(s2);
+// 	if (!s1 && !s2)
+// 		return (NULL);
+// 	else if (!s1)
+// 		return (ft_strdup(s2));
+// 	else if (!s2)
+// 		return (s1);
+// 	joined = malloc(len1 + len2 + 1);
+// 	if (!joined)
+// 		return (free(s1), free(s2), NULL);
+// 	ft_memcpy(joined, s1, len1);
+// 	ft_memcpy(joined + len1, s2, len2);
+// 	joined[len1 + len2] = '\0';
+// 	free(s1);
+// 	return (joined);
+// }
+// 	size_t	len2;
+// 	char	*joined;
+
+// 	len1 = ft_strlen(s1);
+// 	len2 = ft_strlen(s2);
+// 	if (!s1 && !s2)
+// 		return (NULL);
+// 	else if (!s1)
+// 		return (ft_strdup(s2));
+// 	else if (!s2)
+// 		return (s1);
+// 	joined = malloc(len1 + len2 + 1);
+// 	if (!joined)
+// 		return (free(s1), free(s2), NULL);
+// 	ft_memcpy(joined, s1, len1);
+// 	ft_memcpy(joined + len1, s2, len2);
+// 	joined[len1 + len2] = '\0';
+// 	free(s1);
+// 	return (joined);
+// }
+
+char	*check_if_direct_path_valid(char *path)
+{
+	if (!path)
+		return (NULL);
+	if (*path == '/' || *path == '.')
+	{
+		if (access(path, X_OK) == 0)
+			return (ft_strdup(path));
+		else
+			return (NULL);
+	}
+	return (NULL);
+}
+
+// is the string given an existing directory?
+bool	is_dir(const char *path)
+{
+	struct stat	tmp;
+
+	if (!path || !*path || !ft_strchr(path, '/'))
+		return (false);
+	if (stat(path, &tmp) == -1)
+		return (false);
+	return (S_ISDIR(tmp.st_mode));
+}
+
+int	create_pipe(t_exec *exec)
+{
+	if (pipe(exec->pipe_fd) == -1)
+	{
+		custom_error(NULL, "pipe error\n", 1);
+		g_exit_status = 1;
+		return (0);
+	}
+	return (1);
+}
 
 void	custom_error(char *cmd, char *error, int status)
 {

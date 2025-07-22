@@ -7,6 +7,7 @@
 
 # include "libft/libft.h"
 # include <stdio.h>
+# include <sys/stat.h>
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdbool.h>
@@ -16,7 +17,9 @@
 # include <readline/history.h>
 # include <errno.h>
 # include <signal.h>
-#include <sys/wait.h>
+# include <sys/wait.h>
+
+# define EXIT_ERROR "exit: numeric argument required\n"
 
 extern int	g_exit_status;
 
@@ -146,6 +149,8 @@ typedef struct s_operator_vars		// Operator check vars
 //env_func
 t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
+char	*ft_getenv_value(t_env *env, char *key);
+
 t_env	*handle_special_env(char *env_var, int *skip);
 
 
@@ -237,7 +242,7 @@ void	append_env_value(t_env *tmp, char *value);
 void	add_to_env(t_env **env_lst, char *key, char *value);
 char	*get_value(char *str);
 char	*get_key(char *str);
-// int	ft_export(char **args, t_env **env_list, t_exec *exec);
+void	ft_export(char **av, t_exec *x);
 int	ft_pwd(t_env **env);
 int ft_unset(char **cmd, t_env **env);
 

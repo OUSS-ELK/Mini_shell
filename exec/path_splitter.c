@@ -1,19 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   path_splitter.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/20 10:27:11 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/20 10:27:12 by bel-abde         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-/*
- * Counts the number of tokens in the string `str`, using `sep` as separator.
- * Tokens enclosed in `{}` are treated as a single unit.
- */
 static int	count_t(const char *str, char sep)
 {
-	int	count = 0;
+	int	count;
 
+	count = 0;
 	while (*str)
 	{
 		while (*str && *str == sep)
 			str++;
 		if (!*str)
-			break;
+			break ;
 		if (*str == '{')
 		{
 			while (*str && *str != '}')
@@ -31,10 +40,6 @@ static int	count_t(const char *str, char sep)
 	return (count);
 }
 
-/*
- * Advances the string pointer and extracts the next token.
- * Handles brace-delimited segments.
- */
 static void	get_next_t(char **str, char **start, int *len, char sep)
 {
 	char	*end;
@@ -42,8 +47,7 @@ static void	get_next_t(char **str, char **start, int *len, char sep)
 	while (**str && **str == sep)
 		(*str)++;
 	if (!**str)
-		return;
-
+		return ;
 	*start = *str;
 	if (**str == '{')
 	{
@@ -62,25 +66,19 @@ static void	get_next_t(char **str, char **start, int *len, char sep)
 	*len = end - *start;
 }
 
-/*
- * Duplicates a token of length `len` from `start` into `dst[j]`.
- */
 static void	copy_t(char **dst, int j, const char *start, int len)
 {
 	int	i;
 
 	dst[j] = malloc(len + 1);
 	if (!dst[j])
-		return;
+		return ;
 	i = 0;
 	while (i < len)
 		dst[j][i++] = *start++;
 	dst[j][i] = '\0';
 }
 
-/*
- * Frees all tokens in the array up to index `limit`.
- */
 static void	free_t(char **tokens, int limit)
 {
 	int	i;
@@ -91,10 +89,6 @@ static void	free_t(char **tokens, int limit)
 	free(tokens);
 }
 
-/*
- * Splits a string by a separator, while respecting brace-grouped segments.
- * Returns a null-terminated array of strings.
- */
 char	**split_t(const char *str, char sep)
 {
 	int		word_count;

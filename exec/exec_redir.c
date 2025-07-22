@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_redir.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/20 10:27:26 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/20 10:51:09 by bel-abde         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-// open() simple wrapper
 int	open_file(char *filename, int mode, bool quoted)
 {
 	int	fd;
@@ -17,19 +28,17 @@ int	open_file(char *filename, int mode, bool quoted)
 		flags = O_RDONLY;
 	else
 		flags = O_CREAT | O_WRONLY | O_APPEND;
-
 	fd = open(filename, flags, 0644);
 	if (fd == -1)
 		custom_error(filename, ": No such file or directory.\n", 1);
 	return (fd);
 }
 
-/* <  OR  <<  .  For “<<” we only link if it’s the last heredoc.             */
 void	handle_input(t_redir *r)
 {
 	int	in_fd;
 
-	if (r->type == REDIR_IN)                    /* “<” */
+	if (r->type == REDIR_IN)
 	{
 		in_fd = open_file(r->filename, 1, r->quoted);
 		if (dup2(in_fd, STDIN_FILENO) == -1)
@@ -41,21 +50,19 @@ void	handle_input(t_redir *r)
 	}
 	else if (r->type == HEREDOC)
 	{
-		if (r->next == NULL ||                     /* last in list OR        */
-			(r->next && (r->next->type != HEREDOC))) /* next is not another << */
+		if (r->next == NULL || (r->next && (r->next->type != HEREDOC)))
 			handle_heredoc(r);
 	}
 }
 
-/* >    – truncate / overwrite.  Apply dup2 only for the last output redir. */
 void	handle_output(t_redir *r)
 {
 	int	out_fd;
 
-	if (r->type == REDIR_OUT)                   /* “>” */
+	if (r->type == REDIR_OUT)
 	{
 		out_fd = open_file(r->filename, 0, r->quoted);
-		if (r->next == NULL)                    /* last output redirection */
+		if (r->next == NULL)
 		{
 			if (dup2(out_fd, STDOUT_FILENO) == -1)
 			{
@@ -65,18 +72,16 @@ void	handle_output(t_redir *r)
 		}
 		close(out_fd);
 	}
-	else if (r->type == APPEND)                 /* “>>” */
+	else if (r->type == APPEND)
 		handle_append(r);
 }
 
-
-/* >> append.  Only dup2() if this redir is the **last** one in the chain. */
 void	handle_append(t_redir *r)
 {
 	int	out_fd;
 
 	out_fd = open_file(r->filename, 2, r->quoted);
-	if (r->next == NULL)                        /* last output redirection */
+	if (r->next == NULL)
 	{
 		if (dup2(out_fd, STDOUT_FILENO) == -1)
 		{

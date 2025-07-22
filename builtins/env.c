@@ -1,14 +1,17 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 08:52:40 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/21 13:13:14 by bel-abde         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../minishell.h"
 
-/*
- * Implements the env builtin command.
- * Prints all environment variables in the format KEY=VALUE.
- * Special case: Updates "_" to "/usr/bin/env" if it exists and is printable.
- *
- * @param env: Pointer to your environment variable list (t_env **)
- * @return: Always returns 1. Sets g_exit_status accordingly.
- */
 int	ft_env(t_env **env)
 {
 	t_env	*curr;

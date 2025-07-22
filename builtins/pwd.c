@@ -1,30 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pwd.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 08:56:13 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/21 09:01:41 by bel-abde         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "../minishell.h"
 
-/*
- * Searches for the key in the env linked list and returns a copy of the value.
- * Caller must free the returned value.
- */
 static char	*pwd_getenv(char *key, t_env *env)
 {
 	while (env)
 	{
 		if (env->key && env->value && strcmp(env->key, key) == 0)
-			return (strdup(env->value)); // return a **copy** so it can be freed
+			return (strdup(env->value));
 		env = env->next;
 	}
 	return (NULL);
 }
 
-/*
- * Prints the current working directory to stdout.
- * Looks for "PWD" in the environment list. If not found,
- * falls back to using getcwd().
- *
- * @param env: pointer to t_env list
- * @return: always returns 0
- * Side effects: prints to stdout or stderr, sets g_exit_status
- */
 int	ft_pwd(t_env **env)
 {
 	char	*cwd;

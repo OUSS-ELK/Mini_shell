@@ -11,7 +11,7 @@ LDFLAGS = -Llibft -lft -L$(BREW_READLINE)/lib -lreadline
 SRC_DIRS = parsing exec builtins
 
 # Exclude specific files
-EXCLUDED_FILES = builtins/export.c builtins/export_utils.c
+# EXCLUDED_FILES = builtins/export.c builtins/export_utils.c
 
 # Collect source files, filtering out excluded ones from SRC_DIRS
 SRC = main.c \
