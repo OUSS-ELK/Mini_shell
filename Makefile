@@ -5,7 +5,7 @@ CC = cc
 BREW_READLINE = /goinfre/bel-abde/homebrew/opt/readline
 #-fsanitize=address
 # werror
-CFLAGS = -Wall -Wextra -I. -Ilibft -I$(BREW_READLINE)/include
+CFLAGS = -Wall -Wextra   -I. -Ilibft -I$(BREW_READLINE)/include
 LDFLAGS = -Llibft -lft -L$(BREW_READLINE)/lib -lreadline
 
 SRC_DIRS = parsing exec builtins

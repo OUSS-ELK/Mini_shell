@@ -1,34 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helper_function.c                                  :+:      :+:    :+:   */
+/*   environement_2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/19 19:33:43 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/23 05:21:43 by bel-abde         ###   ########.fr       */
+/*   Created: 2025/07/23 05:22:10 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/23 05:22:20 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	f_isspace(char c)
+char	*ft_getenv(char *key, t_env *env)
 {
-	return (c == ' ' || (c >= 9 && c <= 13));
-}
+	int	key_len;
 
-int	is_oper(int type)
-{
-	return (type == REDIR_IN || type == REDIR_OUT || type == APPEND
-		|| type == HEREDOC);
-}
-
-int	is_operator(char oper)
-{
-	return (oper == '|' || oper == '>' || oper == '<');
-}
-
-int	is_quote(char quote)
-{
-	return (quote == '\'' || quote == '"');
+	key_len = ft_strlen(key);
+	while (env != NULL)
+	{
+		if (ft_strncmp(key, env->key, key_len) == 0
+			&& key_len == (int)ft_strlen(env->key))
+			return (env->value);
+		env = env->next;
+	}
+	return (NULL);
 }
