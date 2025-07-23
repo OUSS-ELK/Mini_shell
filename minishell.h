@@ -19,8 +19,6 @@
 # include <signal.h>
 # include <sys/wait.h>
 
-# define EXIT_ERROR "exit: numeric argument required\n"
-
 extern int	g_exit_status;
 
 // Token type
@@ -256,11 +254,6 @@ int ft_unset(char **cmd, t_env **env);
 
 
 // ========== EXEC ===========
-
-//utils
-void	custom_error(char *cmd, char *error, int status);
-// char	**env_to_array(t_env *env_head);
-char	**env_to_array(t_env *lst);
 
 // GNL
 char	*get_next_line(int fd);
