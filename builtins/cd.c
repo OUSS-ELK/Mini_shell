@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:28:16 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/21 08:50:13 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 06:17:09 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,8 @@ int	ft_cd(char **args, t_env **env_ptr)
 		ft_putendl_fd(target, 1);
 	update_pwd_vars(env, target, old_path);
 	g_exit_status = 0;
+	free(old_path);
+	free(target);
 	return (0);
 }
 
