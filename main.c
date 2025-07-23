@@ -3,14 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 05:10:15 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 05:10:17 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 07:55:44 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <dirent.h>
+
+void	print_open_fds(void)
+{
+	DIR				*dir;
+	struct dirent	*ent;
+	int				count = 0;
+
+	dir = opendir("/dev/fd");
+	if (!dir)
+	{
+		perror("opendir");
+		return ;
+	}
+	while ((ent = readdir(dir)))
+	{
+		count++;
+	}
+	closedir(dir);
+	printf("🔍 Open FDs: %d\n", count - 2); // exclude . and ..
+}
 
 int			g_exit_status = 0;
 
@@ -49,8 +70,12 @@ static bool	process_input(char *input, t_env **envr)
 		return (cleanup(token, cmd, input), false);
 	if (builtin_check_execute(cmd, &exec, envr) == 1)
 		return (cleanup(token, cmd, input), false);
+	printf("before exec\n");
+	print_open_fds();
 	if (!execution_main(&exec, cmd, *envr))
 		write_error(8);
+	printf("after exec\n");
+	print_open_fds();
 	cleanup(token, cmd, input);
 	return (true);
 }
