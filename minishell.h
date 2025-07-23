@@ -242,7 +242,6 @@ void	append_env_value(t_env *tmp, char *value);
 void	add_to_env(t_env **env_lst, char *key, char *value);
 char	*get_value(char *str);
 char	*get_key(char *str);
-void	ft_export(char **av, t_exec *x);
 int	ft_pwd(t_env **env);
 int ft_unset(char **cmd, t_env **env);
 
@@ -286,7 +285,7 @@ void	cleanup_dir_error(char **exec_path, char **command, t_cmd *cmd);
 void	cleanup_malloc_error(char *exec_path, char *command);
 void	cleanup_exec_error(char **exec_path, char **command, char **env_array);
 void	ft_free_array(char **array);
-void	ft_print_exit(t_cmd *cmd, int no_file);
+void	rint_n_exit(t_cmd *cmd, int no_file);
 
 // exec_redi
 int		open_file(char *filename, int mode, bool quoted);
@@ -331,7 +330,22 @@ void    handle_signals(void);
 int	handle_heredoc_break(char *line, char *delim);
 /* Expansion and string helpers */
 char	*ft_strjoin_free(char *s1, char *s2);
+char	*token_list_to_str(t_token *token);
 void	ft_expand_vars_in_heredoc(char **str, t_env *env);
+
+// ------- EXPORT
+void	print_export_error(const char *str);
+int		is_valid_export_key(char *s);
+char	**alloc_export_split(char *var);
+int		get_value_start_index(char *var, int key_len);
+char	**split_export_arg(char *var);
+void	update_existing_var(t_env *var, char ***splitted, char *has_value);
+int		add_new_env_var(t_env **env_lst, char **splitted);
+void	add_env_if_missing(t_env **env, char ***splitted, char *has_value);
+void	append_to_env_value(t_env *var, char ***splitted);
+void	print_export_vars(t_env *env);
+int		process_export_argument(char **splitted, t_exec *exec, char *arg);
+int		ft_export(char **av, t_exec *exec);
 
 
 // === TEXT COLORS ===

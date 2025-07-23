@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:06:28 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/20 10:09:37 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 02:34:13 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,4 @@ void	ft_free_array(char **array)
 		i++;
 	}
 	free(array);
-}
-
-void	ft_print_exit(t_cmd *cmd, int no_file)
-{
-	if (no_file)
-		custom_error(cmd->args[0], "No such file or directory\n", 127);
-	else
-		custom_error(cmd->args[0], "command not found\n", 127);
 }

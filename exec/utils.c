@@ -1,165 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/23 02:27:27 by bel-abde          #+#    #+#             */
+/*   Updated: 2025/07/23 02:29:03 by bel-abde         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-// char	*token_list_to_str(t_token *token)
-// {
-// 	char	*result;
-// 	char	*tmp;
-
-// 	result = ft_strdup("");
-// 	while (token)
-// 	{
-// 		tmp = result;
-// 		result = ft_strjoin(result, token->token);
-// 		free(tmp);
-// 		token = token->next;
-// 	}
-// 	return (result);
-// }
-
-// char	*ft_strjoin_free(char *s1, char *s2)
-// {
-// 	size_t	len1;
-// char	*token_list_to_str(t_token *token)
-// {
-// 	char	*result;
-// 	char	*tmp;
-
-// 	result = ft_strdup("");
-// 	while (token)
-// 	{
-// 		tmp = result;
-// 		result = ft_strjoin(result, token->token);
-// 		free(tmp);
-// 		token = token->next;
-// 	}
-// 	return (result);
-// }
-
-// char	*ft_strjoin_free(char *s1, char *s2)
-// {
-// 	size_t	len1;
-// 	size_t	len2;
-// 	char	*joined;
-
-// 	len1 = ft_strlen(s1);
-// 	len2 = ft_strlen(s2);
-// 	if (!s1 && !s2)
-// 		return (NULL);
-// 	else if (!s1)
-// 		return (ft_strdup(s2));
-// 	else if (!s2)
-// 		return (s1);
-// 	joined = malloc(len1 + len2 + 1);
-// 	if (!joined)
-// 		return (free(s1), free(s2), NULL);
-// 	ft_memcpy(joined, s1, len1);
-// 	ft_memcpy(joined + len1, s2, len2);
-// 	joined[len1 + len2] = '\0';
-// 	free(s1);
-// 	return (joined);
-// }
-// 	size_t	len2;
-// 	char	*joined;
-
-// 	len1 = ft_strlen(s1);
-// 	len2 = ft_strlen(s2);
-// 	if (!s1 && !s2)
-// 		return (NULL);
-// 	else if (!s1)
-// 		return (ft_strdup(s2));
-// 	else if (!s2)
-// 		return (s1);
-// 	joined = malloc(len1 + len2 + 1);
-// 	if (!joined)
-// 		return (free(s1), free(s2), NULL);
-// 	ft_memcpy(joined, s1, len1);
-// 	ft_memcpy(joined + len1, s2, len2);
-// 	joined[len1 + len2] = '\0';
-// 	free(s1);
-// 	return (joined);
-// }
-
-char	*check_if_direct_path_valid(char *path)
-{
-	if (!path)
-		return (NULL);
-	if (*path == '/' || *path == '.')
-	{
-		if (access(path, X_OK) == 0)
-			return (ft_strdup(path));
-		else
-			return (NULL);
-	}
-	return (NULL);
-}
-
-// is the string given an existing directory?
-bool	is_dir(const char *path)
-{
-	struct stat	tmp;
-
-	if (!path || !*path || !ft_strchr(path, '/'))
-		return (false);
-	if (stat(path, &tmp) == -1)
-		return (false);
-	return (S_ISDIR(tmp.st_mode));
-}
-
-int	create_pipe(t_exec *exec)
-{
-	if (pipe(exec->pipe_fd) == -1)
-	{
-		custom_error(NULL, "pipe error\n", 1);
-		g_exit_status = 1;
-		return (0);
-	}
-	return (1);
-}
-
-void	custom_error(char *cmd, char *error, int status)
-{
-	write(2, "mnshell: ", 9);
-	if (cmd)
-	{
-		write(2, cmd, ft_strlen(cmd));
-		write(2, ": ", 2);
-	}
-	write(2, error, ft_strlen(error));
-	// printf("Before exit\n");
-	exit(status);
-}
-
-void	ft_free_env_list(t_env **list)
-{
-	t_env	*current;
-	t_env	*next;
-
-	if (!list || !*list)
-		return ;
-	current = *list;
-	while (current)
-	{
-		next = current->next;
-		free(current->key);
-		free(current->value);
-		free(current);
-		current = next;
-	}
-	*list = NULL;
-}
-
-/* ************************************************************************** */
-/*  env_to_array.c                                                            */
-/* ************************************************************************** */
-
-
-/*
- * Count how many elements are in the env linked list.
- */
 static size_t	env_count(t_env *head)
 {
-	size_t	n = 0;
+	size_t	n;
 
+	n = 0;
 	while (head)
 	{
 		n++;
@@ -168,12 +25,7 @@ static size_t	env_count(t_env *head)
 	return (n);
 }
 
-/*
- * Join key + '=' + value (value may be NULL).
- * Returns a freshly‑allocated "key=val" C‑string or NULL on malloc failure.
- * If value is NULL, we still create "key=" (this is what the real env does).
- */
-static char		*join_env_kv(t_env *node)
+static char	*join_env_kv(t_env *node)
 {
 	char	*tmp;
 	char	*joined;
@@ -186,17 +38,11 @@ static char		*join_env_kv(t_env *node)
 	if (node->value)
 		joined = ft_strjoin(tmp, node->value);
 	else
-		joined = ft_strdup(tmp);           /* keep the trailing '='        */
+		joined = ft_strdup(tmp);
 	free(tmp);
 	return (joined);
 }
 
-/*
- * Convert our t_env linked list into a classic **envp array.
- * The array is NULL‑terminated so it can be passed directly to execve().
- * On any allocation failure the function frees what it already built
- * and returns NULL, leaving g_exit_status set to 1.
- */
 char	**env_to_array(t_env *env_head)
 {
 	size_t	i;
@@ -213,7 +59,6 @@ char	**env_to_array(t_env *env_head)
 		envp[i] = join_env_kv(env_head);
 		if (!envp[i])
 		{
-			/* clean up partially‑filled array */
 			while (i > 0)
 				free(envp[--i]);
 			free(envp);
@@ -227,79 +72,12 @@ char	**env_to_array(t_env *env_head)
 	return (envp);
 }
 
-
-void	setup_heredoc_sig(void)
-{
-	signal(SIGINT, handle_heredoc_sigint);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	restore_sigs(void)
-{
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	setup_parent_heredoc_sigs(void)
-{
-	signal(SIGINT, handle_parent_heredoc_sigint);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	setup_parent_waiting_sigs(void)
-{
-	signal(SIGINT, handle_parent_sigint);
-	signal(SIGQUIT, SIG_IGN);
-}
-
-void	setup_child_sigs(void)
-{
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
-}
-
-void	handle_sigint(int sig)
-{
-	(void)sig;
-	write(1, "\n", 1);
-	rl_replace_line("", 0); // clears the current line
-	rl_on_new_line(); // moves to new line
-	rl_redisplay(); // redisplay the prompt
-	g_exit_status = 1;
-}
-
-void	handle_parent_sigint(int sig)
-{
-	(void)sig;
-	g_exit_status = 130; // means process was terminated by SIGINT = signal 2
-}
-
-void	handle_parent_heredoc_sigint(int sig)
-{
-	(void)sig;
-	write(1, "\n", 1);
-	g_exit_status = 1;
-}
-
-void	handle_heredoc_sigint(int sig)
-{
-	(void)sig;
-	exit(1);
-}
-
-void    handle_signals(void)
-{
-        signal(SIGINT, handle_sigint);
-        signal(SIGQUIT, SIG_IGN);
-}
-
-
 // static void	ft_free_strarr(char **arr)
 // {
 // 	int	i;
 
 // 	if (!arr)
-// 		return;
+// 		return ;
 // 	i = 0;
 // 	while (arr[i])
 // 	{
@@ -308,7 +86,6 @@ void    handle_signals(void)
 // 	}
 // 	free(arr);
 // }
-
 
 // char	**env_to_array(t_env *lst)
 // {

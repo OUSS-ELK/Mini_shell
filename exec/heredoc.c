@@ -6,12 +6,11 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:09:51 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/22 12:56:24 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 02:32:31 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
 
 static t_redir	*get_last_heredoc(t_redir *r)
 {
@@ -27,7 +26,6 @@ static t_redir	*get_last_heredoc(t_redir *r)
 	return (last);
 }
 
-// interate over every heredoc in every cmd
 int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 {
 	t_cmd	*cmd;
@@ -56,16 +54,14 @@ int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 		restore_sigs();
 		cmd = cmd->next;
 	}
-	// printf("Heredoc test\n");
 	return (1);
 }
 
-
-// Handle one heredoc redir
 int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 {
-	int	pipefd[2];
+	int		pipefd[2];
 	pid_t	pid;
+
 	if (r == NULL || r->type != HEREDOC)
 		return (1);
 	setup_parent_heredoc_sigs();
@@ -87,67 +83,30 @@ int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 		return (-1);
 }
 
-
-// // wait for child, keep read end if child succeeds (exit 0)
 void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
 {
-	int	status;
+	int		status;
 	sig_t	old_handler;
 
-	close(pipefd[1]);                         /* parent only reads          */
+	close(pipefd[1]);
 	old_handler = signal(SIGINT, SIG_IGN);
 	waitpid(pid, &status, 0);
 	signal(SIGINT, old_handler);
 	g_exit_status = WEXITSTATUS(status);
 	if (g_exit_status == 0 && last)
-		r->fd[0] = pipefd[0];                 /* store read end in redir    */
+		r->fd[0] = pipefd[0];
 	else
 	{
-		close(pipefd[0]);                    /* error → close & mark -1    */
+		close(pipefd[0]);
 		r->fd[0] = -1;
 	}
 }
-// void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
-// {
-// 	int	status;
-// 	sig_t	old_handler;
-// 	char	buf[1024];
 
-
-// 	old_handler = signal(SIGINT, SIG_IGN);
-// 	waitpid(pid, &status, 0);
-// 	signal(SIGINT, old_handler);
-// 	g_exit_status = WEXITSTATUS(status);
-// 	close(pipefd[1]);                         /* parent only reads          */
-// 	if (g_exit_status == 0 && last)
-// 	{
-// 		r->fd[0] = pipefd[0];                 /* store read end in redir    */
-// 			int		nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
-// 		printf("bytes value: %d\n", nbytes);
-// 		printf("r fd not closed\n");
-// 					while (nbytes)
-// 			{
-// 				printf("bytes value: %d\n", nbytes);
-// 				buf[nbytes] = '\0';
-// 				write(STDERR_FILENO, buf, nbytes);
-// 				nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
-// 			}
-// 		printf("while end\n");
-// 	}
-// 	else
-// 	{
-// 		printf("fd closed");
-// 		close(pipefd[0]);                    /* error → close & mark -1    */
-// 		r->fd[0] = -1;
-// 	}
-// }
-
-//  CHILD: read stdin until delimiter, write to pipe, exit
 int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
 {
 	char	*delim;
 
-	close(pipefd[0]);                       /* child only writes          */
+	close(pipefd[0]);
 	setup_heredoc_sig();
 	delim = NULL;
 	delim = delim_join(heredoc->filename, "\n");
@@ -186,3 +145,37 @@ char	*delim_join(char *s1, char *s2)
 	free(s1);
 	return (new_str);
 }
+
+// void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
+// {
+// 	int	status;
+// 	sig_t	old_handler;
+// 	char	buf[1024];
+
+// 	old_handler = signal(SIGINT, SIG_IGN);
+// 	waitpid(pid, &status, 0);
+// 	signal(SIGINT, old_handler);
+// 	g_exit_status = WEXITSTATUS(status);
+// 	close(pipefd[1]);                         /* parent only reads          */
+// 	if (g_exit_status == 0 && last)
+// 	{
+// 		r->fd[0] = pipefd[0];                 /* store read end in redir    */
+// 			int		nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
+// 		printf("bytes value: %d\n", nbytes);
+// 		printf("r fd not closed\n");
+// 					while (nbytes)
+// 			{
+// 				printf("bytes value: %d\n", nbytes);
+// 				buf[nbytes] = '\0';
+// 				write(STDERR_FILENO, buf, nbytes);
+// 				nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
+// 			}
+// 		printf("while end\n");
+// 	}
+// 	else
+// 	{
+// 		printf("fd closed");
+// 		close(pipefd[0]);                    /* error → close & mark -1    */
+// 		r->fd[0] = -1;
+// 	}
+// }

@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:00:31 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/20 10:06:01 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 02:34:55 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	exec_external(t_cmd *cmd, t_exec *exec)
 	if (!cmd_path || !cmd_name[0])
 	{
 		free(cmd_name);
-		ft_print_exit(cmd, no_file);
+		print_n_exit(cmd, no_file);
 	}
 	if (is_dir(cmd_path))
 		cleanup_dir_error(&cmd_path, &cmd_name, cmd);
