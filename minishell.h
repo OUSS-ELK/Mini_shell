@@ -153,15 +153,15 @@ typedef struct s_operator_vars		// Operator check vars
 //env_func
 t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
-char	*ft_getenv_value(t_env *env, char *key);
-
-t_env	*handle_special_env(char *env_var, int *skip);
-
 
 /*			====	Parsing	& Lexing	====		*/ 
 int		parsing_function(t_token **token, char *input, t_cmd **cmd, t_env **envr);
 int 	lexer_input(t_token **token, char *input, t_env *env);
 void	add_token(t_token **token, t_token_vars *vars);
+t_cmd	*parse_cmd(t_token **token);
+t_cmd	*alloc_new_cmd(void);
+char	**handl_word(char **args, char *new_arg);
+int 	handle_redirection(t_cmd *cmd, t_token **curr_token);
 
 /* 			====	Handling Quotes		====		*/
 int		check_quote(char *input);
@@ -171,6 +171,11 @@ int		handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st);
 int		valid_expand(char input, char next);
 int		expansion(t_token **token, char *input, t_env *env, t_lexvars *st);
 int 	expanding_var(t_expndvars *exp_var);
+char	*expand_var_str(char *str, t_env *env, bool heredoc);
+void	ft_expand_vars_in_heredoc(char **str, t_env *env);
+char	*f_strjoin_char(char *s, char c);
+char	*f_strjoin_free(char *s1, char *s2);
+char	*exit_status(char *result, int *i);
 
 /* 		==		Handling Word & operator	==		*/
 int		is_word_start(char c);
@@ -188,39 +193,15 @@ void	free_array(char **str);
 void	free_redir(t_redir *redir);
 void	free_cmd(t_cmd *cmd);
 
-
-t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
-char	*expand_var_str(char *str, t_env *env, bool heredoc);
-t_cmd	*parse_cmd(t_token **token);
-char	*f_strjoin_char(char *s, char c);
-char	*f_strjoin_free(char *s1, char *s2);
-char	*exit_status(char *result, int *i);
-
-
-int 	is_oper(int type);
-t_cmd	*alloc_new_cmd(void);
-char	**handl_word(char **args, char *new_arg);
-char	**handl_word(char **args, char *new_arg);
-int 	is_valid_redir_filename(t_token *op_token);
-void	add_redirection(t_redir **redir_list, t_redir *new_redir);
-int 	create_and_add_redir(t_cmd *cmd, t_token *redir_token);
-int 	handle_redirection(t_cmd *cmd, t_token **curr_token);
-
-
-// helper function
+/* 			====	Helper function		====		*/
 void	write_error(int	n);
 void	cleanup(t_token *token, t_cmd *cmd, char *input);
 int 	f_isspace(char c);
 int		is_quote(char quote);
+int 	is_oper(int type);
 int		is_operator(char oper);
 int		all_space(char *input);
 t_token	*get_last_token(t_token *token);
-
-// // debug
-// void	print_tokens(t_token *token);
-// void	print_env(t_env *env);
-// void	print_array(char **arr);
-void	print_cmds(t_cmd *cmd);
 
 // Builtins
 int		is_builtin(t_cmd *cmd);
@@ -238,6 +219,7 @@ bool	is_last_input_redir(t_redir *curr, t_token_type type);
 int	cmd_list_size(t_cmd *cmd);
 void	builtin_reset_fds(t_exec *exec);
 
+char	*ft_getenv_value(t_env *env, char *key);
 int	ft_cd(char **args, t_env **env_ptr);
 int	ft_echo(t_cmd *cmd);
 int	ft_env(t_env **env);
@@ -338,7 +320,6 @@ int	handle_heredoc_break(char *line, char *delim);
 /* Expansion and string helpers */
 char	*ft_strjoin_free(char *s1, char *s2);
 char	*token_list_to_str(t_token *token);
-void	ft_expand_vars_in_heredoc(char **str, t_env *env);
 
 // ------- EXPORT
 void	print_export_error(const char *str);
@@ -358,20 +339,6 @@ int		ft_export(char **av, t_exec *exec);
 
 // === TEXT COLORS ===
 #define RESET		"\033[0m"
-#define BLACK		"\033[30m"
-#define RED			"\033[31m"
-#define GREEN		"\033[32m"
-#define YELLOW		"\033[33m"
-#define BLUE		"\033[34m"
-#define MAGENTA		"\033[35m"
-#define CYAN		"\033[36m"
-#define WHITE		"\033[37m"
-
-// === BOLD TEXT COLORS ===
 #define BOLDRED     "\033[1;31m"
-#define BOLDGREEN   "\033[1;32m"
-#define BOLDYELLOW  "\033[1;33m"
-#define BOLDBLUE    "\033[1;34m"
-#define BOLDCYAN    "\033[1;36m"
 
 #endif
