@@ -347,7 +347,10 @@ void	print_export_vars(t_env *env);
 int		process_export_argument(char **splitted, t_exec *exec, char *arg);
 int		ft_export(char **av, t_exec *exec);
 
+// utils
+void	custom_error(char *cmd, char *error, int status);
 
+// t_env	*new_env_node(char *env_str);
 
 // === TEXT COLORS ===
 #define RESET		"\033[0m"
