@@ -188,6 +188,9 @@ void	free_cmd(t_cmd *cmd);
 t_token	*creat_token(char *input, t_token_type type, bool space, bool quote);
 char	*expand_var_str(char *str, t_env *env, bool heredoc);
 t_cmd	*parse_cmd(t_token **token);
+char	*f_strjoin_char(char *s, char c);
+char	*f_strjoin_free(char *s1, char *s2);
+
 
 
 int 	is_oper(int type);
