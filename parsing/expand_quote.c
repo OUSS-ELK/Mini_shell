@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expand_quote.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/23 03:44:30 by ouelkhar          #+#    #+#             */
+/*   Updated: 2025/07/23 03:56:15 by ouelkhar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 char	*expand_simple_qt(t_exp_strvars *exp_var)
@@ -65,31 +77,6 @@ char	*expand_loop(char *str, t_env *env, bool heredoc, char *result)
 	}
 	return (exp_var.result);
 }
-
-// char	*expand_loop(char *str, t_env *env, bool heredoc, char *result)
-// {
-// 	t_exp_strvars	exp_var;
-
-// 	init_expand_var(&exp_var, str, env, heredoc, result);
-// 	while (exp_var.str[exp_var.i])
-// 	{
-// 		if (exp_var.str[exp_var.i] == '$')
-// 		{
-// 			exp_var.i++;
-// 			if (exp_var.heredoc)
-// 				exp_var.i--;
-// 			else if (exp_var.str[exp_var.i] == '?')
-// 				exp_var.result = exit_status(exp_var.result, &exp_var.i);
-// 			else if (ft_isalpha(exp_var.str[exp_var.i]) || exp_var.str[exp_var.i] == '_')
-// 				exp_var.result = expand_simple_qt(&exp_var);
-// 			else
-// 				exp_var.result = f_strjoin_char(exp_var.result, '$');
-// 		}
-// 		else
-// 			exp_var.result = f_strjoin_char(exp_var.result, exp_var.str[exp_var.i++]);
-// 	}
-// 	return (exp_var.result);
-// }
 
 char	*expand_var_str(char *str, t_env *env, bool heredoc)
 {

@@ -14,68 +14,43 @@ int main(int argc, char **argv, char **env)
 
 	(void)argc;
 	(void)argv;
-
-	envr = collect_env(env);  // ✅ collect only once at startup
+	envr = collect_env(env); 			// ✅ collect only once at startup
 	if (!envr)
-	{
-		write(2, "minishell: failed to collect env\n", 33);
-		return (1);
-	}
-
+		return (write(2, "minishell: failed to collect env\n", 33), 1);
 	handle_signals();
-
 	while (1)
 	{
 		input = readline(BOLDRED "[MINI_SHELL]$> " RESET);
 		if (!input)
-		{
-			// printf("Input error\n");  // Ctrl + D
 			break;
-		}
 		add_history(input);
 		if (all_space(input))
 		{
 			free(input);
 			continue;
 		}
-
 		token = NULL;
 		cmd = NULL;
-
 		if (!parsing_function(&token, input, &cmd, &envr))  // ✅ pass envr directly
 		{
 			cleanup(token, cmd, input);  // Don't clean envr here
 			continue;
 		}
-
 		exec.env_lst = envr;
 		exec.is_pipe = (cmd && cmd->next);
-
-		printf("DEBUG: parsing_function returned success\n");
-		print_cmds(cmd);
-
 		if (!check_heredocs(cmd, envr))
 		{
-			printf("Error heredoc\n");
 			cleanup(token, cmd, input);
 			continue;
 		}
-
 		if (builtin_check_execute(cmd, &exec, &envr) == 1)
 		{
 			cleanup(token, cmd, input);
 			continue;
 		}
-
-		// printf("DEBUG: Running execution_main\n");
-
 		if (!execution_main(&exec, cmd, envr))
-		{
 			write_error(8);
-		}
-
 		cleanup(token, cmd, input);  // envr remains persistent
-
 		dup2(original_stdin, STDIN_FILENO);
 		dup2(original_stdout, STDOUT_FILENO);
 	}

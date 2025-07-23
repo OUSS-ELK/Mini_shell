@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helper_function2.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/23 03:48:46 by ouelkhar          #+#    #+#             */
+/*   Updated: 2025/07/23 03:49:15 by ouelkhar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-void	write_error(int	n)
+void	write_error(int n)
 {
 	if (n == 1)
 		write(2, "Parsing Error\n", 14);
@@ -36,7 +48,6 @@ t_token	*get_last_token(t_token *token)
 {
 	if (!token)
 		return (NULL);
-
 	while (token->next)
 		token = token->next;
 	return (token);

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   quote_handling.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/23 03:47:01 by ouelkhar          #+#    #+#             */
+/*   Updated: 2025/07/23 03:48:18 by ouelkhar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 int	check_quote(char *input)
@@ -22,7 +34,7 @@ int	check_quote(char *input)
 	return (1);
 }
 
-char	*handle_quote_expansion(char *str, char quote, t_env *env, bool heredoc)
+char	*handle_qte_exp(char *str, char quote, t_env *env, bool heredoc)
 {
 	char	*expand;
 
@@ -52,7 +64,7 @@ char	*extract_quoted_content(char *input, int start, int *end)
 	return (str);
 }
 
-int inside_quote(t_quotevars *qt_var)
+int	inside_quote(t_quotevars *qt_var)
 {
 	char	*str;
 	char	*expand;
@@ -63,7 +75,7 @@ int inside_quote(t_quotevars *qt_var)
 	str = extract_quoted_content(qt_var->input, qt_var->start, &end);
 	if (!str)
 		return (-1);
-	expand = handle_quote_expansion(str, quote, qt_var->env, *(qt_var->heredoc));
+	expand = handle_qte_exp(str, quote, qt_var->env, *(qt_var->heredoc));
 	free(str);
 	if (!expand)
 		return (-1);
@@ -71,7 +83,7 @@ int inside_quote(t_quotevars *qt_var)
 	return (end + 1);
 }
 
-int handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st)
+int	handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st)
 {
 	t_token_vars	vars;
 	t_quotevars		qt_var;
