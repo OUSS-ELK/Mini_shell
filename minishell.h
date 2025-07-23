@@ -47,40 +47,42 @@ typedef struct s_token
 // redirections
 typedef struct s_redir
 {
-	char			*filename;
-	t_token_type	type;
-	bool			quoted;				// if true not expand inside  
-	int				fd[2];
-	struct s_redir	*next;
+    char            *filename;
+    t_token_type    type;
+    bool            quoted;                // if true not expand inside  
+    int                fd[2];
+    bool            last; // Added for heredoc
+    struct s_redir    *next;
 } t_redir;
 
 // environment variables
 typedef struct s_env
 {
-	char			*key;
-	char			*value;
-	struct s_env	*next;
+    char            *key;
+    char            *value;
+    struct s_env    *next;
 } t_env;
 
 // commands  struct that i should pass to exec
 typedef struct s_cmd
 {
-	char			**args;
-	t_redir			*redir;
-	struct s_cmd	*next;
+    char            **args;
+    t_redir            *redir;
+    struct s_cmd    *next;
 } t_cmd;
 
 typedef struct s_exec
 {
-	t_env	*env_lst;
-	char	**env_arr; 				// t_env to char ** for execve()
-	int		exit_status;
-	int		pipe_fd[2];
-	int		stdin_backup;
-	int		stdout_backup;
-	pid_t	last_pid;
-	bool	is_pipe;
-}	t_exec;
+    t_env    *env_lst;
+    char    **env_arr;                 // t_env to char ** for execve()
+    int        exit_status;
+    int        pipe_fd[2];
+    int        stdin_backup;
+    int        stdout_backup;
+    pid_t    last_pid;
+    bool    is_pipe;
+    char    *delim; // Added for heredoc
+}    t_exec;
 
 typedef struct s_lexer_vars			// Lexer variables
 {
@@ -146,6 +148,8 @@ typedef struct s_operator_vars		// Operator check vars
 	int			i;
 }	t_oprvars;
 
+
+
 //env_func
 t_env	*collect_env(char **env);
 char	*ft_getenv(char *key, t_env *env);
@@ -190,7 +194,7 @@ char	*expand_var_str(char *str, t_env *env, bool heredoc);
 t_cmd	*parse_cmd(t_token **token);
 char	*f_strjoin_char(char *s, char c);
 char	*f_strjoin_free(char *s1, char *s2);
-
+char	*exit_status(char *result, int *i);
 
 
 int 	is_oper(int type);
@@ -306,15 +310,15 @@ char	*get_path_value_from_env(t_env *env);
 
 char	**split_t(const char *str, char sep);
 
-// heredoc
-int		check_heredocs(t_cmd *first_cmd, t_env *env_lst);
-int		handle_one_heredoc(t_redir *r, t_env *env, bool last);
-void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last);
-int		open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last);
-char	*delim_join(char *s1, char *s2);
-
-// heredoc utils
-void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env, bool last);
+// EXEC HEREDOC
+int check_heredocs(t_cmd *first_cmd, t_env *env_lst);
+int handle_one_heredoc(t_redir *r, t_env *env);
+void parent_heredoc(int *pipefd, pid_t pid, t_redir *r);
+int open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env);
+char *delim_join(char *s1, char *s2);
+int handle_heredoc_break(char *line, char *delim);
+int valide_exp_heredoc(char *line);
+void ft_read_line(t_exec *exec, t_redir *r);
 
 
 // sigs
@@ -349,6 +353,7 @@ void	append_to_env_value(t_env *var, char ***splitted);
 void	print_export_vars(t_env *env);
 int		process_export_argument(char **splitted, t_exec *exec, char *arg);
 int		ft_export(char **av, t_exec *exec);
+
 
 
 // === TEXT COLORS ===
