@@ -6,11 +6,66 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:14:41 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 02:35:16 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 03:25:30 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env)
+{
+	char	*delim;
+	t_exec	exec;
+
+	close(pipefd[0]);
+	setup_heredoc_sig();
+	delim = NULL;
+	delim = delim_join(heredoc->filename, "\n");
+	if (!delim)
+		custom_error(NULL, "heredoc delim fail\n", 1);
+	exec.env_lst = env;
+	exec.pipe_fd[0] = pipefd[0];
+	exec.pipe_fd[1] = pipefd[1];
+	exec.delim = delim;
+	exec.env_arr = NULL;
+	exec.exit_status = 0;
+	exec.stdin_backup = -1;
+	exec.stdout_backup = -1;
+	exec.last_pid = 0;
+	exec.is_pipe = false;
+	ft_read_line(&exec, heredoc);
+	free(delim);
+	exit(0);
+}
+
+char	*delim_join(char *s1, char *s2)
+{
+	char	*new_str;
+	size_t	total_len;
+	size_t	i;
+	size_t	j;
+
+	if (!s1)
+		return (ft_strdup(s2));
+	if (!s2)
+		return (ft_strdup(s1));
+	total_len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	new_str = (char *)malloc(total_len * sizeof(char));
+	if (!new_str)
+	{
+		free(s1);
+		return (NULL);
+	}
+	i = -1;
+	while (s1[++i])
+		new_str[i] = s1[i];
+	j = -1;
+	while (s2[++j])
+		new_str[i++] = s2[j];
+	new_str[i] = '\0';
+	free(s1);
+	return (new_str);
+}
 
 int	handle_heredoc_break(char *line, char *delim)
 {
@@ -43,8 +98,7 @@ int	valide_exp_heredoc(char *line)
 	return (0);
 }
 
-void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env,
-		bool last)
+void	ft_read_line(t_exec *exec, t_redir *r)
 {
 	char	*line;
 
@@ -52,49 +106,15 @@ void	ft_read_line(char *delim, int *fd_pipe, t_redir *r, t_env *env,
 	{
 		write(STDOUT_FILENO, "> ", 2);
 		line = get_next_line(STDIN_FILENO);
-		if (handle_heredoc_break(line, delim))
+		if (handle_heredoc_break(line, exec->delim))
 			break ;
 		if (!r->quoted && valide_exp_heredoc(line))
 		{
-			ft_expand_vars_in_heredoc(&line, env);
+			ft_expand_vars_in_heredoc(&line, exec->env_lst);
 		}
-		if (last)
-			write(fd_pipe[1], line, ft_strlen(line));
+		if (r->last)
+			write(exec->pipe_fd[1], line, ft_strlen(line));
 		free(line);
 	}
-	close(fd_pipe[1]);
+	close(exec->pipe_fd[1]);
 }
-
-// helper: find last input type redir in list (redir_in or heredoc)
-// static t_redir	*get_last_input(t_redir *redir)
-// {
-// 	t_redir	*last;
-// 	t_redir	*r;
-
-// 	last = NULL;
-// 	r = redir;
-// 	while (r)
-// 	{
-// 		if (r->type == REDIR_IN || redir->type == HEREDOC)
-// 			last = r;
-// 		r = r->next;
-// 	}
-// 	return (last);
-// }
-
-// // helper: find last redir_out or append
-// static t_redir	*get_last_output(t_redir *redir)
-// {
-// 	t_redir	*last;
-// 	t_redir	*r;
-
-// 	last = NULL;
-// 	r = redir;
-// 	while (r)
-// 	{
-// 		if (r->type == REDIR_OUT || redir->type == APPEND)
-// 			last = r;
-// 		r = r->next;
-// 	}
-// 	return (last);
-// }

@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:09:51 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 02:32:31 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 03:24:30 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,36 @@ static t_redir	*get_last_heredoc(t_redir *r)
 	last = NULL;
 	while (r)
 	{
+		r->last = false;
 		if (r->type == HEREDOC)
 			last = r;
 		r = r->next;
 	}
+	if (last)
+		last->last = true;
 	return (last);
+}
+
+static int	handle_heredocs_for_cmd(t_redir *redir, t_env *env_lst)
+{
+	t_redir	*r;
+
+	r = redir;
+	while (r)
+	{
+		if (r->type == HEREDOC)
+		{
+			if (handle_one_heredoc(r, env_lst) == -1 || g_exit_status == 1)
+				return (0);
+		}
+		r = r->next;
+	}
+	return (1);
 }
 
 int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 {
 	t_cmd	*cmd;
-	t_redir	*r;
 	t_redir	*last_heredoc;
 
 	g_exit_status = 0;
@@ -40,24 +59,15 @@ int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 	{
 		last_heredoc = get_last_heredoc(cmd->redir);
 		setup_parent_heredoc_sigs();
-		r = cmd->redir;
-		while (r)
-		{
-			if (r->type == HEREDOC)
-			{
-				if (handle_one_heredoc(r, env_lst, (r == last_heredoc)) == -1
-					|| g_exit_status == 1)
-					return (0);
-			}
-			r = r->next;
-		}
+		if (!handle_heredocs_for_cmd(cmd->redir, env_lst))
+			return (0);
 		restore_sigs();
 		cmd = cmd->next;
 	}
 	return (1);
 }
 
-int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
+int	handle_one_heredoc(t_redir *r, t_env *env)
 {
 	int		pipefd[2];
 	pid_t	pid;
@@ -71,10 +81,10 @@ int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 	if (pid == -1)
 		return (custom_error(NULL, "fork fail\n", 1), -1);
 	if (pid == 0)
-		open_heredoc_child(r, pipefd, env, last);
+		open_heredoc_child(r, pipefd, env);
 	else
 	{
-		parent_heredoc(pipefd, pid, r, last);
+		parent_heredoc(pipefd, pid, r);
 		restore_sigs();
 	}
 	if (g_exit_status == 0)
@@ -83,7 +93,7 @@ int	handle_one_heredoc(t_redir *r, t_env *env, bool last)
 		return (-1);
 }
 
-void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
+void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r)
 {
 	int		status;
 	sig_t	old_handler;
@@ -93,7 +103,7 @@ void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
 	waitpid(pid, &status, 0);
 	signal(SIGINT, old_handler);
 	g_exit_status = WEXITSTATUS(status);
-	if (g_exit_status == 0 && last)
+	if (g_exit_status == 0 && r->last)
 		r->fd[0] = pipefd[0];
 	else
 	{
@@ -101,81 +111,3 @@ void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
 		r->fd[0] = -1;
 	}
 }
-
-int	open_heredoc_child(t_redir *heredoc, int *pipefd, t_env *env, bool last)
-{
-	char	*delim;
-
-	close(pipefd[0]);
-	setup_heredoc_sig();
-	delim = NULL;
-	delim = delim_join(heredoc->filename, "\n");
-	if (!delim)
-		custom_error(NULL, "heredoc delim fail\n", 1);
-	ft_read_line(delim, pipefd, heredoc, env, last);
-	free(delim);
-	exit(0);
-}
-
-char	*delim_join(char *s1, char *s2)
-{
-	char	*new_str;
-	size_t	total_len;
-	size_t	i;
-	size_t	j;
-
-	if (!s1)
-		return (ft_strdup(s2));
-	if (!s2)
-		return (ft_strdup(s1));
-	total_len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	new_str = (char *)malloc(total_len * sizeof(char));
-	if (!new_str)
-	{
-		free(s1);
-		return (NULL);
-	}
-	i = -1;
-	while (s1[++i])
-		new_str[i] = s1[i];
-	j = -1;
-	while (s2[++j])
-		new_str[i++] = s2[j];
-	new_str[i] = '\0';
-	free(s1);
-	return (new_str);
-}
-
-// void	parent_heredoc(int *pipefd, pid_t pid, t_redir *r, bool last)
-// {
-// 	int	status;
-// 	sig_t	old_handler;
-// 	char	buf[1024];
-
-// 	old_handler = signal(SIGINT, SIG_IGN);
-// 	waitpid(pid, &status, 0);
-// 	signal(SIGINT, old_handler);
-// 	g_exit_status = WEXITSTATUS(status);
-// 	close(pipefd[1]);                         /* parent only reads          */
-// 	if (g_exit_status == 0 && last)
-// 	{
-// 		r->fd[0] = pipefd[0];                 /* store read end in redir    */
-// 			int		nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
-// 		printf("bytes value: %d\n", nbytes);
-// 		printf("r fd not closed\n");
-// 					while (nbytes)
-// 			{
-// 				printf("bytes value: %d\n", nbytes);
-// 				buf[nbytes] = '\0';
-// 				write(STDERR_FILENO, buf, nbytes);
-// 				nbytes = read(r->fd[0], buf, sizeof(buf) - 1);
-// 			}
-// 		printf("while end\n");
-// 	}
-// 	else
-// 	{
-// 		printf("fd closed");
-// 		close(pipefd[0]);                    /* error → close & mark -1    */
-// 		r->fd[0] = -1;
-// 	}
-// }
