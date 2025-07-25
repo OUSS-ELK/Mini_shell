@@ -6,7 +6,7 @@
 /*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 03:47:01 by ouelkhar          #+#    #+#             */
-/*   Updated: 2025/07/23 05:28:29 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/23 10:03:28 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,6 @@ int	handle_quote(t_token **token, char *input, t_env *env, t_lexvars *st)
 		st->heredoc = false;
 	return (1);
 }
-
-// #include "../minishell.h"
 
 // int	check_quote(char *input)
 // {

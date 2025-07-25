@@ -220,7 +220,16 @@ int	cmd_list_size(t_cmd *cmd);
 void	builtin_reset_fds(t_exec *exec);
 
 char	*ft_getenv_value(t_env *env, char *key);
+
+// cd
+int	get_args_count(char **args);
 int	ft_cd(char **args, t_env **env_ptr);
+int	resolve_cd_target(char **args, t_env *env, char **target, char *old_path);
+int	resolve_cd_home_or_oldpwd(char **args, t_env *env, char **target, char *old_path);
+char	*expand_tilde(char *input, t_env *env);
+void	update_pwd_vars(t_env *env, char *old_path);
+
+
 int	ft_echo(t_cmd *cmd);
 int	ft_env(t_env **env);
 
@@ -232,7 +241,13 @@ void	add_to_env(t_env **env_lst, char *key, char *value);
 char	*get_value(char *str);
 char	*get_key(char *str);
 int	ft_pwd(t_env **env);
+
+// unset
 int ft_unset(char **cmd, t_env **env);
+int	remove_env_node(t_env **head, t_env *target);
+t_env	*envnew(char *key, char *value);
+void	envadd_back(t_env **env, t_env *new);
+int	set_env(t_env **env);
 
 // export uti
 
@@ -274,7 +289,7 @@ void	cleanup_dir_error(char **exec_path, char **command, t_cmd *cmd);
 void	cleanup_malloc_error(char *exec_path, char *command);
 void	cleanup_exec_error(char **exec_path, char **command, char **env_array);
 void	ft_free_array(char **array);
-void	rint_n_exit(t_cmd *cmd, int no_file);
+void	print_n_exit(t_cmd *cmd, int no_file);
 
 // exec_redi
 int		open_file(char *filename, int mode, bool quoted);
@@ -323,17 +338,29 @@ char	*token_list_to_str(t_token *token);
 
 // ------- EXPORT
 void	print_export_error(const char *str);
-int		is_valid_export_key(char *s);
+// int		is_valid_export_key(char *s);
 char	**alloc_export_split(char *var);
 int		get_value_start_index(char *var, int key_len);
 char	**split_export_arg(char *var);
-void	update_existing_var(t_env *var, char ***splitted, char *has_value);
-int		add_new_env_var(t_env **env_lst, char **splitted);
-void	add_env_if_missing(t_env **env, char ***splitted, char *has_value);
-void	append_to_env_value(t_env *var, char ***splitted);
-void	print_export_vars(t_env *env);
-int		process_export_argument(char **splitted, t_exec *exec, char *arg);
+// void	update_existing_var(t_env *var, char ***splitted, char *has_value);
+// int		add_new_env_var(t_env **env_lst, char **splitted);
+// void	add_env_if_missing(t_env **env, char ***splitted, char *has_value);
+// void	append_to_env_value(t_env *var, char ***splitted);
+// int		process_export_argument(char **splitted, t_exec *exec, char *arg);
 int		ft_export(char **av, t_exec *exec);
+int		export_add_node(t_env **env_lst, char **splitted);
+void	export_add_to_env(t_env **env, char ***splitted, char *has_value);
+void	export_replace(t_env *var, char ***splitted, char *has_value);
+int		export_valid_identifier(char *s);
+char	*copy_str_n(char *dest, const char *src, size_t n);
+void	print_export_vars(t_env *env_list);
+char	*export_strcpy(char *dest, const char *src);
+int		handle_export_logic(char **splitted, t_exec *exec, char *arg);
+void	export_print(t_env *env);
+void	export_append(t_env *var, char ***splitted);
+
+
+
 
 
 

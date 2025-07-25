@@ -3,35 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: oussama-elk <oussama-elk@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 05:10:15 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 12:00:35 by oussama-elk      ###   ########.fr       */
+/*   Updated: 2025/07/24 23:13:41 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <dirent.h>
 
-// void	print_open_fds(void)
-// {
-// 	DIR				*dir;
-// 	struct dirent	*ent;
-// 	int				count = 0;
+int	g_exit_status = 0;
 
-// 	dir = opendir("/dev/fd");
-// 	if (!dir)
-// 	{
-// 		perror("opendir");
-// 		return ;
-// 	}
-// 	while ((ent = readdir(dir)))
-// 	{
-// 		count++;
-// 	}
-// 	closedir(dir);
-// 	printf("🔍 Open FDs: %d\n", count - 2); // exclude . and ..
-// }
+
+void	print_token(t_token *token)
+{
+	while (token)
+	{
+		printf("TOKEN [%s] | TYPE [%d] | space[%d] | quote[%d]\n", token->token, token->type, token->space, token->quote);
+		token = token->next;
+	}
+}
 
 static void	reset_std_fd(int stdin_fd, int stdout_fd)
 {
@@ -62,18 +53,15 @@ static bool	process_input(char *input, t_env **envr)
 	cmd = NULL;
 	if (!parsing_function(&token, input, &cmd, envr))
 		return (cleanup(token, cmd, input), false);
+	print_token(token);
 	exec.env_lst = *envr;
 	exec.is_pipe = (cmd && cmd->next);
 	if (!check_heredocs(cmd, *envr))
 		return (cleanup(token, cmd, input), false);
 	if (builtin_check_execute(cmd, &exec, envr) == 1)
 		return (cleanup(token, cmd, input), false);
-	// printf("before exec\n");
-	// print_open_fds();
 	if (!execution_main(&exec, cmd, *envr))
 		write_error(8);
-	// printf("after exec\n");
-	// print_open_fds();
 	cleanup(token, cmd, input);
 	return (true);
 }
@@ -102,6 +90,7 @@ int	main(int argc, char **argv, char **env)
 			continue ;
 		process_input(input, &envr);
 		reset_std_fd(stdin_fd, stdout_fd);
+		system("leaks -q minishell");
 	}
 	free_env(envr);
 	return (0);

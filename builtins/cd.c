@@ -6,7 +6,7 @@
 /*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:28:16 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 06:17:09 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:42:36 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ int	ft_cd(char **args, t_env **env_ptr)
 			1);
 	if (is_dash)
 		ft_putendl_fd(target, 1);
-	update_pwd_vars(env, target, old_path);
+	update_pwd_vars(env, old_path);
 	g_exit_status = 0;
 	free(old_path);
 	free(target);

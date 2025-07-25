@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_builtin.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:02:55 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 01:23:12 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:38:06 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	run_builtin(t_cmd *cmd, t_env **env, t_exec *exec)
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 		result = ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "export") == 0)
-		result = ft_export(cmd->args, env);
+		result = ft_export(cmd->args, exec);
 	else if (ft_strcmp(cmd->args[0], "unset") == 0)
 		result = ft_unset(cmd->args, env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)

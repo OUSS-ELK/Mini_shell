@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_main.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 13:49:34 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/20 11:20:54 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/24 23:24:54 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ int	execution_main(t_exec *exec, t_cmd *cmd_list, t_env *env)
 	prev_pipe_read = STDIN_FILENO;
 	while (cmd_list)
 	{
-		if (!cmd_list->args || !cmd_list->args[0]
-			|| cmd_list->args[0][0] == '\0')
+		if (!cmd_list->args || !cmd_list->args[0])
+			/*|| cmd_list->args[0][0] == '\0'*/
 		{
 			cmd_list = cmd_list->next;
 			continue ;

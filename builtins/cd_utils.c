@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 08:50:18 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/21 08:50:29 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:29:24 by ouelkhar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char	*ft_getenv_value(t_env *env, char *key)
 	return (NULL);
 }
 
-void	update_pwd_vars(t_env *env, char *new_path, char *old_path)
+void	update_pwd_vars(t_env *env, char *old_path)
 {
 	t_env	*oldpwd;
 	t_env	*pwd;
