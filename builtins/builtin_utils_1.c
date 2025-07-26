@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:03:33 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/21 09:08:34 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/26 07:00:49 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int	builtin_check_execute(t_cmd *cmd, t_exec *exec, t_env **env)
 			return (1);
 		}
 		builtin_reset_fds(exec);
-		return (1);
+		return (g_exit_status);
 	}
 	return (0);
 }

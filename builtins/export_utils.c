@@ -3,20 +3,40 @@
 /*                                                        :::      ::::::::   */
 /*   export_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 00:32:21 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 15:30:27 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/26 07:07:21 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
+static int	alloc_value_part(char **rendu, char *var, int start)
+{
+	int	val_len;
+
+	if (var[start - 1] != '=')
+	{
+		rendu[1] = NULL;
+		return (0);
+	}
+	val_len = strlen(var + start);
+	rendu[1] = malloc(sizeof(char) * (val_len + 1));
+	if (!rendu[1])
+	{
+		free(rendu[0]);
+		free(rendu);
+		return (1);
+	}
+	export_strcpy(rendu[1], var + start);
+	return (0);
+}
+
 char	**alloc_export_split(char *var)
 {
 	char	**rendu;
 	int		key_len;
-	int		val_len;
 	int		start;
 
 	key_len = 0;
@@ -31,11 +51,8 @@ char	**alloc_export_split(char *var)
 		return (free(rendu), NULL);
 	copy_str_n(rendu[0], var, key_len);
 	rendu[0][key_len] = '\0';
-	val_len = strlen(var + start);
-	rendu[1] = malloc(sizeof(char) * (val_len + 1));
-	if (!rendu[1])
-		return (free(rendu[0]), free(rendu), NULL);
-	export_strcpy(rendu[1], var + start);
+	if (alloc_value_part(rendu, var, start))
+		return (NULL);
 	return (rendu);
 }
 
@@ -65,29 +82,4 @@ void	export_replace(t_env *var, char ***splitted, char *has_value)
 	free((*splitted)[0]);
 	free(*splitted);
 	*splitted = NULL;
-}
-
-int	export_add_node(t_env **env_lst, char **splitted)
-{
-	t_env	*new;
-	t_env	*head;
-
-	if (!env_lst || !splitted)
-		return (0);
-	new = malloc(sizeof(t_env));
-	if (!new)
-		return (0);
-	new->key = splitted[0];
-	new->value = splitted[1];
-	new->next = NULL;
-	if (!(*env_lst))
-		*env_lst = new;
-	else
-	{
-		head = *env_lst;
-		while (head->next)
-			head = head->next;
-		head->next = new;
-	}
-	return (1);
 }

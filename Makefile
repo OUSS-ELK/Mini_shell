@@ -1,22 +1,25 @@
 NAME = minishell
 CC = cc
+READLINE = /goinfre/bel-abde/homebrew/opt/readline
+CFLAGS = -Wall -Wextra -Werror -I. -Ilibft -I$(READLINE)/include
+LDFLAGS = -Llibft -lft -L$(READLINE)/lib -lreadline
 
-# Paths to Homebrew readline installation
-BREW_READLINE = /goinfre/ouelkhar/homebrew/opt/readline
-#-fsanitize=address
-# werror
-CFLAGS = -Wall -Wextra -Werror -I. -Ilibft -I$(BREW_READLINE)/include
-LDFLAGS = -Llibft -lft -L$(BREW_READLINE)/lib -lreadline
-
-SRC_DIRS = parsing exec builtins
-
-# Exclude specific files
-# EXCLUDED_FILES = builtins/export.c builtins/export_utils.c
-
-# Collect source files, filtering out excluded ones from SRC_DIRS
 SRC = main.c \
+	parsing/cleaning.c parsing/environement.c parsing/environement_2.c \
+	parsing/expand_handling.c parsing/expand_quote.c parsing/expand.c \
+	parsing/helper_function.c parsing/helper_function2.c parsing/lexing.c \
+	parsing/main_parsing.c parsing/parsing_helper.c parsing/parsing.c \
+	parsing/quote_handling.c parsing/quote_helper.c parsing/word_opearator_handle.c \
+	builtins/builtin_utils_1.c builtins/builtin_utils_2.c builtins/builtin_utils_3.c \
+	builtins/cd_utils.c builtins/cd_utils_2.c builtins/cd.c \
+	builtins/echo.c builtins/env.c builtins/exit.c \
+	builtins/export_utils.c builtins/export_utils_2.c builtins/export_utils_3.c builtins/export.c \
+	builtins/main_builtin.c builtins/pwd.c builtins/unset_utils.c builtins/unset.c \
+	exec/exec_redir.c exec/execution_child_utils.c exec/execution_child.c \
+	exec/execution_main.c exec/expand_heredoc.c exec/heredoc_helper.c exec/heredoc.c \
+	exec/path_resolver.c exec/path_splitter.c exec/utils.c exec/utils_2.c \
+	exec/utils_3.c exec/utils_4.c exec/utils_5.c \
 	get_next_line.c get_next_line_utils.c \
-	$(filter-out $(EXCLUDED_FILES), $(shell find $(SRC_DIRS) -name '*.c'))
 
 OBJ = $(SRC:.c=.o)
 LIBFT = libft/libft.a
@@ -29,7 +32,7 @@ $(NAME): $(LIBFT) $(OBJ)
 $(LIBFT):
 	make -C libft
 
-%.o: %.c
+%.o: %.c minishell.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
@@ -41,3 +44,5 @@ fclean: clean
 	make fclean -C libft
 
 re: fclean all
+
+.PHONY: all clean fclean re

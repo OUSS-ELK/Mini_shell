@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 10:18:33 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 15:37:36 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/26 07:02:29 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,17 @@ int	handle_export_logic(char **splitted, t_exec *exec, char *arg)
 		var = var->next;
 	if (!var)
 	{
+		if (splitted[1] == NULL)
+		{
+			free(splitted[0]);
+			free(splitted);
+			return (1);
+		}
 		if (!export_add_node(&(exec->env_lst), splitted))
 		{
 			free(splitted[0]);
 			free(splitted[1]);
-			free(splitted);
-			return (0);
+			return (free(splitted), 0);
 		}
 	}
 	else if (ft_strchr(arg, '=') && *(ft_strchr(arg, '=') - 1) == '+')
@@ -91,7 +96,8 @@ int	ft_export(char **av, t_exec *exec)
 			continue ;
 		}
 		splitted = split_export_arg(av[i]);
-		if (!splitted || !handle_export_logic(splitted, exec, av[i]))
+		if (!splitted || !handle_export_logic(splitted, exec, av[i])
+			|| !splitted[1])
 			error = 1;
 	}
 	return (error);

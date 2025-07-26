@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 08:53:54 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/21 13:13:02 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/26 07:20:14 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	exit_free_env(t_env **env)
 static void	print_and_exit(t_env **env)
 {
 	g_exit_status = 255;
-	write(2, EXIT_ERROR, 32);
+	write(2, "exit: numeric argument required\n", 32);
 	exit_free_env(env);
 	exit(g_exit_status);
 }
@@ -91,7 +91,6 @@ int	ft_exit(t_cmd *cmd, t_env **env)
 		handle_exit_with_arg(cmd, env);
 	else
 	{
-		g_exit_status = 0;
 		exit_free_env(env);
 		exit(g_exit_status);
 	}

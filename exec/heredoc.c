@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:09:51 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 03:24:30 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/26 06:29:34 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ int	check_heredocs(t_cmd *first_cmd, t_env *env_lst)
 	t_cmd	*cmd;
 	t_redir	*last_heredoc;
 
-	g_exit_status = 0;
 	cmd = first_cmd;
 	if (!cmd)
 		return (1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_main.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 13:49:34 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/24 23:24:54 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/26 07:16:55 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ static void	handle_process(t_exec *exec, t_cmd *cmd_list, int *prev_pipe_read,
 	pid = fork();
 	if (pid == -1)
 	{
-		perror("mnshll: fork");
 		g_exit_status = 1;
+		perror("mnshll: fork");
 		return ;
 	}
 	if (pid == 0)
@@ -41,7 +41,6 @@ int	execution_main(t_exec *exec, t_cmd *cmd_list, t_env *env)
 	while (cmd_list)
 	{
 		if (!cmd_list->args || !cmd_list->args[0])
-			/*|| cmd_list->args[0][0] == '\0'*/
 		{
 			cmd_list = cmd_list->next;
 			continue ;
@@ -62,6 +61,7 @@ void	get_last_status(pid_t last_pid)
 	int		status;
 	pid_t	pid;
 	int		last_status;
+	int		sig;
 
 	last_status = 0;
 	pid = wait(&status);
@@ -73,10 +73,11 @@ void	get_last_status(pid_t last_pid)
 				last_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
 			{
-				if (WTERMSIG(status) == SIGPIPE)
+				sig = WTERMSIG(status);
+				if (sig == SIGPIPE)
 					last_status = 0;
 				else
-					last_status = 128 + WTERMSIG(status);
+					last_status = 128 + sig;
 			}
 		}
 		pid = wait(&status);

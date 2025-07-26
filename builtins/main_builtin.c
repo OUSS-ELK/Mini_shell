@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_builtin.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:02:55 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 15:38:06 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/26 07:09:21 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,5 @@ int	run_builtin(t_cmd *cmd, t_env **env, t_exec *exec)
 	else if (ft_strcmp(cmd->args[0], "exit") == 0)
 		result = ft_exit(cmd, env);
 	g_exit_status = result;
-	return (1);
+	return (g_exit_status);
 }
