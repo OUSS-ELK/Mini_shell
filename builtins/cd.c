@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ouelkhar <ouelkhar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:28:16 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/23 15:42:36 by ouelkhar         ###   ########.fr       */
+/*   Updated: 2025/07/26 01:19:24 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,13 @@ char	*expand_tilde(char *input, t_env *env)
 	return (expanded);
 }
 
-int	resolve_cd_home_or_oldpwd(char **args, t_env *env, char **target,
-		char *old_path)
+int	resolve_cd_home_or_oldpwd(char **args, t_env *env, char **target)
 {
 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
 	{
 		*target = ft_getenv_value(env, "HOME");
 		if (!*target)
 		{
-			free(old_path);
 			write(2, "minishell: cd: HOME not set\n", 29);
 			return (1);
 		}
@@ -45,7 +43,6 @@ int	resolve_cd_home_or_oldpwd(char **args, t_env *env, char **target,
 		*target = ft_getenv_value(env, "OLDPWD");
 		if (!*target)
 		{
-			free(old_path);
 			write(2, "minishell: cd: OLDPWD not set\n", 31);
 			return (1);
 		}
@@ -56,19 +53,53 @@ int	resolve_cd_home_or_oldpwd(char **args, t_env *env, char **target,
 	return (0);
 }
 
+// int	resolve_cd_home_or_oldpwd(char **args, t_env *env, char **target,
+// 		char *old_path)
+// {
+// 	if (!args[1] || ft_strcmp(args[1], "~") == 0)
+// 	{
+// 		*target = ft_getenv_value(env, "HOME");
+// 		if (!*target)
+// 		{
+// 			if (old_path)
+// 				free(old_path);
+// 			write(2, " BBBBBBBBBB minishell: cd: HOME not set\n", 29);
+// 			return (1);
+// 		}
+// 		*target = ft_strdup(*target);
+// 	}
+// 	else if (ft_strcmp(args[1], "-") == 0)
+// 	{
+// 		*target = ft_getenv_value(env, "OLDPWD");
+// 		if (!*target)
+// 		{
+// 			if (old_path)
+// 				free(old_path);
+// 			write(2, "minishell: cd: OLDPWD not set\n", 31);
+// 			return (1);
+// 		}
+// 		*target = ft_strdup(*target);
+// 	}
+// 	else
+// 		return (-1);
+// 	return (0);
+// }
+
 int	resolve_cd_target(char **args, t_env *env, char **target, char *old_path)
 {
 	char	*tmp;
 	int		ret;
 
-	ret = resolve_cd_home_or_oldpwd(args, env, target, old_path);
+	ret = resolve_cd_home_or_oldpwd(args, env, target); //
 	if (ret != -1)
 		return (ret);
+	printf("DKHOLTI HNA\n");
 	tmp = expand_tilde(args[1], env);
 	if (!tmp)
 	{
-		free(old_path);
-		write(2, "minishell: cd: HOME not set\n", 29);
+			if (old_path)
+				free(old_path);
+		write(2, " AJUIIIIIIII minishell: cd: HOME not set\n", 29);
 		return (1);
 	}
 	*target = tmp;
@@ -98,7 +129,22 @@ int	ft_cd(char **args, t_env **env_ptr)
 			g_exit_status = 1, 1);
 	old_path = get_old_path(env);
 	if (!old_path)
-		return (perror("getcwd"), g_exit_status = 1, 1);
+	{
+		if (!args[1])
+		{
+			printf("AAAAAAAAAAAAAAA\n");
+			target = ft_strdup("/");
+			if (!target)
+				return (perror("malloc"), g_exit_status = 1, 1);
+			if (chdir(target) != 0)
+				return (perror(target), free(target), g_exit_status = 1, 1);
+			ft_putendl_fd(target, 1);
+			g_exit_status = 0;
+			free(target);
+			return (0);
+		}
+		return (perror("getcwd"), g_exit_status = 1, 1);	
+	}
 	if (resolve_cd_target(args, env, &target, old_path))
 		return (free(old_path), g_exit_status = 1, 1);
 	is_dash = (args[1] && ft_strcmp(args[1], "-") == 0);
