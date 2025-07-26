@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 10:00:31 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/26 06:24:18 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 02:34:55 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,7 @@ static void	exec_builtin(t_cmd *cmd, t_env *env, t_exec *exec)
 	if (cmd && cmd->args && cmd->args[0] && is_builtin(cmd) == 1)
 	{
 		if (run_builtin(cmd, &env, exec))
-		{
 			exit(g_exit_status);
-		}
 	}
 }
 

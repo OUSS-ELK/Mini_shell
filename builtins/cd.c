@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/27 22:28:16 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/26 06:59:50 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/26 08:44:26 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,46 +117,3 @@ int	ft_cd(char **args, t_env **env_ptr)
 	}
 	return (cd_change_dir(args, env, old_path));
 }
-
-// int	ft_cd(char **args, t_env **env_ptr)
-// {
-// 	t_env	*env;
-// 	char	*target;
-// 	char	*old_path;
-// 	int		is_dash;
-
-// 	env = *env_ptr;
-// 	if (get_args_count(args) > 2)
-// 		return (write(2, "minishell: cd: too many arguments\n", 34),
-// 			g_exit_status = 1, 1);
-// 	old_path = get_old_path(env);
-// 	if (!old_path)
-// 	{
-// 		if (!args[1])
-// 		{
-// 			target = ft_strdup("/");
-// 			if (!target)
-// 				return (perror("malloc"), g_exit_status = 1, 1);
-// 			if (chdir(target) != 0)
-// 				return (perror(target), free(target), g_exit_status = 1, 1);
-// 			ft_putendl_fd(target, 1);
-// 			g_exit_status = 0;
-// 			free(target);
-// 			return (0);
-// 		}
-// 		return (perror("getcwd"), g_exit_status = 1, 1);	
-// 	}
-// 	if (resolve_cd_target(args, env, &target, old_path))
-// 		return (free(old_path), g_exit_status = 1, 1);
-// 	is_dash = (args[1] && ft_strcmp(args[1], "-") == 0);
-// 	if (chdir(target) != 0)
-// 		return (perror(target), free(target), free(old_path), g_exit_status = 1,
-// 			1);
-// 	if (is_dash)
-// 		ft_putendl_fd(target, 1);
-// 	update_pwd_vars(env, old_path);
-// 	g_exit_status = 0;
-// 	free(old_path);
-// 	free(target);
-// 	return (0);
-// }

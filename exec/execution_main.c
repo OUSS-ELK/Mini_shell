@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/06 13:49:34 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/26 07:16:55 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/26 08:54:44 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ static void	handle_process(t_exec *exec, t_cmd *cmd_list, int *prev_pipe_read,
 	pid = fork();
 	if (pid == -1)
 	{
-		g_exit_status = 1;
 		perror("mnshll: fork");
+		g_exit_status = 1;
 		return ;
 	}
 	if (pid == 0)
@@ -61,7 +61,6 @@ void	get_last_status(pid_t last_pid)
 	int		status;
 	pid_t	pid;
 	int		last_status;
-	int		sig;
 
 	last_status = 0;
 	pid = wait(&status);
@@ -73,11 +72,10 @@ void	get_last_status(pid_t last_pid)
 				last_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
 			{
-				sig = WTERMSIG(status);
-				if (sig == SIGPIPE)
+				if (WTERMSIG(status) == SIGPIPE)
 					last_status = 0;
 				else
-					last_status = 128 + sig;
+					last_status = 128 + WTERMSIG(status);
 			}
 		}
 		pid = wait(&status);

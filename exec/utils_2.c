@@ -6,7 +6,7 @@
 /*   By: bel-abde <bel-abde@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 02:25:06 by bel-abde          #+#    #+#             */
-/*   Updated: 2025/07/26 07:32:32 by bel-abde         ###   ########.fr       */
+/*   Updated: 2025/07/23 02:34:38 by bel-abde         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ int	create_pipe(t_exec *exec)
 
 void	custom_error(char *cmd, char *error, int status)
 {
-	g_exit_status = status;
 	write(2, "mnshell: ", 9);
 	if (cmd)
 	{

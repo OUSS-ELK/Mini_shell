@@ -1,6 +1,6 @@
 NAME = minishell
 CC = cc
-READLINE = /goinfre/bel-abde/homebrew/opt/readline
+READLINE = /goinfre/ouelkhar/homebrew/opt/readline
 CFLAGS = -Wall -Wextra -Werror -I. -Ilibft -I$(READLINE)/include
 LDFLAGS = -Llibft -lft -L$(READLINE)/lib -lreadline
 
